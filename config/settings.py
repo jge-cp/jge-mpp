@@ -148,9 +148,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
+
+# Only include static/ directory if it exists (optional for custom static files)
+_static_dir = BASE_DIR / 'static'
+STATICFILES_DIRS = [_static_dir] if _static_dir.exists() else []
+
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files (user uploads)
@@ -187,9 +189,7 @@ UNFOLD = {
         "image": None,
         "redirect_after": None,
     },
-    "STYLES": [
-        "admin/css/admin_fixes.css",
-    ],
+    "STYLES": [],
     "SCRIPTS": [],
 }
 
