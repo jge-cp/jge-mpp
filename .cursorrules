@@ -160,36 +160,13 @@ The `is_historic` field on FA is for legacy data imports:
 
 ## Git & Version Control
 
-### Using GitHub MCP (REQUIRED - Primary Method)
-This project uses GitHub MCP tools as the PRIMARY method for all git operations. This is more reliable than terminal commands, especially when the Django server is running.
-
-**ALWAYS use GitHub MCP tools for git operations:**
-- `mcp_github_push_files` - Push file changes to GitHub
-- `mcp_github_create_or_update_file` - Create or update a single file
-- `mcp_github_list_commits` - View commit history
-- `mcp_github_get_file_contents` - Read file from GitHub
-
-### Why GitHub MCP over Terminal?
-1. **Terminal can fail** when Django server (`python manage.py runserver`) is running
-2. **GitHub MCP works reliably** regardless of what's running in the terminal
-3. **Direct API access** bypasses shell environment issues
-4. **Error: `spawn /bin/bash ENOENT`** - This means terminal is blocked; use GitHub MCP instead
-
-### GitHub CLI (Secondary Method)
-Use GitHub CLI (`gh`) commands directly in terminal ONLY when:
-- No Django server is running
-- Terminal environment is available
-- Simple read operations (status, log)
-
+### Standard Git Workflow
+Use normal git commands in the terminal:
 ```bash
-# Check authentication
-gh auth status
-
-# View repository info
-gh repo view
-
-# Create a pull request
-gh pr create --title "Title" --body "Description"
+git status                    # Check what's changed
+git add .                     # Stage all changes
+git commit -m "message"       # Commit
+git push origin main          # Push to GitHub
 ```
 
 ### Repository Info
@@ -198,11 +175,21 @@ gh pr create --title "Title" --body "Description"
 - **Main Branch**: main
 - **Remote**: origin
 
+### Troubleshooting
+- **`spawn /bin/bash ENOENT` error**: Restart Cursor - this is a session glitch
+- **SSL certificate errors**: Use `required_permissions: ["all"]` for push commands
+- **`xcrun_db` warnings**: Ignore - harmless macOS noise
+- **Push rejected (fetch first)**: Run `git pull origin main --rebase` then push again
+
+### GitHub MCP Tools (Backup)
+If terminal is completely broken, GitHub MCP tools can be used as a fallback:
+- `mcp_github_push_files` - Push files directly via API
+- `mcp_github_get_file_contents` - Read files from GitHub
+
 ## Don't Do
 - Don't use "printer" terminology - use "partner"
 - Don't use company-specific names (1947, Crye) - use generic terms
 - Don't add RM Supplier, FP Supplier, Government roles - removed from MVP
 - Don't modify `.env` without asking user first
 - Don't create new documentation files at root - put in `Docs/`
-- Don't use terminal git commands when Django server is running - use GitHub MCP instead
 
