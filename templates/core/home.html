@@ -1,68 +1,381 @@
-{% extends 'base.html' %}
+{% extends 'base_marketing.html' %} {% block title %}MultiCam® - Combat Proven
+Camouflage{% endblock %} {% block content %}
+<!-- Hero Section -->
+<section
+  class="grain-bg relative min-h-[70vh] flex items-center overflow-hidden"
+>
+  <div
+    class="absolute inset-0 bg-black"
+  ></div>
+  <div class="relative z-10 w-full px-8 lg:px-16">
+    <h1
+      class="font-heading text-[80px] md:text-[130px] lg:text-[165px] font-bold text-white tracking-tight leading-none"
+    >
+      COMBAT PROVEN
+    </h1>
+  </div>
+</section>
 
-{% block title %}Home - Multicam Partner Portal{% endblock %}
+<!-- The Patterns Section -->
+<section class="bg-black grain-bg">
+  <div class="grid grid-cols-1 lg:grid-cols-2 min-h-screen">
+    <!-- Left: Text Content -->
+    <div class="flex flex-col justify-center px-8 lg:px-16 py-24">
+      <h1
+        class="font-heading text-[50px] md:text-[63px] lg:text-[80px] font-bold text-white mb-4 leading-none"
+      >
+        THE PATTERNS
+      </h1>
+      <h2 class="font-heading text-[30px] md:text-[39px] text-gray-500 mb-16">
+        COMBAT PROVEN
+      </h2>
 
-{% block content %}
-<div class="px-4 py-12">
-    <div class="text-center max-w-3xl mx-auto">
-        <!-- Logo -->
-        <div class="w-24 h-24 bg-gradient-to-br from-multicam-olive to-multicam-green rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-lg border border-multicam-olive/50">
-            <span class="text-white font-bold text-3xl">MC</span>
+      <h3 class="font-heading text-[30px] text-white mb-6">ABOUT</h3>
+      <p
+        class="text-gray-400 font-body leading-relaxed"
+        style="font-size: 24px"
+      >
+        MultiCam® is the combat-proven solution for concealment when one needs
+        to operate in widely varied and mixed terrain. While MultiCam® is suited
+        to an extremely wide selection of environments, we have developed three
+        other patterns that are optimized for narrower areas of operation.
+        MultiCam® can be used alone or in conjunction with MultiCam® Alpine,
+        MultiCam® Arid, or MultiCam® Tropic to meet nearly any operational
+        requirement.
+      </p>
+    </div>
+
+    <!-- Right: Pattern Card -->
+    <div class="flex items-center justify-center px-8 lg:px-16 py-24">
+      <div
+        class="w-full aspect-[4/3] bg-multicam-darker rounded-2xl flex items-center justify-center border border-white/5 m-8"
+      >
+        <span
+          class="font-heading font-bold text-[50px] md:text-[63px] text-white tracking-tight"
+          >MULTICAM</span
+        >
+      </div>
+    </div>
+  </div>
+
+  <!-- Pattern Grid - Full Width -->
+  <div class="grid grid-cols-2 md:grid-cols-5">
+    <div
+      class="aspect-square bg-gradient-to-br from-multicam-sand to-multicam-olive flex items-end p-6 rounded-tl-2xl"
+    >
+      <span class="font-heading text-sm md:text-base text-white drop-shadow-lg"
+        >MULTICAM®</span
+      >
+    </div>
+    <div
+      class="aspect-square bg-gradient-to-br from-green-800 to-green-900 flex items-end p-6"
+    >
+      <span class="font-heading text-sm md:text-base text-white drop-shadow-lg"
+        >MULTICAM® TROPIC</span
+      >
+    </div>
+    <div
+      class="aspect-square bg-gradient-to-br from-amber-700 to-amber-900 flex items-end p-6"
+    >
+      <span class="font-heading text-sm md:text-base text-white drop-shadow-lg"
+        >MULTICAM® ARID</span
+      >
+    </div>
+    <div
+      class="aspect-square bg-gradient-to-br from-gray-200 to-gray-400 flex items-end p-6"
+    >
+      <span
+        class="font-heading text-sm md:text-base text-gray-800 drop-shadow-lg"
+        >MULTICAM® ALPINE</span
+      >
+    </div>
+    <div
+      class="aspect-square bg-gradient-to-br from-gray-800 to-black flex items-end p-6 col-span-2 md:col-span-1 rounded-tr-2xl"
+    >
+      <span class="font-heading text-sm md:text-base text-white drop-shadow-lg"
+        >MULTICAM® BLACK</span
+      >
+    </div>
+  </div>
+</section>
+
+<!-- Concept Section -->
+<section class="bg-black grain-bg">
+  <div class="grid grid-cols-1 lg:grid-cols-2 min-h-screen">
+    <!-- Left: Text Content -->
+    <div class="flex flex-col justify-center px-8 lg:px-16 py-24">
+      <h1
+        class="font-heading text-[50px] md:text-[63px] lg:text-[80px] font-bold text-white mb-2 leading-none"
+      >
+        CONCEPT
+      </h1>
+      <h2 class="font-heading text-[30px] md:text-[39px] text-gray-500 mb-20">
+        ADAPTIVE SOLUTIONS
+      </h2>
+
+      <p
+        class="text-gray-400 font-body leading-relaxed"
+        style="font-size: 24px"
+      >
+        The MultiCam® patterns were developed to provide maximum effectiveness
+        across diverse operating environments with a minimum logistical burden.
+        The patterns all have distinct roles but are designed to work together
+        as a system to meet the needs of nearly any operating environment, all
+        while helping the wearer do so with the least amount of kit possible.
+      </p>
+    </div>
+
+    <!-- Right: Effectiveness Visualization (simplified) -->
+    <div
+      class="flex items-center justify-center px-8 lg:px-16 py-24"
+    >
+      <div class="w-full bg-white/5 rounded-2xl p-8">
+        <div class="w-full">
+          <div class="space-y-6">
+            <div
+              class="flex items-center justify-end gap-4 text-sm text-gray-500 font-body"
+            >
+              <span>Effectiveness</span>
+            </div>
+
+            <div
+              class="flex justify-between text-sm text-gray-500 font-body pt-6 border-t border-white/10"
+            >
+              <span>Tundra</span>
+              <span>Desert</span>
+              <span>Temperate</span>
+              <span>Woodland</span>
+              <span>Jungle</span>
+            </div>
+          </div>
         </div>
-        
-        <h1 class="text-4xl font-bold mb-4">Multicam Partner Portal</h1>
-        <p class="text-xl text-secondary mb-8">
-            Manage First Article Inspections, Lot Acceptances, and Production Reporting
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- A Family of Patterns Section -->
+<section class="bg-black grain-bg">
+  <div class="grid grid-cols-1 lg:grid-cols-2 min-h-screen">
+    <!-- Left: Circles Visual -->
+    <div class="px-8 lg:px-16 py-24 flex items-center">
+    <div
+      class="relative bg-gradient-to-br from-multicam-olive/20 to-multicam-green/20 min-h-[500px] w-full rounded-2xl"
+    >
+      <div class="absolute inset-0 flex items-center justify-center">
+        <div class="relative w-full h-full">
+          <!-- Concentric circles only -->
+          <div
+            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 border border-multicam-sand/30 rounded-full"
+          ></div>
+          <div
+            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 border border-multicam-sand/40 rounded-full"
+          ></div>
+          <div
+            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 border border-multicam-sand/50 rounded-full"
+          ></div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <!-- Right: Text Content -->
+    <div class="flex flex-col justify-center px-8 lg:px-16 py-24">
+      <h1
+        class="font-heading text-[50px] md:text-[63px] lg:text-[80px] font-bold text-white leading-tight mb-16"
+      >
+        A FAMILY OF<br />CAMOUFLAGE<br />PATTERNS
+      </h1>
+
+      <p
+        class="text-gray-400 font-body leading-relaxed"
+        style="font-size: 24px"
+      >
+        The same user now has more system-level options. For instance, a
+        MultiCam® chest rig can be paired with a MultiCam Tropic™ uniform for a
+        known jungle deployment. Similarly, a MultiCam® vest and pack can be
+        paired with a MultiCam Arid™ uniform for activity within an open sand
+        and rock desert. MultiCam Alpine™ is best suited for any environment
+        that encounters significant snowfall, while MultiCam Black™ is designed
+        to offer domestic agencies a distinct and authoritative presence suited
+        to law enforcement operations.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="bg-black grain-bg">
+  <div class="grid grid-cols-1 lg:grid-cols-2 min-h-screen">
+    <!-- Left: Text Content -->
+    <div class="flex flex-col justify-center px-8 lg:px-16 py-24">
+      <h1
+        class="font-heading text-[50px] md:text-[63px] lg:text-[80px] font-bold text-white mb-12 leading-none"
+      >
+        HOW IT WORKS
+      </h1>
+
+      <!-- Three Feature Boxes - All same size -->
+      <div class="flex gap-4 mb-8 w-full">
+        <!-- Feature Box 1 -->
+        <div class="flex-1 flex flex-col items-center">
+          <div class="w-full h-44 flex flex-col items-center justify-center bg-multicam-dark rounded-2xl border border-white/10">
+            <svg
+              class="w-10 h-10 text-gray-400 mb-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1"
+                d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"
+              ></path>
+            </svg>
+            <span class="block text-center text-gray-200 font-semibold">High-Resolution</span>
+          </div>
+        </div>
+        <!-- Feature Box 2 -->
+        <div class="flex-1 flex flex-col items-center">
+          <div class="w-full h-44 flex flex-col items-center justify-center bg-multicam-dark rounded-2xl border border-white/10">
+            <svg
+              class="w-10 h-10 text-gray-400 mb-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+              ></path>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+              ></path>
+            </svg>
+            <span class="block text-center text-gray-200 font-semibold">Neural Filling-in</span>
+          </div>
+        </div>
+        <!-- Feature Box 3 -->
+        <div class="flex-1 flex flex-col items-center">
+          <div class="w-full h-44 flex flex-col items-center justify-center bg-multicam-dark rounded-2xl border border-white/10">
+            <svg
+              class="w-10 h-10 text-gray-400 mb-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1"
+                d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+              ></path>
+            </svg>
+            <span class="block text-center text-gray-200 font-semibold">Biomimetic Design</span>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="space-y-8">
+        <p
+          class="text-gray-400 font-body leading-relaxed"
+          style="font-size: 24px"
+        >
+          MultiCam® patterns take advantage of the way the human eye and brain
+          perceive shape, volume, and color. Since only a very small portion of
+          the human eye perceives color, the brain does a lot of "filling-in"
+          for the eye. The unique high resolution design of MultiCam® takes
+          advantage of this principle and helps the observer to "see" the
+          pattern as part of the background.
         </p>
-        
-        {% if user.is_authenticated %}
-            <a href="{% url 'dashboard:dashboard_router' %}" class="btn-primary text-lg px-8 py-3 inline-flex items-center">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path>
-                </svg>
-                Go to Dashboard
-            </a>
-        {% else %}
-            <a href="{% url 'accounts:login' %}" class="btn-primary text-lg px-8 py-3 inline-flex items-center">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
-                </svg>
-                Sign In
-            </a>
-        {% endif %}
+
+        <p
+          class="text-gray-400 font-body leading-relaxed"
+          style="font-size: 24px"
+        >
+          The MultiCam® family of patterns rely more on a blending effect than a
+          traditional contrast effect to disguise the wearer. This effect allows
+          them to perform well in a wide range of environmental conditions. It
+          also helps maintain the patterns' effectiveness even at close ranges
+          where low resolution patterns often stand out against the natural
+          (non-pixelated) environment.
+        </p>
+      </div>
     </div>
-    
-    <!-- Features Section -->
-    <div class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-        <div class="card p-6 text-center">
-            <div class="icon-container w-14 h-14 bg-primary-100 dark:bg-primary-900/30 border-primary-200 dark:border-primary-700 mx-auto mb-4">
-                <svg class="w-7 h-7 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
-                </svg>
-            </div>
-            <h3 class="text-lg font-semibold mb-2">First Article Inspections</h3>
-            <p class="text-sm text-muted">Submit and track First Article approval through two-stage inspection process</p>
-        </div>
-        
-        <div class="card p-6 text-center">
-            <div class="icon-container w-14 h-14 bg-green-100 dark:bg-green-900/30 border-green-200 dark:border-green-700 mx-auto mb-4">
-                <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                </svg>
-            </div>
-            <h3 class="text-lg font-semibold mb-2">Lot Acceptances</h3>
-            <p class="text-sm text-muted">Submit production lots for quality inspection and approval</p>
-        </div>
-        
-        <div class="card p-6 text-center">
-            <div class="icon-container w-14 h-14 bg-purple-100 dark:bg-purple-900/30 border-purple-200 dark:border-purple-700 mx-auto mb-4">
-                <svg class="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
-            </div>
-            <h3 class="text-lg font-semibold mb-2">Production Reporting</h3>
-            <p class="text-sm text-muted">Monthly production reports for license fee calculation</p>
-        </div>
+
+    <!-- Right: Images -->
+    <div class="px-8 lg:px-16 py-24 flex items-center">
+      <div class="grid grid-rows-2 gap-4 w-full">
+        <div
+          class="bg-gradient-to-br from-multicam-sand/40 to-multicam-olive/40 rounded-2xl h-64"
+        ></div>
+        <div
+          class="bg-gradient-to-br from-multicam-green/40 to-multicam-brown/40 rounded-2xl h-64"
+        ></div>
+      </div>
     </div>
-</div>
+  </div>
+</section>
+
+<!-- How It Was Developed Section -->
+<section class="bg-black grain-bg">
+  <div class="grid grid-cols-1 lg:grid-cols-2 min-h-screen">
+    <!-- Left: Text Content -->
+    <div class="flex flex-col justify-center px-8 lg:px-16 py-24">
+      <h1
+        class="font-heading text-[50px] md:text-[63px] lg:text-[80px] font-bold text-white leading-tight mb-20"
+      >
+        HOW MULTICAM<br />WAS DEVELOPED
+      </h1>
+
+      <div class="space-y-8">
+        <p
+          class="text-gray-400 font-body leading-relaxed"
+          style="font-size: 24px"
+        >
+          We spent a lot of time studying how camouflage works in nature, taking
+          into account where it is hardest to hide. We also studied which
+          terrain elements were most common across the widest range of
+          environments. We documented how light affects environmental features
+          and tracked the seasonal and elevational changes in different regions.
+        </p>
+
+        <p
+          class="text-gray-400 font-body leading-relaxed"
+          style="font-size: 24px"
+        >
+          We then factored all that together into digital composites of our
+          observations and began testing them. We spent extensive time
+          discussing our approach with users, factoring in their observations
+          and concerns. Digital images where then created, encompassing
+          everything we had learned. After printing each pattern, we field
+          tested, tuned, and re-tested them until we achieved exactly what we
+          were looking for.
+        </p>
+      </div>
+    </div>
+
+    <!-- Right: Images -->
+    <div class="px-8 lg:px-16 py-24 flex items-center">
+      <div class="grid grid-rows-3 gap-4 w-full">
+        <div
+          class="bg-gradient-to-br from-multicam-olive/30 to-multicam-sand/30 rounded-2xl h-48"
+        ></div>
+        <div
+          class="bg-gradient-to-br from-amber-800/30 to-amber-600/30 rounded-2xl h-48"
+        ></div>
+        <div
+          class="bg-gradient-to-br from-multicam-brown/30 to-multicam-green/30 rounded-2xl h-48"
+        ></div>
+      </div>
+    </div>
+  </div>
+</section>
 {% endblock %}
