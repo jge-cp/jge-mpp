@@ -4,8 +4,12 @@ from . import views
 app_name = 'core'
 
 urlpatterns = [
-    # Public pages
+    # Public marketing pages
     path('', views.home, name='home'),
+    path('patterns/', views.patterns, name='patterns'),
+    path('gallery/', views.gallery, name='gallery'),
+    path('faq/', views.faq, name='faq'),
+    path('suppliers/', views.suppliers, name='suppliers'),
     path('about/', views.about, name='about'),
     path('contact/', views.contact, name='contact'),
     

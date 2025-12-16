@@ -1,115 +1,100 @@
-{% load static %}
 <!DOCTYPE html>
-<html lang="en" x-data="{ darkMode: $persist(false) }" :class="{ 'dark': darkMode }">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Multicam Partner Portal{% endblock %}</title>
+    <title>{% block title %}MultiCam® - Combat Proven Camouflage{% endblock %}</title>
     
-    <!-- Google Fonts -->
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        multicam: {
+                            sand: '#C4B396',
+                            olive: '#5C5844',
+                            brown: '#6B5C4A',
+                            green: '#4A5442',
+                            tan: '#D4C5A9',
+                            dark: '#1a1a1a',
+                            darker: '#0d0d0d',
+                        }
+                    },
+                    fontFamily: {
+                        heading: ['"Roboto Condensed"', 'sans-serif'],
+                        body: ['"Roboto Mono"', 'monospace'],
+                    },
+                    fontSize: {
+                        /* Golden ratio 1.618 scale from 24px base */
+                        'body': ['24px', { lineHeight: '1.6' }],
+                        'h6': ['39px', { lineHeight: '1.3' }],
+                        'h5': ['50px', { lineHeight: '1.2' }],
+                        'h4': ['63px', { lineHeight: '1.1' }],
+                        'h3': ['80px', { lineHeight: '1.1' }],
+                        'h2': ['102px', { lineHeight: '1.0' }],
+                        'h1': ['130px', { lineHeight: '0.95' }],
+                        'hero': ['165px', { lineHeight: '0.9' }],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&family=Roboto+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&family=Roboto+Mono:wght@300;400;500&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS (via CDN for development) -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Flowbite CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" rel="stylesheet" />
     
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
-    <!-- Flowbite -->
-    <link href="https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.js"></script>
-    
-    <!-- Alpine.js Persist Plugin -->
-    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
-    
     <style>
-        /* Custom MultiCam color palette */
-        :root {
-            --multicam-sand: #C4B396;
-            --multicam-tan: #D4C4A8;
-            --multicam-olive: #5C5F3D;
-            --multicam-green: #4A5335;
-            --multicam-brown: #6B5742;
-            --multicam-dark: #1a1a1a;
-            --multicam-darker: #0d0d0d;
+        [x-cloak] { display: none !important; }
+        
+        body {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 24px;
+            line-height: 1.6;
         }
         
-        /* Tailwind config extensions */
-        @layer utilities {
-            .text-multicam-sand { color: var(--multicam-sand); }
-            .text-multicam-tan { color: var(--multicam-tan); }
-            .text-multicam-olive { color: var(--multicam-olive); }
-            .text-multicam-green { color: var(--multicam-green); }
-            .text-multicam-brown { color: var(--multicam-brown); }
-            .bg-multicam-sand { background-color: var(--multicam-sand); }
-            .bg-multicam-tan { background-color: var(--multicam-tan); }
-            .bg-multicam-olive { background-color: var(--multicam-olive); }
-            .bg-multicam-green { background-color: var(--multicam-green); }
-            .bg-multicam-brown { background-color: var(--multicam-brown); }
-            .bg-multicam-dark { background-color: var(--multicam-dark); }
-            .bg-multicam-darker { background-color: var(--multicam-darker); }
-            .border-multicam-sand { border-color: var(--multicam-sand); }
-            .from-multicam-sand { --tw-gradient-from: var(--multicam-sand); }
-            .from-multicam-olive { --tw-gradient-from: var(--multicam-olive); }
-            .from-multicam-green { --tw-gradient-from: var(--multicam-green); }
-            .from-multicam-brown { --tw-gradient-from: var(--multicam-brown); }
-            .to-multicam-sand { --tw-gradient-to: var(--multicam-sand); }
-            .to-multicam-olive { --tw-gradient-to: var(--multicam-olive); }
-            .to-multicam-green { --tw-gradient-to: var(--multicam-green); }
-            .to-multicam-brown { --tw-gradient-to: var(--multicam-brown); }
-            .hover\:bg-multicam-tan:hover { background-color: var(--multicam-tan); }
-            .hover\:text-multicam-sand:hover { color: var(--multicam-sand); }
-            .hover\:text-multicam-tan:hover { color: var(--multicam-tan); }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Roboto Condensed', sans-serif;
+            text-transform: uppercase;
         }
         
-        /* Dark theme grain texture overlay */
+        h1 {
+            font-weight: 700;
+        }
+        
+        h2, h3, h4, h5, h6 {
+            font-weight: 400;
+        }
+        
+        /* Grain texture overlay */
+        .grain-bg {
+            position: relative;
+        }
         .grain-bg::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
             opacity: 0.03;
             pointer-events: none;
-            z-index: 0;
+            z-index: 1;
         }
-        
-        .grain-bg {
+        .grain-bg > * {
             position: relative;
-        }
-        
-        /* Custom fonts */
-        .font-heading {
-            font-family: 'Roboto Condensed', sans-serif;
-        }
-        
-        .font-body {
-            font-family: 'Roboto Mono', monospace;
-        }
-        
-        /* Typography scale using golden ratio (1.618) based on 24px paragraph */
-        .h1-marketing {
-            font-size: 80px;  /* 24 * 1.618^4 ≈ 80 */
-        }
-        
-        .h2-marketing {
-            font-size: 50px;  /* 24 * 1.618^3 ≈ 50 */
-        }
-        
-        .h3-marketing {
-            font-size: 30px;  /* 24 * 1.618^2 ≈ 39, but using 30 for FAQ */
-        }
-        
-        .h4-marketing {
-            font-size: 24px;  /* Base paragraph size */
-        }
-        
-        .p-marketing {
-            font-size: 24px;  /* Base size */
+            z-index: 2;
         }
         
         /* Nav link underline animation */
@@ -134,15 +119,18 @@
             width: 100%;
         }
         
-        /* Dark background */
-        body {
-            background-color: var(--multicam-darker);
+        /* FAQ accordion styling */
+        .faq-item {
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .faq-item:last-child {
+            border-bottom: none;
         }
     </style>
     
-    {% block extra_css %}{% endblock %}
+    {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-black text-white">
+<body class="bg-multicam-darker text-gray-100 min-h-screen font-body">
     <!-- Sticky Navigation -->
     <nav x-data="{ mobileOpen: false }" class="fixed top-0 left-0 right-0 z-50 bg-multicam-darker/95 backdrop-blur-md border-b border-white/10">
         <div class="px-8 lg:px-16">
@@ -200,59 +188,69 @@
         </div>
     </nav>
     
-    <!-- Main Content with top padding for fixed nav -->
-    <main class="pt-20">
+    <!-- Main Content -->
+    <main class="pt-16">
         {% block content %}{% endblock %}
     </main>
     
     <!-- Footer -->
-    <footer class="bg-black border-t border-white/10 py-16 grain-bg">
+    <footer class="bg-black border-t border-white/10 py-16">
         <div class="px-8 lg:px-16">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-                <!-- Combat Proven -->
-                <div>
-                    <h3 class="font-heading font-bold text-2xl mb-6 text-white">COMBAT PROVEN</h3>
-                    <a href="{% url 'core:contact' %}" class="inline-block px-6 py-3 bg-multicam-sand text-multicam-darker font-heading font-bold text-sm uppercase tracking-wide hover:bg-multicam-tan transition-colors rounded-lg">
-                        GET IN TOUCH
-                    </a>
-                </div>
-                
+            <!-- Combat Proven + Get in Touch -->
+            <div class="mb-12">
+                <h2 class="font-heading font-bold text-4xl text-white mb-4">COMBAT PROVEN</h2>
+                <a href="{% url 'core:contact' %}" class="inline-block px-6 py-3 bg-multicam-sand text-multicam-darker font-heading font-bold text-sm uppercase tracking-wide hover:bg-multicam-tan transition-colors rounded-lg">
+                    GET IN TOUCH
+                </a>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
                 <!-- Contact -->
                 <div>
-                    <h4 class="font-heading font-bold text-lg mb-4 text-gray-400">CONTACT</h4>
-                    <div class="space-y-2 text-gray-500 font-body text-sm">
+                    <h3 class="font-heading text-lg text-multicam-sand mb-4">CONTACT</h3>
+                    <address class="not-italic text-gray-400 text-base space-y-1 font-body" style="font-size: 16px;">
                         <p>63 Flushing Ave. Unit 252</p>
                         <p>Brooklyn, NY 11205</p>
                         <p>P. 929-575-4518</p>
                         <p>F. 929-575-4518</p>
-                        <a href="{% url 'core:contact' %}" class="text-multicam-sand hover:text-multicam-tan transition-colors">Contact</a>
-                    </div>
+                        <a href="{% url 'core:contact' %}" class="text-multicam-sand hover:text-multicam-tan block mt-2">Contact</a>
+                    </address>
                 </div>
                 
                 <!-- Links -->
                 <div>
-                    <h4 class="font-heading font-bold text-lg mb-4 text-gray-400">LINKS</h4>
-                    <ul class="space-y-2 text-gray-500 font-body text-sm">
-                        <li><a href="{% url 'core:home' %}" class="hover:text-multicam-sand transition-colors">Home</a></li>
-                        <li><a href="{% url 'core:patterns' %}" class="hover:text-multicam-sand transition-colors">Patterns</a></li>
-                        <li><a href="{% url 'core:gallery' %}" class="hover:text-multicam-sand transition-colors">Gallery</a></li>
-                        <li><a href="{% url 'core:faq' %}" class="hover:text-multicam-sand transition-colors">FAQ</a></li>
-                        <li><a href="{% url 'core:suppliers' %}" class="hover:text-multicam-sand transition-colors">MultiCam Suppliers</a></li>
+                    <h3 class="font-heading text-lg text-multicam-sand mb-4">LINKS</h3>
+                    <ul class="space-y-2 text-base font-body" style="font-size: 16px;">
+                        <li><a href="{% url 'core:home' %}" class="text-gray-400 hover:text-multicam-sand transition-colors">Home</a></li>
+                        <li><a href="{% url 'core:patterns' %}" class="text-gray-400 hover:text-multicam-sand transition-colors">Patterns</a></li>
+                        <li><a href="{% url 'core:gallery' %}" class="text-gray-400 hover:text-multicam-sand transition-colors">Gallery</a></li>
+                        <li><a href="{% url 'core:faq' %}" class="text-gray-400 hover:text-multicam-sand transition-colors">FAQ</a></li>
+                        <li><a href="{% url 'core:suppliers' %}" class="text-gray-400 hover:text-multicam-sand transition-colors">MultiCam Suppliers</a></li>
                     </ul>
                 </div>
                 
                 <!-- Legal -->
                 <div>
-                    <h4 class="font-heading font-bold text-lg mb-4 text-gray-400">LEGAL</h4>
-                    <ul class="space-y-2 text-gray-500 font-body text-sm">
-                        <li><a href="#" class="hover:text-multicam-sand transition-colors">Terms of Use & Privacy</a></li>
-                        <li><a href="#" class="hover:text-multicam-sand transition-colors">Accessibility</a></li>
+                    <h3 class="font-heading text-lg text-multicam-sand mb-4">LEGAL</h3>
+                    <ul class="space-y-2 text-base font-body" style="font-size: 16px;">
+                        <li><a href="#" class="text-gray-400 hover:text-multicam-sand transition-colors">Terms of Use & Privacy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-multicam-sand transition-colors">Accessibility</a></li>
                     </ul>
                 </div>
+                
+                <!-- Logo -->
+                <div class="flex flex-col items-start md:items-end">
+                    <span class="font-heading font-bold text-4xl text-white tracking-tight">MULTICAM</span>
+                </div>
+            </div>
+            
+            <div class="mt-12 pt-8 border-t border-white/10 text-gray-500 font-body" style="font-size: 16px;">
+                <p>&copy; {% now "Y" %} MultiCam®. All rights reserved.</p>
             </div>
         </div>
     </footer>
     
-    {% block extra_js %}{% endblock %}
+    <!-- Flowbite JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
 </body>
 </html>

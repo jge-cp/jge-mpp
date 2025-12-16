@@ -9,8 +9,28 @@ from inspections.models import FirstArticleInspection
 
 
 def home(request):
-    """Public homepage"""
+    """Public marketing homepage"""
     return render(request, 'core/home.html')
+
+
+def patterns(request):
+    """Patterns page"""
+    return render(request, 'core/patterns.html')
+
+
+def gallery(request):
+    """Gallery page"""
+    return render(request, 'core/gallery.html')
+
+
+def faq(request):
+    """FAQ page"""
+    return render(request, 'core/faq.html')
+
+
+def suppliers(request):
+    """MultiCam Suppliers page"""
+    return render(request, 'core/suppliers.html')
 
 
 def about(request):

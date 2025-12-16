@@ -2,7 +2,7 @@
 
 ## What This Portal Replaces
 
-This Django-based portal replaces **3,000+ Google Sheets** used to manage the Multicam Partner Program:
+Django-based portal Multicam Partner Program:
 
 - **38 First Article (FA) workbooks** - One per partner, tracking fabric/camouflage approval submissions
 - **38 Lot Acceptance workbooks** - One per partner, tracking production lot submissions

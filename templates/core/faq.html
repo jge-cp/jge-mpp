@@ -1,0 +1,320 @@
+{% extends 'base_marketing.html' %}
+
+{% block title %}F.A.Q. - MultiCam®{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="grain-bg relative min-h-[40vh] flex items-center overflow-hidden bg-black">
+    <div class="absolute inset-0 bg-gradient-to-r from-black via-black to-transparent"></div>
+    <div class="relative z-10 w-full px-8 lg:px-16">
+        <h1 class="font-heading text-[80px] md:text-[130px] lg:text-[165px] font-bold text-white tracking-tight leading-none">F.A.Q.</h1>
+    </div>
+</section>
+
+<!-- Customer FAQ Section -->
+<section class="bg-black grain-bg py-24">
+    <div class="px-8 lg:px-16">
+        <h1 class="font-heading text-[39px] md:text-[50px] font-bold text-multicam-sand mb-16">CUSTOMER F.A.Q.</h1>
+        
+        <div x-data="{ open: null }" class="max-w-5xl">
+            <!-- FAQ Item 1 -->
+            <div class="faq-item py-8">
+                <button @click="open = open === 1 ? null : 1" class="w-full text-left flex items-center justify-between group">
+                    <span class="font-heading text-[30px] text-white group-hover:text-multicam-sand transition-colors leading-tight">HOW CAN I GET MULTICAM®?</span>
+                    <svg class="w-6 h-6 text-multicam-sand transition-transform flex-shrink-0 ml-4" :class="{ 'rotate-180': open === 1 }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="open === 1" x-collapse class="mt-6">
+                    <p class="text-gray-400 font-body leading-relaxed" style="font-size: 24px;">
+                        MultiCam® is available in a wide range of end items sold by hundreds of companies, both direct from their own websites, and on third party reseller websites. If you're interested in incorporating MultiCam® raw materials (such as fabric, hydrographic film, etc.) into your own end items, you can buy them from any of our authorized raw material providers, an updated list of which can be found here. In each of these two cases, you do not need to enter into a license with Crye. If, on the other hand, you want to make your own MultiCam® raw materials, then you can become a licensed raw material producer (or have a company you already work with become one). Please contact us at legal@cryeprecision.com to begin this process.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- FAQ Item 2 -->
+            <div class="faq-item py-8">
+                <button @click="open = open === 2 ? null : 2" class="w-full text-left flex items-center justify-between group">
+                    <span class="font-heading text-[30px] text-white group-hover:text-multicam-sand transition-colors leading-tight">HOW MANY TYPES OF MULTICAM® PATTERNS ARE THERE?</span>
+                    <svg class="w-6 h-6 text-multicam-sand transition-transform flex-shrink-0 ml-4" :class="{ 'rotate-180': open === 2 }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="open === 2" x-collapse class="mt-6">
+                    <p class="text-gray-400 font-body leading-relaxed" style="font-size: 24px;">
+                        The original MultiCam® design was created in the early 2000's, and since then, have designed four MultiCam® variants, optimized for specific environments. They are Tropic, Arid, Alpine and Black. Additionally, we've created a number of other bespoke MultiCam® patterns for specific countries, including the British Multi-Terrain Pattern (MTP), the Australian MultiCam® Pattern (AMP), the Irish Transitional MultiCam Pattern (ITMP), the Denmark MultiCam Pattern (DMP) and others.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- FAQ Item 3 -->
+            <div class="faq-item py-8">
+                <button @click="open = open === 3 ? null : 3" class="w-full text-left flex items-center justify-between group">
+                    <span class="font-heading text-[30px] text-white group-hover:text-multicam-sand transition-colors leading-tight">WHO IS USING MULTICAM®?</span>
+                    <svg class="w-6 h-6 text-multicam-sand transition-transform flex-shrink-0 ml-4" :class="{ 'rotate-180': open === 3 }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="open === 3" x-collapse class="mt-6">
+                    <p class="text-gray-400 font-body leading-relaxed" style="font-size: 24px;">
+                        MultiCam® is the chosen pattern of U.S. Special Operations Forces, who's rapid deployment capabilities call for effective concealment across many different environments. MultiCam® has been adopted for use by all or portions of the armed forces of many countries, including, but not limited to, the United States, Canada, the United Kingdom, the Netherlands, Poland, Belgium, Denmark, Australia, New Zealand, Peru, Chile, Israel and many others. MultiCam® and its variants are also used domestically and internationally by many federal agencies, elite SWAT and law enforcement units.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- FAQ Item 4 -->
+            <div class="faq-item py-8">
+                <button @click="open = open === 4 ? null : 4" class="w-full text-left flex items-center justify-between group">
+                    <span class="font-heading text-[30px] text-white group-hover:text-multicam-sand transition-colors leading-tight">I'D LIKE TO HAVE CRYE DEVELOP A CUSTOM CAMOUFLAGE FOR MY COUNTRY OR COMPANY. WHAT ARE THE NEXT STEPS?</span>
+                    <svg class="w-6 h-6 text-multicam-sand transition-transform flex-shrink-0 ml-4" :class="{ 'rotate-180': open === 4 }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="open === 4" x-collapse class="mt-6">
+                    <p class="text-gray-400 font-body leading-relaxed" style="font-size: 24px;">
+                        Our Concealment Solutions Program (CSP™) team can work with you to develop a custom bespoke camouflage pattern based on your requirements. Please contact legal@cryeprecision.com to learn more and begin the assessment phase.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- FAQ Item 5 -->
+            <div class="faq-item py-8">
+                <button @click="open = open === 5 ? null : 5" class="w-full text-left flex items-center justify-between group">
+                    <span class="font-heading text-[30px] text-white group-hover:text-multicam-sand transition-colors leading-tight">WHAT TYPES OF MATERIALS IS MULTICAM® AVAILABLE ON?</span>
+                    <svg class="w-6 h-6 text-multicam-sand transition-transform flex-shrink-0 ml-4" :class="{ 'rotate-180': open === 5 }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="open === 5" x-collapse class="mt-6">
+                    <p class="text-gray-400 font-body leading-relaxed" style="font-size: 24px;">
+                        MultiCam® is available in a variety of fabrics, webbings, trims, adhesive vinyl, hydrographic film, anodized aluminum and more. Please visit this page to see a full list of our licensed raw material producers located around the world.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- FAQ Item 6 -->
+            <div class="faq-item py-8">
+                <button @click="open = open === 6 ? null : 6" class="w-full text-left flex items-center justify-between group">
+                    <span class="font-heading text-[30px] text-white group-hover:text-multicam-sand transition-colors leading-tight">HOW CAN I TELL IF AN END ITEM OR RAW MATERIAL IS "AUTHENTIC" OR "GENUINE" MULTICAM?</span>
+                    <svg class="w-6 h-6 text-multicam-sand transition-transform flex-shrink-0 ml-4" :class="{ 'rotate-180': open === 6 }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="open === 6" x-collapse class="mt-6">
+                    <p class="text-gray-400 font-body leading-relaxed" style="font-size: 24px;">
+                        Well… imitation is the sincerest form of flattery, right? Unfortunately, there are many companies and individuals around the world who are seeking to inappropriately and illegally profit off of our brand. While the only way to be certain that you are purchasing authentic MultiCam® is by reaching out to us directly to seek confirmation about a particular seller, some general tips would also include (i) avoiding purchasing products in MultiCam-like patterns that do not use the word "MultiCam®" specifically; (ii) looking for physical hangtags and other official MultiCam® marketing materials in the advertising of those products; and (iii) verifying that the materials you are buying are coming from a licensed raw material provider.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- FAQ Item 7 -->
+            <div class="faq-item py-8">
+                <button @click="open = open === 7 ? null : 7" class="w-full text-left flex items-center justify-between group">
+                    <span class="font-heading text-[30px] text-white group-hover:text-multicam-sand transition-colors leading-tight">ARE MULTICAM® FABRICS TREATED FOR NEAR INFRARED (NIR) SIGNATURE MANAGEMENT?</span>
+                    <svg class="w-6 h-6 text-multicam-sand transition-transform flex-shrink-0 ml-4" :class="{ 'rotate-180': open === 7 }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="open === 7" x-collapse class="mt-6">
+                    <p class="text-gray-400 font-body leading-relaxed" style="font-size: 24px;">
+                        Yes. Nearly all MultiCam® fabrics are carefully printed to tune the reflectance for both the visible and nIR spectrums. For applications where nIR performance is not req, we have developed VS™ versions of the patterns which are tuned for the Visible Spectrum only.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- FAQ Item 8 -->
+            <div class="faq-item py-8">
+                <button @click="open = open === 8 ? null : 8" class="w-full text-left flex items-center justify-between group">
+                    <span class="font-heading text-[30px] text-white group-hover:text-multicam-sand transition-colors leading-tight">WHAT ABOUT SWIR AND THERMAL?</span>
+                    <svg class="w-6 h-6 text-multicam-sand transition-transform flex-shrink-0 ml-4" :class="{ 'rotate-180': open === 8 }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="open === 8" x-collapse class="mt-6">
+                    <p class="text-gray-400 font-body leading-relaxed" style="font-size: 24px;">
+                        We have several developments ongoing to defeat detection in the SWIR, MWIR, and LWIR spectrums. Many of these are controlled and/or confidential technologies. To find out more, please contact gregg@cryeprecision.com.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- FAQ Item 9 -->
+            <div class="faq-item py-8">
+                <button @click="open = open === 9 ? null : 9" class="w-full text-left flex items-center justify-between group">
+                    <span class="font-heading text-[30px] text-white group-hover:text-multicam-sand transition-colors leading-tight">IS MULTICAM® USED FOR HUNTING PURPOSES?</span>
+                    <svg class="w-6 h-6 text-multicam-sand transition-transform flex-shrink-0 ml-4" :class="{ 'rotate-180': open === 9 }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="open === 9" x-collapse class="mt-6">
+                    <p class="text-gray-400 font-body leading-relaxed" style="font-size: 24px;">
+                        Yes. Although we focus on supporting military needs, we often receive support letters from customers who hunt with MultiCam® patterns and swear by its performance.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Licensee FAQ Section -->
+<section class="bg-black grain-bg py-24">
+    <div class="px-8 lg:px-16">
+        <h1 class="font-heading text-[39px] md:text-[50px] font-bold text-multicam-sand mb-16">LICENSEE F.A.Q.</h1>
+        
+        <div x-data="{ open: null }" class="max-w-5xl">
+            <!-- Licensee FAQ Item 1 -->
+            <div class="faq-item py-8">
+                <button @click="open = open === 10 ? null : 10" class="w-full text-left flex items-center justify-between group">
+                    <span class="font-heading text-[30px] text-white group-hover:text-multicam-sand transition-colors leading-tight">HOW DO I GET AUTHORIZATION TO PRINT MULTICAM® OR APPLY IT TO MY OWN MATERIALS?</span>
+                    <svg class="w-6 h-6 text-multicam-sand transition-transform flex-shrink-0 ml-4" :class="{ 'rotate-180': open === 10 }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="open === 10" x-collapse class="mt-6">
+                    <p class="text-gray-400 font-body leading-relaxed" style="font-size: 24px;">
+                        We have a systematic approach to licensing printers to reproduce MultiCam® on fabrics, anodized metals, vinyl, and many other substrates. We are happy to discuss how you would like to apply MultiCam® to your materials, and begin the process.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Licensee FAQ Item 2 -->
+            <div class="faq-item py-8">
+                <button @click="open = open === 11 ? null : 11" class="w-full text-left flex items-center justify-between group">
+                    <span class="font-heading text-[30px] text-white group-hover:text-multicam-sand transition-colors leading-tight">I AM AN END-ITEM MANUFACTURER AND I WOULD LIKE TO INCORPORATE MULTICAM® RAW MATERIALS INTO MY PRODUCTS. DO I NEED A LICENSE?</span>
+                    <svg class="w-6 h-6 text-multicam-sand transition-transform flex-shrink-0 ml-4" :class="{ 'rotate-180': open === 11 }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="open === 11" x-collapse class="mt-6">
+                    <p class="text-gray-400 font-body leading-relaxed" style="font-size: 24px;">
+                        Generally speaking, if you are buying raw materials from an existing licensed MultiCam® source, you can integrate those raw materials with your own manufactured products without the need to enter into a license agreement with us. If our existing raw material sources do not meet your particular manufacturing needs and/or you have a unique application, then please contact us to discuss a licensing arrangement that works best for your operation.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Licensee FAQ Item 3 -->
+            <div class="faq-item py-8">
+                <button @click="open = open === 12 ? null : 12" class="w-full text-left flex items-center justify-between group">
+                    <span class="font-heading text-[30px] text-white group-hover:text-multicam-sand transition-colors leading-tight">DOES THE COMPANY PROVIDE ANY MARKETING SUPPORT FOR MY MULTICAM® PRODUCTS?</span>
+                    <svg class="w-6 h-6 text-multicam-sand transition-transform flex-shrink-0 ml-4" :class="{ 'rotate-180': open === 12 }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="open === 12" x-collapse class="mt-6">
+                    <p class="text-gray-400 font-body leading-relaxed" style="font-size: 24px;">
+                        Yes. We currently feature end-items and other unique products on our various social media platforms, and additionally promote our licensees and raw material producers on our website. If you'd like to have your product featured or otherwise engage with our marketing team, please contact marketing@cryeprecision.com.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Licensee FAQ Item 4 -->
+            <div class="faq-item py-8">
+                <button @click="open = open === 13 ? null : 13" class="w-full text-left flex items-center justify-between group">
+                    <span class="font-heading text-[30px] text-white group-hover:text-multicam-sand transition-colors leading-tight">IF I SELL MULTICAM® END PRODUCTS OR AM A MULTICAM® LICENSEE, WHAT ARE MY OBLIGATIONS TO MARK THE PRODUCTS, AND WHAT MARKETING MATERIALS WILL I BE GIVEN ACCESS TO?</span>
+                    <svg class="w-6 h-6 text-multicam-sand transition-transform flex-shrink-0 ml-4" :class="{ 'rotate-180': open === 13 }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="open === 13" x-collapse class="mt-6">
+                    <p class="text-gray-400 font-body leading-relaxed" style="font-size: 24px;">
+                        Please contact us to discuss your specific situation and requirements.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Hangtags Request Form Section -->
+<section class="bg-black grain-bg">
+    <div class="grid grid-cols-1 lg:grid-cols-3 min-h-screen">
+        <!-- Left: Title -->
+        <div class="flex flex-col justify-center px-8 lg:px-16 py-24">
+            <h1 class="font-heading text-[39px] md:text-[50px] lg:text-[63px] font-bold text-white leading-tight">
+                MULTICAM<br>HANGTAGS &<br>SEW-IN LABELS<br>REQUEST FORM
+            </h1>
+        </div>
+        
+        <!-- Right: Form -->
+        <div class="lg:col-span-2 px-8 lg:px-16 py-24">
+            <div class="bg-white/5 px-8 lg:px-12 py-16 rounded-2xl">
+            <h2 class="font-heading text-[30px] text-white mb-10">CONTACT INFO</h2>
+            
+            <form class="space-y-4 font-body" style="font-size: 18px;">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" placeholder="Company Name *" class="w-full px-4 py-4 bg-multicam-dark border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-multicam-sand rounded-lg">
+                    <input type="text" placeholder="First Name *" class="w-full px-4 py-4 bg-multicam-dark border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-multicam-sand rounded-lg">
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" placeholder="Address 1 *" class="w-full px-4 py-4 bg-multicam-dark border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-multicam-sand rounded-lg">
+                    <input type="text" placeholder="Last Name *" class="w-full px-4 py-4 bg-multicam-dark border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-multicam-sand rounded-lg">
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" placeholder="Address 2" class="w-full px-4 py-4 bg-multicam-dark border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-multicam-sand rounded-lg">
+                    <input type="text" placeholder="Phone *" class="w-full px-4 py-4 bg-multicam-dark border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-multicam-sand rounded-lg">
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" placeholder="City" class="w-full px-4 py-4 bg-multicam-dark border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-multicam-sand rounded-lg">
+                    <input type="text" placeholder="Fax" class="w-full px-4 py-4 bg-multicam-dark border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-multicam-sand rounded-lg">
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" placeholder="State/Province *" class="w-full px-4 py-4 bg-multicam-dark border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-multicam-sand rounded-lg">
+                    <input type="email" placeholder="Email *" class="w-full px-4 py-4 bg-multicam-dark border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-multicam-sand rounded-lg">
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" placeholder="Zip/Postal Code *" class="w-full px-4 py-4 bg-multicam-dark border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-multicam-sand rounded-lg">
+                    <div></div>
+                </div>
+                
+                <h2 class="font-heading text-[30px] text-white mt-16 mb-6">SHIP TO INFO</h2>
+                
+                <div class="flex items-center mb-8">
+                    <input type="checkbox" id="same_as_contact" class="w-5 h-5 bg-multicam-dark border-white/10 text-multicam-sand focus:ring-multicam-sand rounded">
+                    <label for="same_as_contact" class="ml-3 text-gray-400">Same as Contact Info</label>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" placeholder="Company Name *" class="w-full px-4 py-4 bg-multicam-dark border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-multicam-sand rounded-lg">
+                    <input type="text" placeholder="First Name *" class="w-full px-4 py-4 bg-multicam-dark border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-multicam-sand rounded-lg">
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" placeholder="Address 1 *" class="w-full px-4 py-4 bg-multicam-dark border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-multicam-sand rounded-lg">
+                    <input type="text" placeholder="Last Name *" class="w-full px-4 py-4 bg-multicam-dark border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-multicam-sand rounded-lg">
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" placeholder="Address 2" class="w-full px-4 py-4 bg-multicam-dark border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-multicam-sand rounded-lg">
+                    <input type="text" placeholder="Phone *" class="w-full px-4 py-4 bg-multicam-dark border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-multicam-sand rounded-lg">
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" placeholder="City" class="w-full px-4 py-4 bg-multicam-dark border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-multicam-sand rounded-lg">
+                    <input type="text" placeholder="Fax" class="w-full px-4 py-4 bg-multicam-dark border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-multicam-sand rounded-lg">
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" placeholder="State/Province *" class="w-full px-4 py-4 bg-multicam-dark border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-multicam-sand rounded-lg">
+                    <input type="email" placeholder="Email *" class="w-full px-4 py-4 bg-multicam-dark border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-multicam-sand rounded-lg">
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" placeholder="Zip/Postal Code *" class="w-full px-4 py-4 bg-multicam-dark border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-multicam-sand rounded-lg">
+                    <div></div>
+                </div>
+                
+                <div class="pt-10">
+                    <button type="submit" class="px-10 py-4 bg-multicam-sand text-multicam-darker font-heading font-bold uppercase tracking-wide hover:bg-multicam-tan transition-colors rounded-lg">
+                        SUBMIT
+                    </button>
+                </div>
+            </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
