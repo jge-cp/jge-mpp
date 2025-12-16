@@ -1,23 +1,73 @@
 # Multicam Partner Portal
 
-Django-based portal for managing the Multicam Partner Program
+Django-based portal for managing the Multicam Partner Program, replacing 3,000+ Google Sheets with a unified FA/Lot submission and review workflow.
 
 ## Quick Start
 
+### Automated Setup (Recommended)
+
+Clone the repository and run the setup script:
+
 ```bash
-# Setup (one time)
-source venv/bin/activate
+git clone https://github.com/Crye-Precision/multicam-partner-portal.git
+cd multicam-partner-portal
+```
+
+**Mac/Linux:**
+```bash
+./scripts/setup.sh --with-test-users
+```
+
+**Windows:**
+```cmd
+scripts\setup.bat /with-test-users
+```
+
+Then start the server:
+```bash
+source venv/bin/activate   # Windows: venv\Scripts\activate
+python manage.py runserver
+```
+
+Visit: **http://localhost:8000**
+
+### Manual Setup
+
+If you prefer to run commands manually:
+
+```bash
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate   # Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Setup database (SQLite for local dev)
 python manage.py migrate
 python manage.py load_initial_data
-python manage.py createsuperuser
+
+# Create test users (optional)
+python manage.py setup_test_users
 
 # Run server
 python manage.py runserver
 ```
 
-Visit: http://localhost:8000
-
 **No `.env` file needed for local development!**
+
+### Test Users
+
+If you ran setup with `--with-test-users`, use these credentials:
+
+| Username | Password | Role |
+|----------|----------|------|
+| partner | partner123 | Partner |
+| primary_inspector | primary_inspector123 | Primary Inspector |
+| final_inspector | final_inspector123 | Final Inspector |
+| staff | staff123 | Staff Executive |
+
+---
 
 ## MVP User Roles
 
@@ -65,14 +115,16 @@ Partner submits FA → Primary Inspector → Final Inspector → Approved
 ## Project Structure
 
 ```
-MCP-3/
+multicam-partner-portal/
 ├── config/          # Django settings
 ├── accounts/        # User auth & profiles
 ├── inspections/     # FA & Lot workflows
-├── dashboard/       # Dashboards
-├── core/            # Public pages
+├── notifications/   # Email & in-app notifications
+├── dashboard/       # Role-based dashboards
+├── core/            # Public pages & shared models
 ├── templates/       # HTML templates
-└── Docs/            # All documentation
+├── scripts/         # Setup scripts
+└── Docs/            # Documentation
 ```
 
 ## License
