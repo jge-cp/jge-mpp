@@ -158,10 +158,69 @@ The `is_historic` field on FA is for legacy data imports:
 - Historic FAs may have missing fields
 - Used when importing from old Google Sheets system
 
+## Git & Version Control
+
+### Using GitHub CLI (Required)
+This project uses GitHub CLI (`gh`) for all git operations to avoid terminal/shell issues in the development environment.
+
+**Important**: Always use `gh` commands instead of direct `git` commands when possible.
+
+### Common Git Operations
+```bash
+# Check status
+git status
+
+# Add files
+git add .
+# or specific files
+git add templates/
+
+# Commit changes
+git commit -m "Descriptive commit message"
+
+# Push to GitHub (using GitHub CLI)
+gh repo sync
+# or use git push
+git push origin main
+
+# Pull latest changes
+git pull origin main
+
+# Create a new branch
+git checkout -b feature-name
+
+# View commit history
+git log --oneline
+```
+
+### GitHub CLI Commands
+```bash
+# Check authentication
+gh auth status
+
+# View repository info
+gh repo view
+
+# Create a pull request
+gh pr create --title "Title" --body "Description"
+
+# List pull requests
+gh pr list
+
+# View issues
+gh issue list
+```
+
+### Repository Info
+- **Organization**: Crye-Precision
+- **Repository**: Private
+- **Main Branch**: main
+- **Remote**: origin
+
 ## Don't Do
 - Don't use "printer" terminology - use "partner"
 - Don't use company-specific names (1947, Crye) - use generic terms
 - Don't add RM Supplier, FP Supplier, Government roles - removed from MVP
 - Don't modify `.env` without asking user first
 - Don't create new documentation files at root - put in `Docs/`
-
+- Don't use direct git commands if GitHub CLI (`gh`) is available and appropriate
