@@ -1,6 +1,6 @@
 # Multicam Partner Portal
 
-Django-based portal for managing the Multicam Partner Program, replacing 3,000+ Google Sheets with a unified FA/Lot submission and review workflow.
+Django-based portal for managing the Multicam Partner Program
 
 ## Quick Start
 
