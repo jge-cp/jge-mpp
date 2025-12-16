@@ -1,0 +1,56 @@
+{% extends 'base_marketing.html' %}
+
+{% block title %}Gallery - MultiCam®{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="grain-bg relative min-h-[40vh] flex items-center overflow-hidden bg-black">
+    <div class="absolute inset-0 bg-gradient-to-r from-black via-black to-transparent"></div>
+    <div class="relative z-10 w-full px-8 lg:px-16">
+        <h1 class="font-heading text-[80px] md:text-[130px] lg:text-[165px] font-bold text-white tracking-tight leading-none">GALLERY</h1>
+    </div>
+</section>
+
+<!-- Gallery Grid -->
+<section class="bg-black grain-bg py-24">
+    <div class="px-8 lg:px-16">
+        <h2 class="font-heading text-[39px] md:text-[50px] text-multicam-sand mb-16">IN THE FIELD</h2>
+        
+        <!-- Gallery Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="aspect-[4/3] bg-gradient-to-br from-multicam-sand/40 to-multicam-olive/40 rounded-2xl"></div>
+            <div class="aspect-[4/3] bg-gradient-to-br from-green-800/40 to-green-900/40 rounded-2xl"></div>
+            <div class="aspect-[4/3] bg-gradient-to-br from-amber-700/40 to-amber-900/40 rounded-2xl"></div>
+            <div class="aspect-[4/3] bg-gradient-to-br from-multicam-olive/40 to-multicam-green/40 rounded-2xl"></div>
+            <div class="aspect-[4/3] bg-gradient-to-br from-multicam-brown/40 to-multicam-sand/40 rounded-2xl"></div>
+            <div class="aspect-[4/3] bg-gradient-to-br from-gray-800/40 to-black/40 rounded-2xl"></div>
+        </div>
+    </div>
+</section>
+
+<!-- Products Section -->
+<section class="bg-black grain-bg py-24">
+    <div class="px-8 lg:px-16">
+        <h2 class="font-heading text-[39px] md:text-[50px] text-multicam-sand mb-16">PRODUCTS</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="aspect-square bg-gradient-to-br from-multicam-sand/30 to-multicam-olive/30 rounded-2xl"></div>
+            <div class="aspect-square bg-gradient-to-br from-multicam-olive/30 to-multicam-green/30 rounded-2xl"></div>
+            <div class="aspect-square bg-gradient-to-br from-multicam-green/30 to-multicam-brown/30 rounded-2xl"></div>
+            <div class="aspect-square bg-gradient-to-br from-multicam-brown/30 to-multicam-sand/30 rounded-2xl"></div>
+        </div>
+    </div>
+</section>
+
+<!-- Development Section -->
+<section class="bg-black grain-bg py-24">
+    <div class="px-8 lg:px-16">
+        <h2 class="font-heading text-[39px] md:text-[50px] text-multicam-sand mb-16">DEVELOPMENT</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="aspect-video bg-gradient-to-br from-multicam-sand/20 to-multicam-olive/20 rounded-2xl"></div>
+            <div class="aspect-video bg-gradient-to-br from-multicam-olive/20 to-multicam-green/20 rounded-2xl"></div>
+        </div>
+    </div>
+</section>
+{% endblock %}
