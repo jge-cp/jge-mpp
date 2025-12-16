@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+
+{% block title %}Submit Monthly Report - Multicam Partner Portal{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-0">
+    <!-- Page Header -->
+    <div class="mb-8">
+        <nav class="flex mb-4" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="{% url 'dashboard:partner_dashboard' %}" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-white">
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+                        </svg>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400">Monthly Report</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">Submit Monthly Report</h1>
+        <p class="text-gray-600 dark:text-gray-400 mt-2">Report your production for license fee calculation.</p>
+    </div>
+    
+    <form method="post" class="card p-6 mb-8">
+        {% csrf_token %}
+        
+        {% if form.errors %}
+            <div class="mb-6 p-4 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span class="text-sm font-medium text-red-800 dark:text-red-300">Please correct the errors below.</span>
+                </div>
+            </div>
+        {% endif %}
+        
+        <!-- Reporting Period -->
+        <div class="mb-8">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">Reporting Period</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="form-label" for="{{ form.period_from.id_for_label }}">
+                        Period From <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.period_from }}
+                    {% if form.period_from.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.period_from.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="form-label" for="{{ form.period_to.id_for_label }}">
+                        Period To <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.period_to }}
+                    {% if form.period_to.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.period_to.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Billing Information -->
+        <div class="mb-8">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">Billing Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="form-label" for="{{ form.billing_date.id_for_label }}">
+                        Billing Date <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.billing_date }}
+                    {% if form.billing_date.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.billing_date.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="form-label" for="{{ form.billing_document_reference.id_for_label }}">
+                        Billing Document Reference
+                    </label>
+                    {{ form.billing_document_reference }}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Customer Information -->
+        <div class="mb-8">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">Customer Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="form-label" for="{{ form.customer_name.id_for_label }}">
+                        Customer Name <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.customer_name }}
+                    {% if form.customer_name.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.customer_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="form-label" for="{{ form.customer_po.id_for_label }}">
+                        Customer PO
+                    </label>
+                    {{ form.customer_po }}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Production Details -->
+        <div class="mb-8">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">Production Details</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="form-label" for="{{ form.lot_number.id_for_label }}">
+                        Lot Number
+                    </label>
+                    {{ form.lot_number }}
+                </div>
+                <div>
+                    <label class="form-label" for="{{ form.material_number.id_for_label }}">
+                        Material Number
+                    </label>
+                    {{ form.material_number }}
+                </div>
+                <div class="md:col-span-2">
+                    <label class="form-label" for="{{ form.fabric_type.id_for_label }}">
+                        Fabric Type <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.fabric_type }}
+                    {% if form.fabric_type.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.fabric_type.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="form-label" for="{{ form.mc_variant.id_for_label }}">
+                        MC Variant <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.mc_variant }}
+                    {% if form.mc_variant.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.mc_variant.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="form-label" for="{{ form.mpg_reference.id_for_label }}">
+                        Military/Gov Reference
+                    </label>
+                    {{ form.mpg_reference }}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Production Metrics -->
+        <div class="mb-8">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">Production Metrics</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="form-label" for="{{ form.yardage_produced.id_for_label }}">
+                        Yardage Produced <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.yardage_produced }}
+                    {% if form.yardage_produced.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.yardage_produced.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="form-label" for="{{ form.cuttable_width.id_for_label }}">
+                        Cuttable Width (inches)
+                    </label>
+                    {{ form.cuttable_width }}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Non-License Fee -->
+        <div class="mb-8">
+            <div class="flex items-center">
+                {{ form.non_license_fee_printing }}
+                <label class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100" for="{{ form.non_license_fee_printing.id_for_label }}">
+                    Non-license fee printing
+                </label>
+            </div>
+            <p class="text-gray-500 dark:text-gray-400 text-xs mt-1">Check if this is non-license fee printing.</p>
+        </div>
+        
+        <!-- Notes -->
+        <div class="mb-8">
+            <label class="form-label" for="{{ form.notes.id_for_label }}">
+                Additional Notes
+            </label>
+            {{ form.notes }}
+        </div>
+        
+        <!-- Form Actions -->
+        <div class="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <a href="{% url 'dashboard:partner_dashboard' %}" class="btn-secondary text-center">
+                Cancel
+            </a>
+            <button type="submit" class="btn-primary">
+                <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Submit Report
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

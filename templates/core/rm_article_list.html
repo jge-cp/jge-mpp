@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}My Articles - Multicam Partner Portal{% endblock %}
+
+{% block content %}
+<div class="px-4 py-6">
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Registered Articles</h1>
+            <p class="text-gray-600 mt-1">Your registered raw materials</p>
+        </div>
+        <a href="{% url 'core:rm_new_article' %}" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded">
+            + Register New Article
+        </a>
+    </div>
+    
+    <div class="bg-white shadow overflow-hidden sm:rounded-md">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Composition</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Construction</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Weight</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TDS</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for article in articles %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="font-medium text-gray-900">{{ article.product_name }}</div>
+                            {% if article.product_code %}
+                                <div class="text-sm text-gray-500">{{ article.product_code }}</div>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {{ article.composition }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {{ article.get_construction_display }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {{ article.get_weight_group_display }}
+                            {% if article.weight_value %}
+                                <br><span class="text-xs">{{ article.weight_value }} oz/yd²</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            {% with current_tds=article.tds_documents.filter|first %}
+                                {% if article.tds_documents.exists %}
+                                    <a href="{{ article.tds_documents.first.file.url }}" class="text-blue-600 hover:underline" target="_blank">
+                                        Download
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'core:rm_upload_tds' %}?article={{ article.pk }}" class="text-orange-600 hover:underline">
+                                        Upload
+                                    </a>
+                                {% endif %}
+                            {% endwith %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 text-xs rounded-full 
+                                {% if article.status == 'active' %}bg-green-100 text-green-800
+                                {% elif article.status == 'pending' %}bg-yellow-100 text-yellow-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ article.get_status_display }}
+                            </span>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                            No articles registered yet. <a href="{% url 'core:rm_new_article' %}" class="text-blue-600 hover:underline">Register your first article</a>.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+

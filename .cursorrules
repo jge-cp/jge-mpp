@@ -1,0 +1,167 @@
+# Multicam Partner Portal - Project Context
+
+## Project Overview
+Django-based portal replacing 3,000+ Google Sheets for the Multicam Partner Program. Handles First Article (FA) submissions and Lot Acceptances with a two-stage inspection workflow.
+
+## Technology Stack
+- **Backend**: Django 5.x, PostgreSQL (prod), SQLite (dev)
+- **Frontend**: HTMX, Alpine.js, Tailwind CSS, Flowbite
+- **Admin**: Django Unfold
+- **Email**: Resend (prod), Console (dev)
+- **Hosting**: Railway
+
+## MVP User Roles (IMPORTANT)
+| Role | Code | Description |
+|------|------|-------------|
+| Partner | `user_functionality='partner'` | Submits FAs and Lots |
+| Primary Inspector | `user_functionality='admin'`, `admin_role='primary_inspector'` | First FA review + all Lot reviews |
+| Final Inspector | `user_functionality='admin'`, `admin_role='final_inspector'` | Final FA review only |
+| Staff | `user_functionality='admin'`, `admin_role='staff_executive'` etc. | Dashboard access |
+| Full Admin | `user_functionality='admin'`, `admin_role='full_admin'` | All access |
+
+## Two-Stage FA Workflow
+1. Partner submits FA → status: `pending`
+2. Primary Inspector reviews → status: `pending_final` (approved) or `rejected`
+3. Final Inspector reviews → status: `approved` or `rejected`
+
+Lot Workflow: Single-stage, Primary Inspector only
+
+## Key Models
+- `accounts.UserProfile` - Extended user with roles and permissions
+- `inspections.FirstArticleInspection` - FA with two-stage review fields
+- `inspections.LotAcceptance` - Lot submissions (single-stage)
+- `inspections.FAEvaluation` / `FAColorEvaluation` - FA evaluation with color ratings
+- `inspections.LotEvaluation` / `LotSampleEvaluation` - Lot evaluation per sample
+- `notifications.Notification` - Email and in-app notifications
+- `core.CamouflageType` / `VariantColor` - Camouflage variants with colors
+
+## Important Naming Conventions
+- Use "Partner" not "Printer" (generic term for all submitters)
+- Use "Primary Inspector" and "Final Inspector" (not company-specific names)
+- Use "Staff" for executive/finance/operations dashboard users
+
+## Display Name Convention
+FAs and Lots use a consistent display format via the `display_name` property:
+- **First Article**: `{fabric_style} - {multicam_variant} - {fa_lot_number}`
+- **Lot**: `{fabric_style} - {multicam_variant} - {lot_lot_number}`
+
+Example: "131968 Nylon/Spandex - Multicam - 10008840229"
+
+### Field Naming
+- `fa_lot_number` - The First Article's lot number (on FirstArticleInspection)
+- `lot_lot_number` - The Lot's own lot number (on LotAcceptance)
+- `original_fa_lot_number` - Copied from FA's `fa_lot_number` when Lot is submitted
+
+Always use `fa.display_name` or `lot.display_name` in templates for headers and lists.
+
+## Key URLs
+- Partner dashboard: `/portal/dashboard/partner/`
+- Inspector dashboard: `/portal/admin/dashboard/`
+- Staff dashboard: `/portal/admin/staff/`
+- FA submit: `/portal/fa/submit/`
+- Lot submit: `/portal/lot/submit/`
+- FA queues: `/portal/admin/fa/queue/primary/` and `/portal/admin/fa/queue/final/`
+- Lot queue: `/portal/admin/lot/queue/`
+
+## Code Patterns
+
+### Checking User Roles
+```python
+profile = request.user.profile
+profile.is_partner()           # Partner user
+profile.is_primary_inspector() # Primary Inspector
+profile.is_final_inspector()   # Final Inspector
+profile.is_any_inspector()     # Any inspector type
+profile.is_staff()             # Staff (executive/finance/operations)
+```
+
+### FA Status Choices
+```python
+STATUS_CHOICES = [
+    ('pending', 'Pending Primary Review'),
+    ('pending_final', 'Pending Final Review'),
+    ('approved', 'Approved'),
+    ('rejected', 'Rejected'),
+]
+```
+
+### Dashboard Routing
+The `UserProfile.get_dashboard_url()` method returns the correct dashboard based on user type/role.
+
+## File Organization
+- Documentation: `Docs/` (PROJECT_OVERVIEW.md, DEVELOPMENT.md, DEPLOYMENT.md)
+- Templates: `templates/{app_name}/{template}.html`
+- Static files: `staticfiles/` (gitignored, generated)
+- User uploads: `media/` (gitignored)
+
+## Development Notes
+- No `.env` needed for local dev (Django uses sensible defaults)
+- Email prints to console in dev mode
+- SQLite database (`db.sqlite3`) for local dev
+- Run `python manage.py load_initial_data` to load camouflage types
+
+## Testing
+
+### Set up test users
+```bash
+python manage.py setup_test_users
+```
+Creates: partner/partner123, primary_inspector/primary_inspector123, final_inspector/final_inspector123, staff/staff123
+
+### Run automated tests
+```bash
+# All tests (78 tests)
+python manage.py test inspections.tests inspections.tests_workflow notifications.tests
+
+# Workflow tests only (FA, Lot, notifications)
+python manage.py test inspections.tests_workflow --verbosity=2
+```
+
+Test files:
+- `inspections/tests.py` - Model and view tests
+- `inspections/tests_workflow.py` - End-to-end workflow + notification tests
+- `notifications/tests.py` - Notification system tests
+
+## Common Tasks
+
+### Add new FA status badge color
+Edit templates to include the new status in badge conditionals:
+```html
+{% if fa.status == 'pending_final' %}bg-blue-100 text-blue-800{% endif %}
+```
+
+### Restrict view to specific inspector type
+```python
+if not profile.is_primary_inspector():
+    messages.error(request, 'Only Primary Inspectors can access this.')
+    return redirect('dashboard:partner_dashboard')
+```
+
+### Send notification (email + in-app)
+```python
+from inspections.emails import send_fa_submitted_notification
+send_fa_submitted_notification(fa)  # Sends both email AND in-app notification
+```
+
+All notification functions in `inspections.emails`:
+- `send_fa_submitted_notification(fa)` - FA submitted → Primary Inspector
+- `send_fa_pending_final_notification(fa)` - Primary approved → Final Inspector  
+- `send_fa_approved_notification(fa)` - Final approved → Partner
+- `send_fa_rejected_notification(fa)` - Rejected → Partner (+ Primary if final stage)
+- `send_lot_submitted_notification(lot)` - Lot submitted → Primary Inspector
+- `send_lot_approved_notification(lot)` - Lot approved → Partner
+- `send_lot_rejected_notification(lot)` - Lot rejected → Partner
+
+## Historic First Articles
+The `is_historic` field on FA is for legacy data imports:
+- Only admins can set `is_historic=True` (via Django admin)
+- Historic FAs may have missing fields
+- Used when importing from old Google Sheets system
+
+## Don't Do
+- Don't use "printer" terminology - use "partner"
+- Don't use company-specific names (1947, Crye) - use generic terms
+- Don't add RM Supplier, FP Supplier, Government roles - removed from MVP
+- Don't modify `.env` without asking user first
+- Don't create new documentation files at root - put in `Docs/`
+

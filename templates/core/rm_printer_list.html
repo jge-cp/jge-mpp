@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}MC Printer List - Multicam Partner Portal{% endblock %}
+
+{% block content %}
+<div class="px-4 py-6">
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">MC Printer List</h1>
+        <p class="text-gray-600 mt-1">Approved print partners</p>
+    </div>
+    
+    <div class="bg-white shadow overflow-hidden sm:rounded-md">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Level</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Approved FAs</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for printer in printers %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4">
+                            <div class="font-medium text-gray-900">{{ printer.company_name }}</div>
+                            <div class="text-sm text-gray-500">{{ printer.technical_email }}</div>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">
+                            {{ printer.technical_contact|default:"-" }}
+                            {% if printer.commercial_contact %}
+                                <br><span class="text-xs text-gray-400">Commercial: {{ printer.commercial_contact }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">
+                            {% if printer.city or printer.country %}
+                                {{ printer.city }}{% if printer.city and printer.country %}, {% endif %}{{ printer.country }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">
+                                {{ printer.mpp_level.level_name|default:"Standard" }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                            {{ printer.approved_fa_count }}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                            No printers found.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+

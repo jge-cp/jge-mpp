@@ -1,0 +1,617 @@
+{% extends 'base.html' %}
+
+{% block title %}Evaluate FA - {{ fa.display_name }} - Multicam Partner Portal{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Evaluation result indicators - VERY VISUAL */
+    .result-pass {
+        background-color: #16a34a !important;
+        color: white !important;
+        font-weight: bold;
+        padding: 4px 12px;
+        border-radius: 4px;
+        display: inline-block;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.05em;
+    }
+    .result-fail {
+        background-color: #dc2626 !important;
+        color: white !important;
+        font-weight: bold;
+        padding: 4px 12px;
+        border-radius: 4px;
+        display: inline-block;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.05em;
+    }
+    .result-pending {
+        background-color: #6b7280;
+        color: white;
+        font-weight: bold;
+        padding: 4px 12px;
+        border-radius: 4px;
+        display: inline-block;
+    }
+    
+    /* Rating row styling - GREEN/RED backgrounds */
+    .rating-row {
+        transition: background-color 0.2s;
+    }
+    .rating-row.pass-row {
+        background-color: rgba(22, 163, 74, 0.25) !important;
+    }
+    .rating-row.fail-row {
+        background-color: rgba(220, 38, 38, 0.25) !important;
+    }
+    
+    /* Overall result styling */
+    .overall-pass {
+        background-color: #16a34a !important;
+        color: white !important;
+        border: 3px solid #15803d !important;
+    }
+    .overall-fail {
+        background-color: #dc2626 !important;
+        color: white !important;
+        border: 3px solid #b91c1c !important;
+    }
+    .overall-result-text {
+        font-size: 2rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+    
+    /* Status badges - more prominent */
+    .status-approved {
+        background-color: #16a34a !important;
+        color: white !important;
+        font-size: 1.1rem;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-weight: bold;
+    }
+    .status-rejected {
+        background-color: #dc2626 !important;
+        color: white !important;
+        font-size: 1.1rem;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-weight: bold;
+    }
+    
+    /* Evaluation table */
+    .eval-table th {
+        background-color: var(--color-bg-elevated);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+    }
+    .eval-table td, .eval-table th {
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--color-border);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="px-4 py-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-primary">First Article Evaluation</h1>
+            <p class="text-lg text-muted mt-1">{{ fa.display_name }}</p>
+        </div>
+        <div class="flex items-center space-x-3">
+            {% if is_read_only %}
+                <span class="bg-gray-600 text-white text-sm px-3 py-1 rounded font-bold">VIEW ONLY</span>
+            {% endif %}
+            {% if is_primary_review %}
+                <span class="badge-warning text-lg px-4 py-2">Primary Review (1947)</span>
+            {% elif is_final_review %}
+                <span class="badge-info text-lg px-4 py-2">Final Review (Crye)</span>
+            {% elif is_completed %}
+                {% if fa.status == 'approved' %}
+                    <span class="status-approved">✓ APPROVED</span>
+                {% else %}
+                    <span class="status-rejected">✗ REJECTED</span>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+    
+    {% if is_read_only %}
+    <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded">
+        <p class="text-blue-800 dark:text-blue-200">
+            <strong>View Only:</strong> This FA has been {{ fa.status }}. 
+            {% if fa.status == 'rejected' %}
+            <a href="{% url 'inspections:fa_detail' fa.fai_id %}" class="underline">Go to FA Detail</a> to resubmit.
+            {% endif %}
+        </p>
+    </div>
+    {% endif %}
+    
+    <!-- FA Details Card -->
+    <div class="card p-6 mb-6">
+        <h2 class="text-xl font-bold mb-4 border-b border-theme pb-2">Submission Details</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+                <dt class="text-sm font-medium text-muted">Partner</dt>
+                <dd class="mt-1 text-primary font-semibold">{{ fa.vendor.company_name }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Fabric Style</dt>
+                <dd class="mt-1 text-primary">{{ fa.fabric_style }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">MultiCam Variant</dt>
+                <dd class="mt-1 text-primary">{{ fa.multicam_variant.camouflage_name }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">FA Lot Number</dt>
+                <dd class="mt-1 text-primary">{{ fa.fa_lot_number }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Shade Standard</dt>
+                <dd class="mt-1 text-primary">{{ fa.get_shade_standard_display }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Shade Standard No.</dt>
+                <dd class="mt-1 text-primary">{{ fa.shade_standard_number|default:"-" }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Spectral Reflectance Req.</dt>
+                <dd class="mt-1 text-primary">{{ fa.get_spectral_reflectance_requirement_display }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Date of Printing</dt>
+                <dd class="mt-1 text-primary">{{ fa.date_of_printing|date:"M d, Y" }}</dd>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Evaluation Form -->
+    <form method="post" enctype="multipart/form-data" id="evaluation-form">
+        {% csrf_token %}
+        
+        <!-- Shade Matching Section -->
+        <div class="card p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4 border-b border-theme pb-2">
+                Shade Matching Evaluation
+                <span class="text-sm font-normal text-muted ml-2">
+                    (Rating ≥ 3 = Pass)
+                </span>
+            </h2>
+            
+            <table class="w-full eval-table">
+                <thead>
+                    <tr>
+                        <th class="text-left w-1/4">Color</th>
+                        <th class="text-left w-1/3">Rating</th>
+                        <th class="text-left">Comment</th>
+                        <th class="text-center w-24">Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for color, form, color_eval in color_forms %}
+                    <tr class="rating-row {% if color_eval and color_eval.rating %}{% if color_eval.is_passing %}pass-row{% else %}fail-row{% endif %}{% endif %}"
+                        data-color-id="{{ color.id }}">
+                        <td class="font-medium">
+                            {{ color.color_name }}
+                        </td>
+                        <td>
+                            <select name="color_{{ color.id }}-rating" 
+                                    class="form-select w-full color-rating-select"
+                                    data-color-id="{{ color.id }}"
+                                    onchange="updateColorResult(this)"
+                                    {% if is_read_only %}disabled{% endif %}>
+                                <option value="">-- Select Rating --</option>
+                                <option value="0" {% if color_eval and color_eval.rating == '0' %}selected{% endif %}>0 - Off-Shade</option>
+                                <option value="0-1" {% if color_eval and color_eval.rating == '0-1' %}selected{% endif %}>0-1 - Off-Shade/Much</option>
+                                <option value="1" {% if color_eval and color_eval.rating == '1' %}selected{% endif %}>1 - Much</option>
+                                <option value="1-2" {% if color_eval and color_eval.rating == '1-2' %}selected{% endif %}>1-2 - Much/Considerable</option>
+                                <option value="2" {% if color_eval and color_eval.rating == '2' %}selected{% endif %}>2 - Considerable</option>
+                                <option value="2-3" {% if color_eval and color_eval.rating == '2-3' %}selected{% endif %}>2-3 - Considerable/Noticeable</option>
+                                <option value="3" {% if color_eval and color_eval.rating == '3' %}selected{% endif %}>3 - Noticeable</option>
+                                <option value="3-4" {% if color_eval and color_eval.rating == '3-4' %}selected{% endif %}>3-4 - Noticeable/Slight</option>
+                                <option value="4" {% if color_eval and color_eval.rating == '4' %}selected{% endif %}>4 - Slight</option>
+                                <option value="4-5" {% if color_eval and color_eval.rating == '4-5' %}selected{% endif %}>4-5 - Slight/Equal</option>
+                                <option value="5" {% if color_eval and color_eval.rating == '5' %}selected{% endif %}>5 - Equal</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" name="color_{{ color.id }}-comment" 
+                                   class="form-input w-full"
+                                   placeholder="Comment (optional)"
+                                   value="{{ color_eval.comment|default:'' }}"
+                                   {% if is_read_only %}disabled{% endif %}>
+                        </td>
+                        <td class="text-center">
+                            <span class="color-result result-pending"
+                                  id="result-{{ color.id }}">
+                                {% if color_eval and color_eval.rating %}
+                                    {% if color_eval.is_passing %}Pass{% else %}Fail{% endif %}
+                                {% else %}
+                                    --
+                                {% endif %}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Overall Criteria Section -->
+        <div class="card p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4 border-b border-theme pb-2">Overall Criteria</h2>
+            
+            <table class="w-full eval-table">
+                <thead>
+                    <tr>
+                        <th class="text-left w-1/3">Criterion</th>
+                        <th class="text-left w-1/3">Evaluation</th>
+                        <th class="text-center w-24">Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="rating-row {% if evaluation.pattern_execution == 'pass' %}pass-row{% elif evaluation.pattern_execution == 'fail' %}fail-row{% endif %}">
+                        <td class="font-medium">Pattern Execution</td>
+                        <td>
+                            <select name="pattern_execution" 
+                                    class="form-select w-full criteria-select"
+                                    data-criterion="pattern"
+                                    onchange="updateCriterionResult(this)"
+                                    {% if is_read_only %}disabled{% endif %}>
+                                <option value="">-- Select --</option>
+                                <option value="pass" {% if evaluation.pattern_execution == 'pass' %}selected{% endif %}>Pass</option>
+                                <option value="fail" {% if evaluation.pattern_execution == 'fail' %}selected{% endif %}>Fail</option>
+                            </select>
+                        </td>
+                        <td class="text-center">
+                            <span class="criterion-result result-pending" id="result-pattern">
+                                {% if evaluation.pattern_execution %}
+                                    {% if evaluation.pattern_execution == 'pass' %}Pass{% else %}Fail{% endif %}
+                                {% else %}--{% endif %}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr class="rating-row {% if evaluation.scale == 'pass' %}pass-row{% elif evaluation.scale == 'fail' %}fail-row{% endif %}">
+                        <td class="font-medium">Scale</td>
+                        <td>
+                            <select name="scale" 
+                                    class="form-select w-full criteria-select"
+                                    data-criterion="scale"
+                                    onchange="updateCriterionResult(this)"
+                                    {% if is_read_only %}disabled{% endif %}>
+                                <option value="">-- Select --</option>
+                                <option value="pass" {% if evaluation.scale == 'pass' %}selected{% endif %}>Pass</option>
+                                <option value="fail" {% if evaluation.scale == 'fail' %}selected{% endif %}>Fail</option>
+                            </select>
+                        </td>
+                        <td class="text-center">
+                            <span class="criterion-result result-pending" id="result-scale">
+                                {% if evaluation.scale %}
+                                    {% if evaluation.scale == 'pass' %}Pass{% else %}Fail{% endif %}
+                                {% else %}--{% endif %}
+                            </span>
+                        </td>
+                    </tr>
+                    <tr class="rating-row {% if evaluation.spectral_reflectance == 'pass' %}pass-row{% elif evaluation.spectral_reflectance == 'fail' %}fail-row{% endif %}">
+                        <td class="font-medium">
+                            Spectral Reflectance
+                            {% if fa.spectral_reflectance_requirement == 'visible_only' %}
+                                <span class="text-xs text-muted">(Visible Spectrum Only - N/A)</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if fa.spectral_reflectance_requirement == 'visible_only' %}
+                                <span class="text-muted">N/A - Visible Spectrum Only</span>
+                                <input type="hidden" name="spectral_reflectance" value="">
+                            {% else %}
+                                <select name="spectral_reflectance" 
+                                        class="form-select w-full criteria-select"
+                                        data-criterion="spectral"
+                                        onchange="updateCriterionResult(this)"
+                                        {% if is_read_only %}disabled{% endif %}>
+                                    <option value="">-- Select --</option>
+                                    <option value="pass" {% if evaluation.spectral_reflectance == 'pass' %}selected{% endif %}>Pass</option>
+                                    <option value="fail" {% if evaluation.spectral_reflectance == 'fail' %}selected{% endif %}>Fail</option>
+                                </select>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <span class="criterion-result {% if fa.spectral_reflectance_requirement == 'visible_only' %}result-pass{% else %}result-pending{% endif %}" id="result-spectral">
+                                {% if fa.spectral_reflectance_requirement == 'visible_only' %}
+                                    Pass
+                                {% elif evaluation.spectral_reflectance %}
+                                    {% if evaluation.spectral_reflectance == 'pass' %}Pass{% else %}Fail{% endif %}
+                                {% else %}--{% endif %}
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Comments Section -->
+        <div class="card p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4 border-b border-theme pb-2">Comments</h2>
+            <textarea name="comments" 
+                      class="form-textarea w-full"
+                      rows="4"
+                      placeholder="Overall evaluation comments...">{{ evaluation.comments|default:'' }}</textarea>
+        </div>
+        
+        <!-- File Upload Section -->
+        <div class="card p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4 border-b border-theme pb-2">Inspection Documents</h2>
+            <input type="file" name="inspection_documents" multiple 
+                   class="form-input"
+                   accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+            <p class="text-sm text-muted mt-2">Attach any supporting documents (PDF, Word, images)</p>
+        </div>
+        
+        <!-- Overall Result Preview - VERY PROMINENT -->
+        <div class="card p-8 mb-6 border-4" id="overall-result-card">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-bold" id="overall-result-title">OVERALL RESULT</h2>
+                    <p class="text-muted text-sm" id="overall-result-subtitle">All criteria must pass for approval</p>
+                </div>
+                <div id="overall-result-display" class="text-3xl font-bold">
+                    <!-- JavaScript will update this based on current ratings -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="flex justify-between items-center">
+            {% if is_read_only %}
+            <a href="{% url 'inspections:fa_detail' fa.fai_id %}" class="btn-secondary">
+                ← Back to FA Detail
+            </a>
+            <a href="{% url 'inspections:fa_evaluation_history' fa.fai_id %}" 
+               class="btn-secondary">
+                View Full History
+            </a>
+            {% else %}
+            <a href="{% if is_primary_review %}{% url 'inspections:fa_review_queue_primary' %}{% else %}{% url 'inspections:fa_review_queue_final' %}{% endif %}" 
+               class="btn-secondary">
+                ← Back to Queue
+            </a>
+            
+            <div class="flex space-x-4">
+                <button type="submit" name="save_draft" 
+                        class="btn-secondary">
+                    Save Draft
+                </button>
+                <button type="submit" name="submit_evaluation" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded border border-blue-700"
+                        onclick="return confirmSubmit()">
+                    Submit Evaluation
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </form>
+    
+    {% if is_final_review and primary_evaluation %}
+    <!-- Primary Inspector's Evaluation Reference -->
+    <div class="card p-6 mt-6 bg-opacity-50" style="background-color: rgba(156, 163, 175, 0.1);">
+        <h3 class="text-lg font-bold mb-2 text-muted">Primary Inspector's Evaluation (Reference)</h3>
+        <p class="text-sm text-muted mb-2">
+            Reviewed by: {{ primary_evaluation.inspector.username }} on {{ primary_evaluation.evaluation_date|date:"M d, Y H:i" }}
+        </p>
+        <p class="text-sm text-muted">
+            Result: {% if primary_evaluation.all_pass %}<span class="result-pass">Pass</span>{% else %}<span class="result-fail">Fail</span>{% endif %}
+        </p>
+        {% if primary_evaluation.comments %}
+        <p class="text-sm text-muted mt-2">
+            <strong>Comments:</strong> {{ primary_evaluation.comments }}
+        </p>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Passing ratings (>= 3)
+    const passingRatings = ['3', '3-4', '4', '4-5', '5'];
+    
+    function isPassingRating(rating) {
+        return passingRatings.includes(rating);
+    }
+    
+    function updateColorResult(select) {
+        const colorId = select.dataset.colorId;
+        const row = select.closest('tr');
+        const resultSpan = document.getElementById('result-' + colorId);
+        const rating = select.value;
+        
+        console.log('updateColorResult called:', colorId, rating);
+        
+        if (!resultSpan) {
+            console.error('Result span not found for color:', colorId);
+            return;
+        }
+        
+        if (!rating) {
+            resultSpan.textContent = '--';
+            resultSpan.className = 'result-pending';
+            row.classList.remove('pass-row', 'fail-row');
+        } else if (isPassingRating(rating)) {
+            resultSpan.textContent = 'PASS';
+            resultSpan.className = 'result-pass';
+            row.classList.remove('fail-row');
+            row.classList.add('pass-row');
+        } else {
+            resultSpan.textContent = 'FAIL';
+            resultSpan.className = 'result-fail';
+            row.classList.remove('pass-row');
+            row.classList.add('fail-row');
+        }
+        
+        updateOverallResult();
+    }
+    
+    function updateCriterionResult(select) {
+        const criterion = select.dataset.criterion;
+        const row = select.closest('tr');
+        const resultSpan = document.getElementById('result-' + criterion);
+        const value = select.value;
+        
+        console.log('updateCriterionResult called:', criterion, value);
+        
+        if (!resultSpan) {
+            console.error('Result span not found for criterion:', criterion);
+            return;
+        }
+        
+        if (!value) {
+            resultSpan.textContent = '--';
+            resultSpan.className = 'result-pending';
+            row.classList.remove('pass-row', 'fail-row');
+        } else if (value === 'pass') {
+            resultSpan.textContent = 'PASS';
+            resultSpan.className = 'result-pass';
+            row.classList.remove('fail-row');
+            row.classList.add('pass-row');
+        } else {
+            resultSpan.textContent = 'FAIL';
+            resultSpan.className = 'result-fail';
+            row.classList.remove('pass-row');
+            row.classList.add('fail-row');
+        }
+        
+        updateOverallResult();
+    }
+    
+    function updateOverallResult() {
+        const colorSelects = document.querySelectorAll('.color-rating-select');
+        const criteriaSelects = document.querySelectorAll('.criteria-select');
+        const overallDisplay = document.getElementById('overall-result-display');
+        const overallCard = document.getElementById('overall-result-card');
+        
+        if (!overallDisplay || !overallCard) {
+            console.log('Overall result elements not found yet');
+            return;
+        }
+        
+        let allRated = true;
+        let allPass = true;
+        
+        // Check colors
+        colorSelects.forEach(select => {
+            const rating = select.value;
+            if (!rating) {
+                allRated = false;
+            } else if (!isPassingRating(rating)) {
+                allPass = false;
+            }
+        });
+        
+        // Check criteria (excluding spectral if visible-only)
+        criteriaSelects.forEach(select => {
+            const value = select.value;
+            if (!value) {
+                allRated = false;
+            } else if (value === 'fail') {
+                allPass = false;
+            }
+        });
+        
+        // Update display with prominent styling
+        const overallTitle = document.getElementById('overall-result-title');
+        const overallSubtitle = document.getElementById('overall-result-subtitle');
+        
+        overallCard.classList.remove('overall-pass', 'overall-fail');
+        
+        if (!allRated) {
+            overallDisplay.innerHTML = '<span class="overall-result-text text-gray-400">INCOMPLETE</span>';
+            overallCard.style.borderColor = 'var(--color-border)';
+            if (overallTitle) overallTitle.className = 'text-2xl font-bold';
+            if (overallSubtitle) overallSubtitle.className = 'text-muted text-sm';
+        } else if (allPass) {
+            overallDisplay.innerHTML = '<span class="overall-result-text text-white">✓ PASS</span>';
+            overallCard.classList.add('overall-pass');
+            if (overallTitle) overallTitle.className = 'text-2xl font-bold text-white';
+            if (overallSubtitle) overallSubtitle.className = 'text-white/80 text-sm';
+        } else {
+            overallDisplay.innerHTML = '<span class="overall-result-text text-white">✗ FAIL</span>';
+            overallCard.classList.add('overall-fail');
+            if (overallTitle) overallTitle.className = 'text-2xl font-bold text-white';
+            if (overallSubtitle) overallSubtitle.className = 'text-white/80 text-sm';
+        }
+        
+        console.log('Overall result updated:', allRated ? (allPass ? 'PASS' : 'FAIL') : 'INCOMPLETE');
+    }
+    
+    function confirmSubmit() {
+        const colorSelects = document.querySelectorAll('.color-rating-select');
+        const criteriaSelects = document.querySelectorAll('.criteria-select');
+        
+        let allRated = true;
+        let allPass = true;
+        
+        colorSelects.forEach(select => {
+            if (!select.value) allRated = false;
+            else if (!isPassingRating(select.value)) allPass = false;
+        });
+        
+        criteriaSelects.forEach(select => {
+            if (!select.value) allRated = false;
+            else if (select.value === 'fail') allPass = false;
+        });
+        
+        if (!allRated) {
+            alert('Please complete all ratings before submitting.');
+            return false;
+        }
+        
+        const resultMsg = allPass 
+            ? 'This evaluation PASSES. Submit?' 
+            : 'This evaluation FAILS. The FA will be rejected. Continue?';
+        
+        return confirm(resultMsg);
+    }
+    
+    // Initialize everything on page load AND attach event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM Content Loaded - Initializing FA Evaluation');
+        
+        // Attach change event listeners to color rating selects
+        document.querySelectorAll('.color-rating-select').forEach(function(select) {
+            console.log('Attaching listener to color select:', select.dataset.colorId);
+            select.addEventListener('change', function() {
+                console.log('Color select changed:', this.dataset.colorId, this.value);
+                updateColorResult(this);
+            });
+            // Initialize with current value
+            updateColorResult(select);
+        });
+        
+        // Attach change event listeners to criteria selects
+        document.querySelectorAll('.criteria-select').forEach(function(select) {
+            console.log('Attaching listener to criteria select:', select.dataset.criterion);
+            select.addEventListener('change', function() {
+                console.log('Criteria select changed:', this.dataset.criterion, this.value);
+                updateCriterionResult(this);
+            });
+            // Initialize with current value
+            updateCriterionResult(select);
+        });
+        
+        // Initial overall result calculation
+        updateOverallResult();
+        
+        console.log('Initialization complete');
+    });
+</script>
+{% endblock %}

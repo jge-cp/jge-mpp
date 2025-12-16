@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+
+{% block title %}Submit First Article Inspection - Multicam Partner Portal{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-0">
+    <!-- Page Header -->
+    <div class="mb-8">
+        <nav class="flex mb-4" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="{% url 'dashboard:partner_dashboard' %}" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-white">
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+                        </svg>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2 dark:text-gray-400">Submit First Article</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Submit First Article Inspection</h1>
+        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            Complete this form to submit a new First Article for inspection. Required fields are marked with an asterisk (*).
+        </p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="card p-6">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <!-- Form Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <!-- Fabric Style -->
+                <div>
+                    <label for="{{ form.fabric_style.id_for_label }}" class="form-label">
+                        Fabric Style <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.fabric_style }}
+                    {% if form.fabric_style.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.fabric_style.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- MultiCam Variant -->
+                <div>
+                    <label for="{{ form.multicam_variant.id_for_label }}" class="form-label">
+                        MultiCam Variant <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.multicam_variant }}
+                    {% if form.multicam_variant.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.multicam_variant.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Shade Standard -->
+                <div>
+                    <label for="{{ form.shade_standard.id_for_label }}" class="form-label">
+                        Shade Standard <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.shade_standard }}
+                    {% if form.shade_standard.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.shade_standard.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Shade Standard Number -->
+                <div>
+                    <label for="{{ form.shade_standard_number.id_for_label }}" class="form-label">
+                        Shade Standard Number
+                    </label>
+                    {{ form.shade_standard_number }}
+                </div>
+                
+                <!-- Spectral Reflectance Requirement -->
+                <div>
+                    <label for="{{ form.spectral_reflectance_requirement.id_for_label }}" class="form-label">
+                        Spectral Reflectance Requirement <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.spectral_reflectance_requirement }}
+                    {% if form.spectral_reflectance_requirement.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.spectral_reflectance_requirement.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Lot Number/Identifier -->
+                <div>
+                    <label for="{{ form.fa_lot_number.id_for_label }}" class="form-label">
+                        FA Lot Number <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.fa_lot_number }}
+                    {% if form.fa_lot_number.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.fa_lot_number.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Date of Printing -->
+                <div>
+                    <label for="{{ form.date_of_printing.id_for_label }}" class="form-label">
+                        Date of Printing <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.date_of_printing }}
+                    {% if form.date_of_printing.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.date_of_printing.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Name of Partner Representative -->
+                <div>
+                    <label for="{{ form.name_of_printer_representative.id_for_label }}" class="form-label">
+                        Name of Partner Representative <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.name_of_printer_representative }}
+                    {% if form.name_of_printer_representative.errors %}
+                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.name_of_printer_representative.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- First Article Ship Date -->
+                <div>
+                    <label for="{{ form.first_article_ship_date.id_for_label }}" class="form-label">
+                        First Article Ship Date
+                    </label>
+                    {{ form.first_article_ship_date }}
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">When the First Article sample will be/was shipped</p>
+                </div>
+                
+                <!-- Tracking Number -->
+                <div>
+                    <label for="{{ form.tracking_number.id_for_label }}" class="form-label">
+                        Tracking Number
+                    </label>
+                    {{ form.tracking_number }}
+                </div>
+            </div>
+            
+            <!-- Supporting Documents -->
+            <div class="mb-8">
+                <label class="form-label">Supporting Documents</label>
+                <div class="flex items-center justify-center w-full">
+                    <label for="submission_documents" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500">
+                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                            <svg class="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                                <span class="font-semibold">Click to upload</span> or drag and drop
+                            </p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">PDF, Word, or Images (max 10MB each)</p>
+                        </div>
+                        <input id="submission_documents" name="submission_documents" type="file" multiple 
+                               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" class="hidden" />
+                    </label>
+                </div>
+                <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                    Upload any relevant documentation, test results, or images for the First Article.
+                </p>
+            </div>
+            
+            <!-- Form Actions -->
+            <div class="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <a href="{% url 'dashboard:partner_dashboard' %}" class="btn-secondary text-center">
+                    Cancel
+                </a>
+                <button type="submit" class="btn-primary">
+                    <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Submit for Review
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Help Section -->
+    <div class="mt-8 card p-6">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">What happens next?</h3>
+        <div class="space-y-4">
+            <div class="flex items-start">
+                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center mr-3">
+                    <span class="text-primary-600 dark:text-primary-400 font-semibold text-sm">1</span>
+                </div>
+                <div>
+                    <h4 class="font-medium text-gray-900 dark:text-white">Primary Review</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Your First Article will be reviewed by the Primary Inspector for initial approval.</p>
+                </div>
+            </div>
+            <div class="flex items-start">
+                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center mr-3">
+                    <span class="text-primary-600 dark:text-primary-400 font-semibold text-sm">2</span>
+                </div>
+                <div>
+                    <h4 class="font-medium text-gray-900 dark:text-white">Final Review</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">If approved by the Primary Inspector, the Final Inspector will give final approval.</p>
+                </div>
+            </div>
+            <div class="flex items-start">
+                <div class="flex-shrink-0 w-8 h-8 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mr-3">
+                    <span class="text-green-600 dark:text-green-400 font-semibold text-sm">3</span>
+                </div>
+                <div>
+                    <h4 class="font-medium text-gray-900 dark:text-white">Production Ready</h4>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Once fully approved, you can begin production and submit Lot Acceptances.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

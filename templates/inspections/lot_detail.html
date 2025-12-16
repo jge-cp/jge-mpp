@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ lot.display_name }} - Multicam Partner Portal{% endblock %}
+
+{% block content %}
+<div class="px-4 py-6">
+    <h1 class="text-3xl font-bold mb-6">Lot: {{ lot.display_name }}</h1>
+    <div class="card p-6">
+        <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+            <div>
+                <dt class="text-sm font-medium text-muted">Fabric Style</dt>
+                <dd class="mt-1 text-sm text-primary">{{ lot.fabric_style }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">MultiCam Variant</dt>
+                <dd class="mt-1 text-sm text-primary">{{ lot.multicam_variant.camouflage_name }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Status</dt>
+                <dd class="mt-1">
+                    {% if lot.status == 'approved' %}
+                        <span class="badge-success">Approved</span>
+                    {% elif lot.status == 'rejected' %}
+                        <span class="badge-danger">Rejected</span>
+                    {% else %}
+                        <span class="badge-warning">Pending</span>
+                    {% endif %}
+                </dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Lot Number</dt>
+                <dd class="mt-1 text-sm text-primary font-semibold">{{ lot.lot_lot_number }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Original First Article</dt>
+                <dd class="mt-1 text-sm">
+                    <a href="{% url 'inspections:fa_detail' lot.original_fa.fai_id %}" class="text-blue-600 hover:underline">
+                        {{ lot.original_fa.display_name }}
+                    </a>
+                </dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Original FA Lot Number</dt>
+                <dd class="mt-1 text-sm text-primary">{{ lot.original_fa_lot_number }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Yards Printed</dt>
+                <dd class="mt-1 text-sm text-primary">{{ lot.number_of_yards_printed }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Number of Samples</dt>
+                <dd class="mt-1 text-sm text-primary">{{ lot.number_of_samples }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Submission Date</dt>
+                <dd class="mt-1 text-sm text-primary">{{ lot.submission_date|date:"M d, Y" }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Date of Printing</dt>
+                <dd class="mt-1 text-sm text-primary">{{ lot.date_of_printing|date:"M d, Y" }}</dd>
+            </div>
+        </dl>
+    </div>
+</div>
+{% endblock %}
+

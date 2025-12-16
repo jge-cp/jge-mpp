@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}Order Marketing Package - Multicam Partner Portal{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-6">
+    <div class="mb-6">
+        <a href="{% url 'dashboard:fp_supplier_dashboard' %}" class="text-blue-600 hover:underline">&larr; Back to Dashboard</a>
+        <h1 class="text-3xl font-bold text-gray-900 mt-2">Order Marketing Package</h1>
+        <p class="text-gray-600 mt-2">Order woven tabs, hangtags, and branding materials.</p>
+    </div>
+    
+    <form method="post" class="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4">
+        {% csrf_token %}
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mb-4 p-3 rounded {% if message.tags == 'error' %}bg-red-100 text-red-700 border border-red-400{% else %}bg-blue-100 text-blue-700 border border-blue-400{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <!-- Product Information -->
+        <div class="mb-6">
+            <h2 class="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">Product Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="rm_supplier">
+                        RM Supplier Used
+                    </label>
+                    <select name="rm_supplier" id="rm_supplier"
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="">Select or enter below</option>
+                        {% for supplier in rm_suppliers %}
+                            <option value="{{ supplier.pk }}">{{ supplier.company_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="rm_supplier_name">
+                        Or Enter RM Supplier Name
+                    </label>
+                    <input type="text" name="rm_supplier_name" id="rm_supplier_name"
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        placeholder="If not in list above">
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="fabric_type">
+                        Type of Fabric/Knit *
+                    </label>
+                    <input type="text" name="fabric_type" id="fabric_type" required
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        placeholder="e.g., Ripstop Nylon">
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="camouflage_type">
+                        Type of Camouflage *
+                    </label>
+                    <select name="camouflage_type" id="camouflage_type" required
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="">Select...</option>
+                        {% for camo in camouflages %}
+                            <option value="{{ camo.pk }}">{{ camo.camouflage_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quantity -->
+        <div class="mb-6">
+            <h2 class="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">Quantity</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="number_of_pieces">
+                        Number of Pieces *
+                    </label>
+                    <input type="number" name="number_of_pieces" id="number_of_pieces" min="1" required
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        placeholder="How many pieces needed">
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="yardage_to_be_used">
+                        Yardage to be Used (optional)
+                    </label>
+                    <input type="number" step="0.01" name="yardage_to_be_used" id="yardage_to_be_used"
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        placeholder="Expected yardage">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Shipping Address -->
+        <div class="mb-6">
+            <h2 class="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">Shipping Address</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-2">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="shipping_name">
+                        Company/Recipient Name *
+                    </label>
+                    <input type="text" name="shipping_name" id="shipping_name" required
+                        value="{{ profile.company_name }}"
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="shipping_street">
+                        Street Address *
+                    </label>
+                    <input type="text" name="shipping_street" id="shipping_street" required
+                        value="{{ profile.street }}"
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="shipping_city">
+                        City *
+                    </label>
+                    <input type="text" name="shipping_city" id="shipping_city" required
+                        value="{{ profile.city }}"
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="shipping_state">
+                        State/Province
+                    </label>
+                    <input type="text" name="shipping_state" id="shipping_state"
+                        value="{{ profile.state }}"
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="shipping_country">
+                        Country *
+                    </label>
+                    <input type="text" name="shipping_country" id="shipping_country" required
+                        value="{{ profile.country }}"
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="shipping_postal_code">
+                        Postal Code *
+                    </label>
+                    <input type="text" name="shipping_postal_code" id="shipping_postal_code" required
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Submit -->
+        <div class="flex items-center justify-between">
+            <a href="{% url 'dashboard:fp_supplier_dashboard' %}" class="text-gray-600 hover:text-gray-800">
+                Cancel
+            </a>
+            <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded focus:outline-none focus:shadow-outline">
+                Submit Order
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

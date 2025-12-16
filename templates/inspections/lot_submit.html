@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block title %}Submit Lot - Multicam Partner Portal{% endblock %}
+
+{% block content %}
+<div class="px-4 py-6">
+    <h1 class="text-3xl font-bold mb-6">Submit Lot for Acceptance</h1>
+    <div class="card p-6">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="mb-6">
+                <label class="form-label" for="{{ form.original_fa.id_for_label }}">
+                    Select Approved First Article *
+                </label>
+                <select name="original_fa" id="{{ form.original_fa.id_for_label }}"
+                        class="form-input"
+                        hx-get="{% url 'inspections:get_fa_details' 'PLACEHOLDER' %}"
+                        hx-trigger="change"
+                        hx-target="#fa-details"
+                        hx-swap="innerHTML"
+                        x-data
+                        @change="$el.setAttribute('hx-get', '{% url 'inspections:get_fa_details' 'PLACEHOLDER' %}'.replace('PLACEHOLDER', $el.value)); htmx.trigger($el, 'htmx:configRequest')">
+                    <option value="">-- Select an Approved First Article --</option>
+                    {% for fa in form.original_fa.field.queryset %}
+                        <option value="{{ fa.fai_id }}">{{ fa.display_name }}</option>
+                    {% endfor %}
+                </select>
+                {% if form.original_fa.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.original_fa.errors.0 }}</p>
+                {% endif %}
+                <p class="text-xs text-muted mt-1">Only approved First Articles are shown</p>
+            </div>
+            
+            <div id="fa-details" class="mb-6">
+                <div class="bg-elevated rounded-lg p-4 border border-theme">
+                    <p class="text-sm text-muted">Select an approved First Article to see its details</p>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label class="form-label" for="{{ form.lot_lot_number.id_for_label }}">
+                        Lot Number *
+                    </label>
+                    {{ form.lot_lot_number }}
+                    {% if form.lot_lot_number.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.lot_lot_number.errors.0 }}</p>
+                    {% endif %}
+                    <p class="text-xs text-muted mt-1">Your unique identifier for this lot</p>
+                </div>
+                
+                <div>
+                    <label class="form-label" for="{{ form.number_of_yards_printed.id_for_label }}">
+                        Number of Yards Printed *
+                    </label>
+                    {{ form.number_of_yards_printed }}
+                    {% if form.number_of_yards_printed.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.number_of_yards_printed.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <div>
+                    <label class="form-label" for="{{ form.number_of_samples.id_for_label }}">
+                        Number of Samples *
+                    </label>
+                    {{ form.number_of_samples }}
+                    {% if form.number_of_samples.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.number_of_samples.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <div>
+                    <label class="form-label" for="{{ form.date_of_printing.id_for_label }}">
+                        Date of Printing *
+                    </label>
+                    {{ form.date_of_printing }}
+                    {% if form.date_of_printing.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.date_of_printing.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <div>
+                    <label class="form-label" for="{{ form.date_shipped.id_for_label }}">
+                        Date Shipped
+                    </label>
+                    {{ form.date_shipped }}
+                </div>
+                
+                <div>
+                    <label class="form-label" for="{{ form.tracking_number.id_for_label }}">
+                        Tracking Number
+                    </label>
+                    {{ form.tracking_number }}
+                </div>
+                
+                <div>
+                    <label class="form-label" for="{{ form.name_of_submitter.id_for_label }}">
+                        Name of Submitter *
+                    </label>
+                    {{ form.name_of_submitter }}
+                    {% if form.name_of_submitter.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.name_of_submitter.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="mb-6">
+                <label class="form-label" for="{{ form.individual_sample_numbers.id_for_label }}">
+                    Individual Sample Numbers *
+                </label>
+                {{ form.individual_sample_numbers }}
+                {% if form.individual_sample_numbers.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.individual_sample_numbers.errors.0 }}</p>
+                {% endif %}
+                <p class="text-xs text-muted mt-1">Comma-separated list (e.g., 10010043849-1, 10010043849-2, 10010043849-3)</p>
+            </div>
+            
+            <div class="mb-6">
+                <label class="form-label">
+                    Supporting Documents
+                </label>
+                <input type="file" name="submission_documents" multiple 
+                       class="form-input"
+                       accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                <p class="text-xs text-muted mt-1">PDF, Word, or Image files (max 10MB each)</p>
+            </div>
+            
+            <div class="flex justify-end space-x-4">
+                <a href="{% url 'dashboard:partner_dashboard' %}" 
+                   class="btn-secondary">
+                    Cancel
+                </a>
+                <button type="submit" class="btn-primary">
+                    Submit Lot
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Initialize HTMX with dynamic URL for FA details
+document.addEventListener('DOMContentLoaded', function() {
+    const faSelect = document.querySelector('select[name="original_fa"]');
+    if (faSelect) {
+        faSelect.addEventListener('change', function() {
+            const faiId = this.value;
+            if (faiId) {
+                htmx.ajax('GET', '{% url "inspections:get_fa_details" "PLACEHOLDER" %}'.replace('PLACEHOLDER', faiId), {
+                    target: '#fa-details',
+                    swap: 'innerHTML'
+                });
+            } else {
+                document.getElementById('fa-details').innerHTML = `
+                    <div class="bg-elevated rounded-lg p-4 border border-theme">
+                        <p class="text-sm text-muted">Select an approved First Article to see its details</p>
+                    </div>
+                `;
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
+

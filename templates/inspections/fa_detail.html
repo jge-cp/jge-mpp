@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ fa.display_name }} - Multicam Partner Portal{% endblock %}
+
+{% block extra_head %}
+<style>
+    .result-pass {
+        background-color: #22c55e !important;
+        color: white !important;
+        font-weight: bold;
+        padding: 2px 8px;
+        border-radius: 4px;
+    }
+    .result-fail {
+        background-color: #ef4444 !important;
+        color: white !important;
+        font-weight: bold;
+        padding: 2px 8px;
+        border-radius: 4px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="px-4 py-6">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-primary">First Article: {{ fa.display_name }}</h1>
+        <div class="flex space-x-3">
+            <a href="{% url 'inspections:fa_evaluation_history' fa.fai_id %}" class="btn-secondary">
+                View Evaluation History
+            </a>
+            {% if can_resubmit %}
+            <a href="{% url 'inspections:fa_resubmit' fa.fai_id %}" 
+               class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded border border-blue-700">
+                Resubmit for Review
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- FA Details -->
+    <div class="card p-6 mb-6">
+        <h2 class="text-xl font-bold mb-4 border-b border-theme pb-2">Submission Details</h2>
+        <dl class="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2 md:grid-cols-3">
+            <div>
+                <dt class="text-sm font-medium text-muted">Fabric Style</dt>
+                <dd class="mt-1 text-primary">{{ fa.fabric_style }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Status</dt>
+                <dd class="mt-1">
+                    {% if fa.status == 'approved' %}
+                        <span class="badge-success">Approved</span>
+                    {% elif fa.status == 'rejected' %}
+                        <span class="badge-danger">Rejected</span>
+                    {% elif fa.status == 'pending_final' %}
+                        <span class="badge-info">Pending Final Review</span>
+                    {% else %}
+                        <span class="badge-warning">Pending Primary Review</span>
+                    {% endif %}
+                </dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">MultiCam Variant</dt>
+                <dd class="mt-1 text-primary">{{ fa.multicam_variant.camouflage_name }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">FA Lot Number</dt>
+                <dd class="mt-1 text-primary font-semibold">{{ fa.fa_lot_number }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Shade Standard</dt>
+                <dd class="mt-1 text-primary">{{ fa.get_shade_standard_display }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Spectral Reflectance Req.</dt>
+                <dd class="mt-1 text-primary">{{ fa.get_spectral_reflectance_requirement_display }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Submission Date</dt>
+                <dd class="mt-1 text-primary">{{ fa.submission_date|date:"M d, Y H:i" }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Date of Printing</dt>
+                <dd class="mt-1 text-primary">{{ fa.date_of_printing|date:"M d, Y" }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Tracking Number</dt>
+                <dd class="mt-1 text-primary">{{ fa.tracking_number|default:"-" }}</dd>
+            </div>
+        </dl>
+    </div>
+    
+    <!-- Evaluation Summary -->
+    {% if evaluation_history %}
+    <div class="card p-6 mb-6">
+        <h2 class="text-xl font-bold mb-4 border-b border-theme pb-2">Latest Evaluation</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Primary Evaluation Summary -->
+            <div class="border border-theme rounded p-4">
+                <h3 class="font-bold mb-3">Primary Inspector (1947)</h3>
+                {% for attempt_num, stages in evaluation_history.items %}
+                    {% if forloop.first %}
+                        {% if stages.primary %}
+                            <div class="space-y-2 text-sm">
+                                <p>
+                                    <span class="text-muted">Inspector:</span>
+                                    <span class="text-primary">{{ stages.primary.inspector.username|default:"N/A" }}</span>
+                                </p>
+                                <p>
+                                    <span class="text-muted">Date:</span>
+                                    <span class="text-primary">{{ stages.primary.evaluation_date|date:"M d, Y H:i" }}</span>
+                                </p>
+                                <p>
+                                    <span class="text-muted">Result:</span>
+                                    {% if stages.primary.is_submitted %}
+                                        {% if stages.primary.all_pass %}
+                                            <span class="result-pass">Pass</span>
+                                        {% else %}
+                                            <span class="result-fail">Fail</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="badge-warning">In Progress</span>
+                                    {% endif %}
+                                </p>
+                                {% if stages.primary.comments %}
+                                <p>
+                                    <span class="text-muted">Comments:</span>
+                                    <span class="text-primary">{{ stages.primary.comments|truncatewords:30 }}</span>
+                                </p>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted">Awaiting primary review</p>
+                        {% endif %}
+                    {% endif %}
+                {% empty %}
+                    <p class="text-muted">Awaiting primary review</p>
+                {% endfor %}
+            </div>
+            
+            <!-- Final Evaluation Summary -->
+            <div class="border border-theme rounded p-4">
+                <h3 class="font-bold mb-3">Final Inspector (Crye)</h3>
+                {% for attempt_num, stages in evaluation_history.items %}
+                    {% if forloop.first %}
+                        {% if stages.final %}
+                            <div class="space-y-2 text-sm">
+                                <p>
+                                    <span class="text-muted">Inspector:</span>
+                                    <span class="text-primary">{{ stages.final.inspector.username|default:"N/A" }}</span>
+                                </p>
+                                <p>
+                                    <span class="text-muted">Date:</span>
+                                    <span class="text-primary">{{ stages.final.evaluation_date|date:"M d, Y H:i" }}</span>
+                                </p>
+                                <p>
+                                    <span class="text-muted">Result:</span>
+                                    {% if stages.final.is_submitted %}
+                                        {% if stages.final.all_pass %}
+                                            <span class="result-pass">Pass</span>
+                                        {% else %}
+                                            <span class="result-fail">Fail</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="badge-warning">In Progress</span>
+                                    {% endif %}
+                                </p>
+                                {% if stages.final.comments %}
+                                <p>
+                                    <span class="text-muted">Comments:</span>
+                                    <span class="text-primary">{{ stages.final.comments|truncatewords:30 }}</span>
+                                </p>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted">
+                                {% if stages.primary and stages.primary.all_pass %}
+                                    Awaiting final review
+                                {% else %}
+                                    Not applicable (Primary review not passed)
+                                {% endif %}
+                            </p>
+                        {% endif %}
+                    {% endif %}
+                {% empty %}
+                    <p class="text-muted">Awaiting primary review</p>
+                {% endfor %}
+            </div>
+        </div>
+        
+        {% if evaluation_history|length > 1 %}
+        <p class="mt-4 text-sm text-muted">
+            This First Article has been reviewed {{ evaluation_history|length }} time(s).
+            <a href="{% url 'inspections:fa_evaluation_history' fa.fai_id %}" class="text-blue-600 hover:underline">
+                View complete history →
+            </a>
+        </p>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    <!-- Back Link -->
+    <div class="mt-6">
+        <a href="{% url 'inspections:fa_list' %}" class="btn-secondary">
+            ← Back to FA List
+        </a>
+    </div>
+</div>
+{% endblock %}

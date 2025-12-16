@@ -1,0 +1,95 @@
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.models import User
+from unfold.admin import ModelAdmin, TabularInline
+from .models import UserProfile
+
+
+class UserProfileInline(TabularInline):
+    """Inline to show UserProfile on User admin page"""
+    model = UserProfile
+    can_delete = False
+    verbose_name_plural = 'Profile'
+    fk_name = 'user'
+    fields = ['user_functionality', 'admin_role', 'company_name', 'status']
+    readonly_fields = ['company_name']
+
+
+# Unregister the default User admin
+admin.site.unregister(User)
+
+
+@admin.register(User)
+class UserAdmin(BaseUserAdmin):
+    """Custom User admin with UserProfile inline"""
+    inlines = [UserProfileInline]
+    list_display = ['username', 'email', 'first_name', 'last_name', 'is_staff', 'get_user_type']
+    
+    def get_user_type(self, obj):
+        if hasattr(obj, 'profile'):
+            return obj.profile.get_user_functionality_display()
+        return '-'
+    get_user_type.short_description = 'User Type'
+
+
+@admin.register(UserProfile)
+class UserProfileAdmin(ModelAdmin):
+    list_display = ['company_name', 'user', 'user_functionality', 'admin_role', 'status', 'technical_email']
+    list_filter = ['user_functionality', 'admin_role', 'status', 'partner_type']
+    search_fields = ['company_name', 'technical_email', 'commercial_email']
+    readonly_fields = ['created_at', 'updated_at']
+    actions = ['reset_to_default_permissions']
+    
+    @admin.action(description='Reset selected profiles to default permissions')
+    def reset_to_default_permissions(self, request, queryset):
+        """Reset permissions to defaults based on user_functionality"""
+        for profile in queryset:
+            profile.set_default_permissions()
+            profile.save(update_fields=[
+                'can_submit_fa', 'can_submit_lots', 'can_submit_reports',
+                'can_review_fa', 'can_review_lots',
+                'can_register_articles', 'can_upload_tds',
+                'can_view_printer_list', 'can_browse_rm_library',
+                'can_order_marketing', 'can_manage_users',
+            ])
+        self.message_user(request, f'Reset permissions for {queryset.count()} profile(s).')
+    
+    fieldsets = (
+        ('User Account', {
+            'fields': ('user', 'user_functionality', 'admin_role', 'status')
+        }),
+        ('Portal Permissions', {
+            'fields': (
+                'can_submit_fa', 'can_submit_lots', 'can_submit_reports',
+                'can_review_fa', 'can_review_lots',
+                'can_register_articles', 'can_upload_tds',
+                'can_view_printer_list', 'can_browse_rm_library',
+                'can_order_marketing', 'can_manage_users',
+            ),
+            'description': 'These are the actual portal permissions. They are set automatically based on User Type but can be customized.',
+        }),
+        ('Company Information', {
+            'fields': ('company_name', 'technical_email', 'technical_contact', 
+                      'commercial_email', 'commercial_contact')
+        }),
+        ('Address', {
+            'fields': ('street', 'number', 'city', 'state', 'country', 'telephone'),
+            'classes': ('collapse',)
+        }),
+        ('Partner Information', {
+            'fields': ('partner_type', 'mpp_level', 'license_agreement_date', 
+                      'license_expiry_date', 'license_agreement_docs'),
+            'classes': ('collapse',)
+        }),
+        ('Legacy Data', {
+            'fields': ('google_sheet_fa_id', 'google_sheet_lot_id'),
+            'classes': ('collapse',)
+        }),
+        ('Notes', {
+            'fields': ('notes',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )

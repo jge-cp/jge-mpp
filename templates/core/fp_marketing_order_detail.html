@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Order #{{ order.order_id }} - Multicam Partner Portal{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-6">
+    <div class="mb-6">
+        <a href="{% url 'core:fp_marketing_orders_list' %}" class="text-blue-600 hover:underline">&larr; Back to Orders</a>
+        <h1 class="text-3xl font-bold text-gray-900 mt-2">Order #{{ order.order_id }}</h1>
+        <span class="px-3 py-1 text-sm rounded-full inline-block mt-2
+            {% if order.status == 'delivered' %}bg-green-100 text-green-800
+            {% elif order.status == 'shipped' %}bg-blue-100 text-blue-800
+            {% elif order.status == 'processing' %}bg-purple-100 text-purple-800
+            {% elif order.status == 'approved' %}bg-cyan-100 text-cyan-800
+            {% elif order.status == 'cancelled' %}bg-red-100 text-red-800
+            {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+            {{ order.get_status_display }}
+        </span>
+    </div>
+    
+    <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Order Details</h2>
+        <dl class="grid grid-cols-2 gap-4">
+            <div>
+                <dt class="text-sm text-gray-500">Order Date</dt>
+                <dd class="font-medium">{{ order.created_at|date:"F d, Y" }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm text-gray-500">RM Supplier</dt>
+                <dd class="font-medium">{{ order.rm_supplier.company_name|default:order.rm_supplier_name|default:"-" }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm text-gray-500">Fabric Type</dt>
+                <dd class="font-medium">{{ order.fabric_type }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm text-gray-500">Camouflage</dt>
+                <dd class="font-medium">{{ order.camouflage_type.camouflage_name }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm text-gray-500">Number of Pieces</dt>
+                <dd class="font-medium text-lg">{{ order.number_of_pieces }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm text-gray-500">Yardage</dt>
+                <dd class="font-medium">{{ order.yardage_to_be_used|default:"-" }}</dd>
+            </div>
+        </dl>
+    </div>
+    
+    <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Shipping Address</h2>
+        <address class="not-italic">
+            <p class="font-medium">{{ order.shipping_name }}</p>
+            <p>{{ order.shipping_street }}</p>
+            <p>{{ order.shipping_city }}{% if order.shipping_state %}, {{ order.shipping_state }}{% endif %} {{ order.shipping_postal_code }}</p>
+            <p>{{ order.shipping_country }}</p>
+        </address>
+    </div>
+    
+    {% if order.tracking_number or order.shipped_date %}
+    <div class="bg-white shadow rounded-lg p-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Shipping Information</h2>
+        <dl class="grid grid-cols-2 gap-4">
+            {% if order.tracking_number %}
+            <div>
+                <dt class="text-sm text-gray-500">Tracking Number</dt>
+                <dd class="font-medium">{{ order.tracking_number }}</dd>
+            </div>
+            {% endif %}
+            {% if order.shipped_date %}
+            <div>
+                <dt class="text-sm text-gray-500">Shipped Date</dt>
+                <dd class="font-medium">{{ order.shipped_date|date:"F d, Y" }}</dd>
+            </div>
+            {% endif %}
+            {% if order.delivered_date %}
+            <div>
+                <dt class="text-sm text-gray-500">Delivered Date</dt>
+                <dd class="font-medium">{{ order.delivered_date|date:"F d, Y" }}</dd>
+            </div>
+            {% endif %}
+        </dl>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block title %}Report #{{ report.report_id }} - Multicam Partner Portal{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-6">
+    <div class="mb-6">
+        <a href="{% url 'inspections:report_list' %}" class="text-blue-600 hover:underline">&larr; Back to Reports</a>
+        <h1 class="text-3xl font-bold text-gray-900 mt-2">Report #{{ report.report_id }}</h1>
+        <div class="flex items-center mt-2 space-x-2">
+            <span class="px-3 py-1 text-sm rounded-full 
+                {% if report.status == 'invoiced' %}bg-green-100 text-green-800
+                {% elif report.status == 'reviewed' %}bg-blue-100 text-blue-800
+                {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                {{ report.get_status_display }}
+            </span>
+            {% if report.non_license_fee_printing %}
+                <span class="px-3 py-1 text-sm rounded-full bg-gray-100 text-gray-600">
+                    Non-License Fee Printing
+                </span>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Reporting Period</h2>
+        <dl class="grid grid-cols-2 gap-4">
+            <div>
+                <dt class="text-sm text-gray-500">Period From</dt>
+                <dd class="font-medium">{{ report.period_from|date:"F d, Y" }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm text-gray-500">Period To</dt>
+                <dd class="font-medium">{{ report.period_to|date:"F d, Y" }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm text-gray-500">Report Date</dt>
+                <dd class="font-medium">{{ report.report_date|date:"F d, Y" }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm text-gray-500">Submitted</dt>
+                <dd class="font-medium">{{ report.created_at|date:"F d, Y H:i" }}</dd>
+            </div>
+        </dl>
+    </div>
+    
+    <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Billing Information</h2>
+        <dl class="grid grid-cols-2 gap-4">
+            <div>
+                <dt class="text-sm text-gray-500">Billing Date</dt>
+                <dd class="font-medium">{{ report.billing_date|date:"F d, Y" }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm text-gray-500">Billing Document Reference</dt>
+                <dd class="font-medium">{{ report.billing_document_reference|default:"-" }}</dd>
+            </div>
+        </dl>
+    </div>
+    
+    <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Customer Information</h2>
+        <dl class="grid grid-cols-2 gap-4">
+            <div>
+                <dt class="text-sm text-gray-500">Customer Name</dt>
+                <dd class="font-medium">{{ report.customer_name }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm text-gray-500">Customer PO</dt>
+                <dd class="font-medium">{{ report.customer_po|default:"-" }}</dd>
+            </div>
+        </dl>
+    </div>
+    
+    <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Production Details</h2>
+        <dl class="grid grid-cols-2 gap-4">
+            <div>
+                <dt class="text-sm text-gray-500">Fabric Type</dt>
+                <dd class="font-medium">{{ report.fabric_type }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm text-gray-500">MC Variant</dt>
+                <dd class="font-medium">{{ report.mc_variant.camouflage_name }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm text-gray-500">Lot Number</dt>
+                <dd class="font-medium">{{ report.lot_number|default:"-" }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm text-gray-500">Material Number</dt>
+                <dd class="font-medium">{{ report.material_number|default:"-" }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm text-gray-500">Yardage Produced</dt>
+                <dd class="font-medium text-lg">{{ report.yardage_produced }} yards</dd>
+            </div>
+            <div>
+                <dt class="text-sm text-gray-500">Cuttable Width</dt>
+                <dd class="font-medium">{{ report.cuttable_width|default:"-" }} inches</dd>
+            </div>
+            <div>
+                <dt class="text-sm text-gray-500">Military/Gov Reference</dt>
+                <dd class="font-medium">{{ report.mpg_reference|default:"-" }}</dd>
+            </div>
+        </dl>
+    </div>
+    
+    {% if report.invoice_reference or report.reviewed_by %}
+    <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Accounting Information</h2>
+        <dl class="grid grid-cols-2 gap-4">
+            <div>
+                <dt class="text-sm text-gray-500">Invoice Reference</dt>
+                <dd class="font-medium">{{ report.invoice_reference|default:"-" }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm text-gray-500">Reviewed By</dt>
+                <dd class="font-medium">{{ report.reviewed_by.get_full_name|default:report.reviewed_by.username|default:"-" }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm text-gray-500">Reviewed Date</dt>
+                <dd class="font-medium">{{ report.reviewed_date|date:"F d, Y H:i"|default:"-" }}</dd>
+            </div>
+        </dl>
+    </div>
+    {% endif %}
+    
+    {% if report.notes %}
+    <div class="bg-white shadow rounded-lg p-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Notes</h2>
+        <p class="text-gray-700">{{ report.notes }}</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

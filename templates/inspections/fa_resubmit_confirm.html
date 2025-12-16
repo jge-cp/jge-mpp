@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Resubmit First Article - Multicam Partner Portal{% endblock %}
+
+{% block content %}
+<div class="px-4 py-6">
+    <div class="max-w-2xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6 text-primary">Resubmit First Article</h1>
+        
+        <div class="card p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">{{ fa.display_name }}</h2>
+            
+            <div class="mb-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded">
+                <p class="text-yellow-800 dark:text-yellow-200">
+                    <strong>Note:</strong> This First Article was rejected. Resubmitting will put it back in the 
+                    review queue for the Primary Inspector to evaluate again.
+                </p>
+            </div>
+            
+            <dl class="grid grid-cols-2 gap-4 mb-6">
+                <div>
+                    <dt class="text-sm font-medium text-muted">Current Status</dt>
+                    <dd class="mt-1">
+                        <span class="badge-danger">Rejected</span>
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-muted">Previous Attempts</dt>
+                    <dd class="mt-1 text-primary">{{ fa.get_current_attempt_number }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-muted">Fabric Style</dt>
+                    <dd class="mt-1 text-primary">{{ fa.fabric_style }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-muted">MultiCam Variant</dt>
+                    <dd class="mt-1 text-primary">{{ fa.multicam_variant.camouflage_name }}</dd>
+                </div>
+            </dl>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="flex justify-between items-center">
+                    <a href="{% url 'inspections:fa_detail' fa.fai_id %}" class="btn-secondary">
+                        ← Cancel
+                    </a>
+                    <button type="submit" 
+                            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded border border-blue-700">
+                        Confirm Resubmission
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="card p-6">
+            <h3 class="text-lg font-bold mb-4">What happens next?</h3>
+            <ol class="list-decimal list-inside space-y-2 text-muted">
+                <li>Your First Article will be placed back in the Primary Inspector's queue</li>
+                <li>The Primary Inspector (1947) will review and evaluate it</li>
+                <li>If approved, it moves to the Final Inspector (Crye) for final review</li>
+                <li>If approved by both, your First Article will be approved and you can submit Lots</li>
+            </ol>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,475 @@
+{% extends 'base.html' %}
+
+{% block title %}Evaluate Lot - {{ lot.display_name }} - Multicam Partner Portal{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Evaluation result indicators */
+    .result-pass {
+        background-color: #22c55e !important;
+        color: white !important;
+        font-weight: bold;
+        padding: 2px 8px;
+        border-radius: 4px;
+    }
+    .result-fail {
+        background-color: #ef4444 !important;
+        color: white !important;
+        font-weight: bold;
+        padding: 2px 8px;
+        border-radius: 4px;
+    }
+    .result-pending {
+        background-color: #6b7280;
+        color: white;
+        font-weight: bold;
+        padding: 2px 8px;
+        border-radius: 4px;
+    }
+    
+    /* Sample section styling */
+    .sample-section {
+        border: 2px solid var(--color-border);
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        transition: border-color 0.2s;
+    }
+    .sample-section.pass-section {
+        border-color: #22c55e;
+    }
+    .sample-section.fail-section {
+        border-color: #ef4444;
+    }
+    .sample-header {
+        background-color: var(--color-bg-elevated);
+        padding: 1rem;
+        border-bottom: 1px solid var(--color-border);
+        border-radius: 6px 6px 0 0;
+    }
+    
+    /* Rating row styling */
+    .rating-row {
+        transition: background-color 0.2s;
+    }
+    .rating-row.pass-row {
+        background-color: rgba(34, 197, 94, 0.1);
+    }
+    .rating-row.fail-row {
+        background-color: rgba(239, 68, 68, 0.1);
+    }
+    
+    /* Evaluation table */
+    .eval-table th {
+        background-color: var(--color-bg-elevated);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        letter-spacing: 0.05em;
+    }
+    .eval-table td, .eval-table th {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid var(--color-border);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="px-4 py-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-primary">Lot Evaluation</h1>
+            <p class="text-lg text-muted mt-1">{{ lot.display_name }}</p>
+        </div>
+        <div>
+            <span class="badge-info text-lg px-4 py-2">{{ num_samples }} Samples</span>
+        </div>
+    </div>
+    
+    <!-- Lot Details Card -->
+    <div class="card p-6 mb-6">
+        <h2 class="text-xl font-bold mb-4 border-b border-theme pb-2">Lot Details</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+                <dt class="text-sm font-medium text-muted">Partner</dt>
+                <dd class="mt-1 text-primary font-semibold">{{ lot.vendor.company_name }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Original FA</dt>
+                <dd class="mt-1">
+                    <a href="{% url 'inspections:fa_detail' lot.original_fa.fai_id %}" class="text-blue-600 hover:underline">
+                        {{ lot.original_fa.display_name }}
+                    </a>
+                </dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Fabric Style</dt>
+                <dd class="mt-1 text-primary">{{ lot.fabric_style }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">MultiCam Variant</dt>
+                <dd class="mt-1 text-primary">{{ lot.multicam_variant.camouflage_name }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Lot Number</dt>
+                <dd class="mt-1 text-primary font-semibold">{{ lot.lot_lot_number }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Yards Printed</dt>
+                <dd class="mt-1 text-primary">{{ lot.number_of_yards_printed }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Spectral Reflectance Req.</dt>
+                <dd class="mt-1 text-primary">{{ lot.original_fa.get_spectral_reflectance_requirement_display }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Date of Printing</dt>
+                <dd class="mt-1 text-primary">{{ lot.date_of_printing|date:"M d, Y" }}</dd>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Evaluation Form -->
+    <form method="post" id="evaluation-form">
+        {% csrf_token %}
+        
+        <!-- Sample Sections -->
+        {% for sample in samples_data %}
+        <div class="sample-section" id="sample-section-{{ sample.sample_number }}" data-sample="{{ sample.sample_number }}">
+            <div class="sample-header flex justify-between items-center">
+                <div>
+                    <h3 class="text-lg font-bold text-primary">Sample {{ sample.sample_number }}: {{ sample.sample_id }}</h3>
+                </div>
+                <div>
+                    <span class="sample-result result-pending" id="sample-result-{{ sample.sample_number }}">
+                        {% if sample.sample_eval.pattern_execution and sample.sample_eval.scale %}
+                            {% if sample.sample_eval.all_pass %}Pass{% else %}Fail{% endif %}
+                        {% else %}--{% endif %}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="p-4">
+                <!-- Shade Matching Table -->
+                <h4 class="font-semibold mb-2 text-sm text-muted uppercase">Shade Matching (Rating ≥ 3 = Pass)</h4>
+                <table class="w-full eval-table mb-4">
+                    <thead>
+                        <tr>
+                            <th class="text-left w-1/4">Color</th>
+                            <th class="text-left w-1/3">Rating</th>
+                            <th class="text-left">Comment</th>
+                            <th class="text-center w-20">Result</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for color, color_eval in sample.color_forms %}
+                        <tr class="rating-row {% if color_eval and color_eval.rating %}{% if color_eval.is_passing %}pass-row{% else %}fail-row{% endif %}{% endif %}"
+                            data-sample="{{ sample.sample_number }}" data-color="{{ color.id }}">
+                            <td class="font-medium text-sm">{{ color.color_name }}</td>
+                            <td>
+                                <select name="sample_{{ sample.sample_number }}_color_{{ color.id }}-rating" 
+                                        class="form-select w-full text-sm color-rating-select"
+                                        data-sample="{{ sample.sample_number }}" data-color="{{ color.id }}"
+                                        onchange="updateColorResult(this)">
+                                    <option value="">-- Select --</option>
+                                    <option value="0" {% if color_eval and color_eval.rating == '0' %}selected{% endif %}>0 - Off-Shade</option>
+                                    <option value="0-1" {% if color_eval and color_eval.rating == '0-1' %}selected{% endif %}>0-1</option>
+                                    <option value="1" {% if color_eval and color_eval.rating == '1' %}selected{% endif %}>1 - Much</option>
+                                    <option value="1-2" {% if color_eval and color_eval.rating == '1-2' %}selected{% endif %}>1-2</option>
+                                    <option value="2" {% if color_eval and color_eval.rating == '2' %}selected{% endif %}>2 - Considerable</option>
+                                    <option value="2-3" {% if color_eval and color_eval.rating == '2-3' %}selected{% endif %}>2-3</option>
+                                    <option value="3" {% if color_eval and color_eval.rating == '3' %}selected{% endif %}>3 - Noticeable</option>
+                                    <option value="3-4" {% if color_eval and color_eval.rating == '3-4' %}selected{% endif %}>3-4</option>
+                                    <option value="4" {% if color_eval and color_eval.rating == '4' %}selected{% endif %}>4 - Slight</option>
+                                    <option value="4-5" {% if color_eval and color_eval.rating == '4-5' %}selected{% endif %}>4-5</option>
+                                    <option value="5" {% if color_eval and color_eval.rating == '5' %}selected{% endif %}>5 - Equal</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="text" name="sample_{{ sample.sample_number }}_color_{{ color.id }}-comment" 
+                                       class="form-input w-full text-sm"
+                                       placeholder="Optional"
+                                       value="{{ color_eval.comment|default:'' }}">
+                            </td>
+                            <td class="text-center">
+                                <span class="color-result result-pending" id="result-s{{ sample.sample_number }}-c{{ color.id }}">
+                                    {% if color_eval and color_eval.rating %}
+                                        {% if color_eval.is_passing %}Pass{% else %}Fail{% endif %}
+                                    {% else %}--{% endif %}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+                <!-- Overall Criteria -->
+                <h4 class="font-semibold mb-2 text-sm text-muted uppercase">Overall Criteria</h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
+                    <div>
+                        <label class="form-label text-sm">Pattern Execution</label>
+                        <select name="sample_{{ sample.sample_number }}_pattern" 
+                                class="form-select w-full criteria-select"
+                                data-sample="{{ sample.sample_number }}" data-criterion="pattern"
+                                onchange="updateSampleCriterion(this)">
+                            <option value="">-- Select --</option>
+                            <option value="pass" {% if sample.sample_eval.pattern_execution == 'pass' %}selected{% endif %}>Pass</option>
+                            <option value="fail" {% if sample.sample_eval.pattern_execution == 'fail' %}selected{% endif %}>Fail</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label text-sm">Scale</label>
+                        <select name="sample_{{ sample.sample_number }}_scale" 
+                                class="form-select w-full criteria-select"
+                                data-sample="{{ sample.sample_number }}" data-criterion="scale"
+                                onchange="updateSampleCriterion(this)">
+                            <option value="">-- Select --</option>
+                            <option value="pass" {% if sample.sample_eval.scale == 'pass' %}selected{% endif %}>Pass</option>
+                            <option value="fail" {% if sample.sample_eval.scale == 'fail' %}selected{% endif %}>Fail</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label text-sm">
+                            Spectral Reflectance
+                            {% if lot.original_fa.spectral_reflectance_requirement == 'visible_only' %}
+                                <span class="text-xs text-muted">(N/A)</span>
+                            {% endif %}
+                        </label>
+                        {% if lot.original_fa.spectral_reflectance_requirement == 'visible_only' %}
+                            <span class="text-muted block py-2">N/A - Visible Spectrum Only</span>
+                            <input type="hidden" name="sample_{{ sample.sample_number }}_spectral" value="">
+                        {% else %}
+                            <select name="sample_{{ sample.sample_number }}_spectral" 
+                                    class="form-select w-full criteria-select"
+                                    data-sample="{{ sample.sample_number }}" data-criterion="spectral"
+                                    onchange="updateSampleCriterion(this)">
+                                <option value="">-- Select --</option>
+                                <option value="pass" {% if sample.sample_eval.spectral_reflectance == 'pass' %}selected{% endif %}>Pass</option>
+                                <option value="fail" {% if sample.sample_eval.spectral_reflectance == 'fail' %}selected{% endif %}>Fail</option>
+                            </select>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Sample Comments -->
+                <div>
+                    <label class="form-label text-sm">Sample Comments (optional)</label>
+                    <input type="text" name="sample_{{ sample.sample_number }}_comments" 
+                           class="form-input w-full"
+                           placeholder="Comments for this sample"
+                           value="{{ sample.sample_eval.comments|default:'' }}">
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        
+        <!-- Overall Comments Section -->
+        <div class="card p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4 border-b border-theme pb-2">Overall Comments</h2>
+            <textarea name="comments" 
+                      class="form-textarea w-full"
+                      rows="3"
+                      placeholder="Overall lot evaluation comments...">{{ evaluation.comments|default:'' }}</textarea>
+        </div>
+        
+        <!-- Overall Result Preview -->
+        <div class="card p-6 mb-6 border-2" id="overall-result-card">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-xl font-bold">Overall Lot Result</h2>
+                    <p class="text-muted text-sm">All {{ num_samples }} samples must pass</p>
+                </div>
+                <div id="overall-result-display" class="text-2xl font-bold">
+                    {% if evaluation.is_submitted %}
+                        {% if evaluation.all_pass %}
+                            <span class="result-pass px-6 py-3">PASS</span>
+                        {% else %}
+                            <span class="result-fail px-6 py-3">FAIL</span>
+                        {% endif %}
+                    {% else %}
+                        <span class="result-pending px-6 py-3">Pending</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="flex justify-between items-center">
+            <a href="{% url 'inspections:lot_review_queue' %}" class="btn-secondary">
+                ← Back to Queue
+            </a>
+            
+            <div class="flex space-x-4">
+                <button type="submit" name="save_draft" class="btn-secondary">
+                    Save Draft
+                </button>
+                <button type="submit" name="submit_evaluation" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded border border-blue-700"
+                        onclick="return confirmSubmit()">
+                    Submit Evaluation
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const passingRatings = ['3', '3-4', '4', '4-5', '5'];
+    const numSamples = {{ num_samples }};
+    
+    function isPassingRating(rating) {
+        return passingRatings.includes(rating);
+    }
+    
+    function updateColorResult(select) {
+        const sampleNum = select.dataset.sample;
+        const colorId = select.dataset.color;
+        const row = select.closest('tr');
+        const resultSpan = document.getElementById(`result-s${sampleNum}-c${colorId}`);
+        const rating = select.value;
+        
+        if (!rating) {
+            resultSpan.textContent = '--';
+            resultSpan.className = 'color-result result-pending';
+            row.classList.remove('pass-row', 'fail-row');
+        } else if (isPassingRating(rating)) {
+            resultSpan.textContent = 'Pass';
+            resultSpan.className = 'color-result result-pass';
+            row.classList.remove('fail-row');
+            row.classList.add('pass-row');
+        } else {
+            resultSpan.textContent = 'Fail';
+            resultSpan.className = 'color-result result-fail';
+            row.classList.remove('pass-row');
+            row.classList.add('fail-row');
+        }
+        
+        updateSampleResult(sampleNum);
+    }
+    
+    function updateSampleCriterion(select) {
+        const sampleNum = select.dataset.sample;
+        updateSampleResult(sampleNum);
+    }
+    
+    function updateSampleResult(sampleNum) {
+        const section = document.getElementById(`sample-section-${sampleNum}`);
+        const resultSpan = document.getElementById(`sample-result-${sampleNum}`);
+        
+        // Get all color ratings for this sample
+        const colorSelects = section.querySelectorAll('.color-rating-select');
+        let allColorsRated = true;
+        let allColorsPass = true;
+        
+        colorSelects.forEach(select => {
+            if (!select.value) {
+                allColorsRated = false;
+            } else if (!isPassingRating(select.value)) {
+                allColorsPass = false;
+            }
+        });
+        
+        // Get criteria
+        const patternSelect = section.querySelector('[name*="_pattern"]');
+        const scaleSelect = section.querySelector('[name*="_scale"]');
+        const spectralSelect = section.querySelector('[name*="_spectral"]');
+        
+        let allCriteriaSet = patternSelect.value && scaleSelect.value;
+        let allCriteriaPass = patternSelect.value === 'pass' && scaleSelect.value === 'pass';
+        
+        if (spectralSelect && spectralSelect.tagName === 'SELECT') {
+            if (spectralSelect.value) {
+                allCriteriaPass = allCriteriaPass && spectralSelect.value === 'pass';
+            } else {
+                allCriteriaSet = false;
+            }
+        }
+        
+        // Update sample result
+        if (!allColorsRated || !allCriteriaSet) {
+            resultSpan.textContent = 'Incomplete';
+            resultSpan.className = 'sample-result result-pending';
+            section.classList.remove('pass-section', 'fail-section');
+        } else if (allColorsPass && allCriteriaPass) {
+            resultSpan.textContent = 'Pass';
+            resultSpan.className = 'sample-result result-pass';
+            section.classList.remove('fail-section');
+            section.classList.add('pass-section');
+        } else {
+            resultSpan.textContent = 'Fail';
+            resultSpan.className = 'sample-result result-fail';
+            section.classList.remove('pass-section');
+            section.classList.add('fail-section');
+        }
+        
+        updateOverallResult();
+    }
+    
+    function updateOverallResult() {
+        const overallDisplay = document.getElementById('overall-result-display');
+        const overallCard = document.getElementById('overall-result-card');
+        
+        let allSamplesComplete = true;
+        let allSamplesPass = true;
+        
+        for (let i = 1; i <= numSamples; i++) {
+            const resultSpan = document.getElementById(`sample-result-${i}`);
+            const resultText = resultSpan.textContent.trim();
+            
+            if (resultText === 'Incomplete' || resultText === '--') {
+                allSamplesComplete = false;
+            } else if (resultText === 'Fail') {
+                allSamplesPass = false;
+            }
+        }
+        
+        if (!allSamplesComplete) {
+            overallDisplay.innerHTML = '<span class="result-pending px-6 py-3">Incomplete</span>';
+            overallCard.style.borderColor = 'var(--color-border)';
+        } else if (allSamplesPass) {
+            overallDisplay.innerHTML = '<span class="result-pass px-6 py-3">WILL PASS</span>';
+            overallCard.style.borderColor = '#22c55e';
+        } else {
+            overallDisplay.innerHTML = '<span class="result-fail px-6 py-3">WILL FAIL</span>';
+            overallCard.style.borderColor = '#ef4444';
+        }
+    }
+    
+    function confirmSubmit() {
+        let allSamplesComplete = true;
+        let allSamplesPass = true;
+        
+        for (let i = 1; i <= numSamples; i++) {
+            const resultSpan = document.getElementById(`sample-result-${i}`);
+            const resultText = resultSpan.textContent.trim();
+            
+            if (resultText === 'Incomplete' || resultText === '--') {
+                allSamplesComplete = false;
+            } else if (resultText === 'Fail') {
+                allSamplesPass = false;
+            }
+        }
+        
+        if (!allSamplesComplete) {
+            alert('Please complete all sample evaluations before submitting.');
+            return false;
+        }
+        
+        const resultMsg = allSamplesPass 
+            ? 'This lot will PASS. Submit evaluation?' 
+            : 'This lot will FAIL. The lot will be rejected. Continue?';
+        
+        return confirm(resultMsg);
+    }
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Update all sample results
+        for (let i = 1; i <= numSamples; i++) {
+            updateSampleResult(i);
+        }
+    });
+</script>
+{% endblock %}

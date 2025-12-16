@@ -1,0 +1,314 @@
+{% comment %}
+Sidebar partial for dashboard pages.
+Include this in dashboard templates that need the sidebar navigation.
+
+Required context:
+- user: The authenticated user
+- profile: The user's profile (user.profile)
+
+Optional context for badge counts (from inspector dashboard):
+- fa_pending: Number of FAs pending primary review
+- fa_pending_final: Number of FAs pending final review
+- lot_pending: Number of lots pending review
+{% endcomment %}
+
+<!-- Mobile sidebar backdrop -->
+<div x-show="sidebarOpen" 
+     x-cloak
+     @click="sidebarOpen = false"
+     class="fixed inset-0 z-30 bg-gray-900/50 md:hidden"
+     x-transition:enter="transition-opacity ease-linear duration-300"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     x-transition:leave="transition-opacity ease-linear duration-300"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0">
+</div>
+
+<!-- Sidebar -->
+<aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+       class="fixed top-0 left-0 z-40 w-64 h-screen pt-14 transition-transform bg-white border-r border-gray-200 md:translate-x-0 dark:bg-gray-800 dark:border-gray-700"
+       style="background-color: var(--color-bg-card); border-color: var(--color-border);"
+       aria-label="Sidenav">
+    <div class="overflow-y-auto py-5 px-3 h-full">
+        
+        <!-- User Info Section -->
+        <div class="pb-4 mb-4 border-b" style="border-color: var(--color-border);">
+            {% if profile.is_partner %}
+                <!-- Partner Badge -->
+                <div class="flex items-center space-x-3 px-2">
+                    <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-multicam-olive to-multicam-green rounded-lg flex flex-col items-center justify-center text-white text-center border border-multicam-olive/50">
+                        <span class="text-[8px] font-bold leading-tight">{{ profile.get_partner_level_display|upper|default:"STANDARD" }}</span>
+                        <span class="text-[6px] leading-tight opacity-80">MULTICAM</span>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-sm font-semibold truncate">{{ profile.company_name|default:user.username }}</p>
+                        <p class="text-xs text-muted truncate">Partner</p>
+                        <span class="badge badge-approved text-[10px] px-2 py-0.5">Active</span>
+                    </div>
+                </div>
+            {% elif profile.is_any_inspector %}
+                <!-- Inspector Badge -->
+                <div class="flex items-center space-x-3 px-2">
+                    <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br {% if profile.is_primary_inspector %}from-yellow-500 to-amber-600{% elif profile.is_final_inspector %}from-blue-500 to-indigo-600{% else %}from-purple-500 to-purple-700{% endif %} rounded-lg flex flex-col items-center justify-center text-white">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                        <span class="text-[8px] font-medium">{% if profile.is_primary_inspector %}PRIMARY{% elif profile.is_final_inspector %}FINAL{% else %}INSPECTOR{% endif %}</span>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-sm font-semibold truncate">{{ user.get_full_name|default:user.username }}</p>
+                        <p class="text-xs text-muted truncate">{{ profile.get_admin_role_display }}</p>
+                    </div>
+                </div>
+            {% elif profile.is_staff %}
+                <!-- Staff Badge -->
+                <div class="flex items-center space-x-3 px-2">
+                    <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-lg flex flex-col items-center justify-center text-white">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                        </svg>
+                        <span class="text-[8px] font-medium">STAFF</span>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-sm font-semibold truncate">{{ user.get_full_name|default:user.username }}</p>
+                        <p class="text-xs text-muted truncate">{{ profile.get_admin_role_display }}</p>
+                    </div>
+                </div>
+            {% else %}
+                <!-- Default user -->
+                <div class="flex items-center space-x-3 px-2">
+                    <div class="flex-shrink-0 w-10 h-10 bg-primary-600 rounded-full flex items-center justify-center text-white">
+                        <span class="text-lg font-medium">{{ user.username|slice:":1"|upper }}</span>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-sm font-semibold truncate">{{ user.get_full_name|default:user.username }}</p>
+                        <p class="text-xs text-muted truncate">{{ user.email }}</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Navigation Links -->
+        <ul class="space-y-1">
+            <!-- Overview - Always shown -->
+            <li>
+                <a href="{% url 'dashboard:dashboard_router' %}" 
+                   class="sidebar-link {% if request.resolver_match.url_name == 'partner_dashboard' or request.resolver_match.url_name == 'inspector_dashboard' or request.resolver_match.url_name == 'staff_dashboard' %}active{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
+                        <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
+                    </svg>
+                    Overview
+                </a>
+            </li>
+        </ul>
+
+        {% if profile.is_partner %}
+        <!-- Partner Navigation -->
+        <div class="sidebar-section-title mt-4">First Articles</div>
+        <ul class="space-y-1">
+            <li>
+                <a href="{% url 'inspections:fa_submit' %}" class="sidebar-link {% if request.resolver_match.url_name == 'fa_submit' %}active{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Submit New
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'inspections:fa_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'fa_list' %}active{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    My First Articles
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-section-title mt-4">Lots</div>
+        <ul class="space-y-1">
+            <li>
+                <a href="{% url 'inspections:lot_submit' %}" class="sidebar-link {% if request.resolver_match.url_name == 'lot_submit' %}active{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Submit New
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'inspections:lot_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'lot_list' %}active{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    </svg>
+                    My Lots
+                </a>
+            </li>
+        </ul>
+
+        {% comment %}Reports hidden for now
+        <div class="sidebar-section-title mt-4">Reports</div>
+        <ul class="space-y-1">
+            <li>
+                <a href="{% url 'inspections:report_submit' %}" class="sidebar-link {% if request.resolver_match.url_name == 'report_submit' %}active{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Submit Monthly Report
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'inspections:report_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'report_list' %}active{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    My Reports
+                </a>
+            </li>
+        </ul>
+        {% endcomment %}
+        {% endif %}
+
+        {% if profile.is_any_inspector %}
+        <!-- Inspector Navigation -->
+        <div class="sidebar-section-title mt-4">First Articles</div>
+        <ul class="space-y-1">
+            {% if profile.is_primary_inspector %}
+            <li>
+                <a href="{% url 'inspections:fa_review_queue_primary' %}" class="sidebar-link {% if request.resolver_match.url_name == 'fa_review_queue_primary' %}active{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                    </svg>
+                    First Article Queue
+                    {% if fa_pending %}<span class="sidebar-badge ml-auto">{{ fa_pending }}</span>{% endif %}
+                </a>
+            </li>
+            {% endif %}
+            {% if profile.is_final_inspector %}
+            <li>
+                <a href="{% url 'inspections:fa_review_queue_final' %}" class="sidebar-link {% if request.resolver_match.url_name == 'fa_review_queue_final' %}active{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    </svg>
+                    First Article Queue
+                    {% if fa_pending_final %}<span class="sidebar-badge ml-auto">{{ fa_pending_final }}</span>{% endif %}
+                </a>
+            </li>
+            {% endif %}
+            <li>
+                <a href="{% url 'inspections:fa_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'fa_list' %}active{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                    </svg>
+                    All First Articles
+                </a>
+            </li>
+        </ul>
+
+        {% if profile.is_primary_inspector %}
+        <div class="sidebar-section-title mt-4">Lots</div>
+        <ul class="space-y-1">
+            <li>
+                <a href="{% url 'inspections:lot_review_queue' %}" class="sidebar-link {% if request.resolver_match.url_name == 'lot_review_queue' %}active{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    </svg>
+                    Lot Queue
+                    {% if lot_pending %}<span class="sidebar-badge ml-auto">{{ lot_pending }}</span>{% endif %}
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'inspections:lot_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'lot_list' %}active{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                    </svg>
+                    All Lots
+                </a>
+            </li>
+        </ul>
+        {% endif %}
+
+        {% comment %}Reports hidden for now
+        <div class="sidebar-section-title mt-4">Reports</div>
+        <ul class="space-y-1">
+            <li>
+                <a href="{% url 'inspections:accounting_reports_queue' %}" class="sidebar-link {% if request.resolver_match.url_name == 'accounting_reports_queue' %}active{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Review Reports
+                </a>
+            </li>
+        </ul>
+        {% endcomment %}
+        {% endif %}
+
+        {% if profile.is_staff %}
+        <!-- Staff Navigation -->
+        <div class="sidebar-section-title mt-4">Analytics</div>
+        <ul class="space-y-1">
+            <li>
+                <a href="{% url 'dashboard:staff_dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'staff_dashboard' %}active{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    Program Stats
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-section-title mt-4">First Articles</div>
+        <ul class="space-y-1">
+            <li>
+                <a href="{% url 'inspections:fa_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'fa_list' %}active{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    All First Articles
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-section-title mt-4">Lots</div>
+        <ul class="space-y-1">
+            <li>
+                <a href="{% url 'inspections:lot_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'lot_list' %}active{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    </svg>
+                    All Lots
+                </a>
+            </li>
+        </ul>
+
+        {% comment %}Reports hidden for now
+        <div class="sidebar-section-title mt-4">Reports</div>
+        <ul class="space-y-1">
+            <li>
+                <a href="{% url 'inspections:report_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'report_list' %}active{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    All Reports
+                </a>
+            </li>
+        </ul>
+        {% endcomment %}
+        {% endif %}
+
+        <!-- Admin Link (only for superusers) -->
+        {% if user.is_superuser %}
+        <ul class="pt-4 mt-4 space-y-1 border-t" style="border-color: var(--color-border);">
+            <li>
+                <a href="{% url 'admin:index' %}" class="sidebar-link" target="_blank">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    Admin
+                </a>
+            </li>
+        </ul>
+        {% endif %}
+    </div>
+</aside>

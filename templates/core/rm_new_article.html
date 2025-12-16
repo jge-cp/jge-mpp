@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}Register New Article - Multicam Partner Portal{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-6">
+    <div class="mb-6">
+        <a href="{% url 'dashboard:rm_supplier_dashboard' %}" class="text-blue-600 hover:underline">&larr; Back to Dashboard</a>
+        <h1 class="text-3xl font-bold text-gray-900 mt-2">Register New Article</h1>
+        <p class="text-gray-600 mt-2">Register a new fabric or material for MC printing.</p>
+    </div>
+    
+    <form method="post" enctype="multipart/form-data" class="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4">
+        {% csrf_token %}
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mb-4 p-3 rounded {% if message.tags == 'error' %}bg-red-100 text-red-700 border border-red-400{% else %}bg-blue-100 text-blue-700 border border-blue-400{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <!-- Product Information -->
+        <div class="mb-6">
+            <h2 class="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">Product Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="product_name">
+                        Product Name *
+                    </label>
+                    <input type="text" name="product_name" id="product_name" required
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        placeholder="Fabric/material name">
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="product_code">
+                        Product Code
+                    </label>
+                    <input type="text" name="product_code" id="product_code"
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        placeholder="Your product code">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Composition -->
+        <div class="mb-6">
+            <h2 class="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">Material Composition</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-2">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="composition">
+                        Fiber Content *
+                    </label>
+                    <input type="text" name="composition" id="composition" required
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        placeholder="e.g., 50% Nylon, 50% Cotton">
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="construction">
+                        Construction *
+                    </label>
+                    <select name="construction" id="construction" required
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="">Select...</option>
+                        <option value="woven">Woven</option>
+                        <option value="knit">Knit</option>
+                        <option value="nonwoven">Non-Woven</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="weight_group">
+                        Weight Group *
+                    </label>
+                    <select name="weight_group" id="weight_group" required
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <option value="">Select...</option>
+                        <option value="light">Light (&lt;4 oz/yd²)</option>
+                        <option value="medium">Medium (4-8 oz/yd²)</option>
+                        <option value="heavy">Heavy (&gt;8 oz/yd²)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="weight_value">
+                        Weight (oz/yd²)
+                    </label>
+                    <input type="number" step="0.01" name="weight_value" id="weight_value"
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        placeholder="e.g., 6.5">
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="width">
+                        Width (inches)
+                    </label>
+                    <input type="number" step="0.01" name="width" id="width"
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        placeholder="e.g., 60">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Additional Info -->
+        <div class="mb-6">
+            <h2 class="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">Additional Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="finish">
+                        Finish
+                    </label>
+                    <input type="text" name="finish" id="finish"
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        placeholder="e.g., DWR, Flame Resistant">
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="color">
+                        Base Color
+                    </label>
+                    <input type="text" name="color" id="color" value="Greige"
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Approved Camouflages -->
+        <div class="mb-6">
+            <h2 class="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">Approved Camouflage Types</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {% for camo in camouflages %}
+                    <label class="flex items-center">
+                        <input type="checkbox" name="approved_camouflages" value="{{ camo.pk }}"
+                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <span class="ml-2 text-sm text-gray-700">{{ camo.camouflage_name }}</span>
+                    </label>
+                {% empty %}
+                    <p class="text-gray-500">No camouflage types available</p>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- TDS Upload -->
+        <div class="mb-6">
+            <h2 class="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">Technical Data Sheet (Optional)</h2>
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="tds_file">
+                    Upload TDS
+                </label>
+                <input type="file" name="tds_file" id="tds_file" accept=".pdf,.doc,.docx"
+                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                <p class="text-xs text-gray-500 mt-1">PDF or Word document</p>
+            </div>
+        </div>
+        
+        <!-- Description -->
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="description">
+                Description
+            </label>
+            <textarea name="description" id="description" rows="3"
+                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                placeholder="Additional notes about this material"></textarea>
+        </div>
+        
+        <!-- Submit -->
+        <div class="flex items-center justify-between">
+            <a href="{% url 'dashboard:rm_supplier_dashboard' %}" class="text-gray-600 hover:text-gray-800">
+                Cancel
+            </a>
+            <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded focus:outline-none focus:shadow-outline">
+                Register Article
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

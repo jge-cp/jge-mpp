@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}RM Library - Multicam Partner Portal{% endblock %}
+
+{% block content %}
+<div class="px-4 py-6">
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">RM Library</h1>
+        <p class="text-gray-600 mt-1">Browse approved raw materials by composition and weight</p>
+    </div>
+    
+    <!-- Filters -->
+    <div class="bg-white shadow rounded-lg p-4 mb-6">
+        <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Construction</label>
+                <select name="construction" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <option value="">All</option>
+                    <option value="woven" {% if construction == 'woven' %}selected{% endif %}>Woven</option>
+                    <option value="knit" {% if construction == 'knit' %}selected{% endif %}>Knit</option>
+                    <option value="nonwoven" {% if construction == 'nonwoven' %}selected{% endif %}>Non-Woven</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Weight</label>
+                <select name="weight_group" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <option value="">All</option>
+                    <option value="light" {% if weight_group == 'light' %}selected{% endif %}>Light (&lt;4 oz/yd²)</option>
+                    <option value="medium" {% if weight_group == 'medium' %}selected{% endif %}>Medium (4-8 oz/yd²)</option>
+                    <option value="heavy" {% if weight_group == 'heavy' %}selected{% endif %}>Heavy (&gt;8 oz/yd²)</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Supplier</label>
+                <select name="supplier" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <option value="">All Suppliers</option>
+                    {% for s in suppliers %}
+                        <option value="{{ s.pk }}" {% if supplier_id == s.pk|stringformat:"s" %}selected{% endif %}>{{ s.company_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="flex items-end">
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Filter
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Articles Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for article in articles %}
+            <div class="bg-white shadow rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <h3 class="text-lg font-bold text-gray-900 mb-2">{{ article.product_name }}</h3>
+                <dl class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">Supplier:</dt>
+                        <dd class="text-gray-900">{{ article.supplier.company_name }}</dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">Composition:</dt>
+                        <dd class="text-gray-900">{{ article.composition }}</dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">Construction:</dt>
+                        <dd class="text-gray-900">{{ article.get_construction_display }}</dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">Weight:</dt>
+                        <dd class="text-gray-900">{{ article.get_weight_group_display }}</dd>
+                    </div>
+                    {% if article.width %}
+                    <div class="flex justify-between">
+                        <dt class="text-gray-500">Width:</dt>
+                        <dd class="text-gray-900">{{ article.width }}"</dd>
+                    </div>
+                    {% endif %}
+                </dl>
+                
+                <!-- Approved Camos -->
+                {% if article.approved_camouflages.exists %}
+                <div class="mt-3 pt-3 border-t">
+                    <p class="text-xs text-gray-500 mb-1">Approved for:</p>
+                    <div class="flex flex-wrap gap-1">
+                        {% for camo in article.approved_camouflages.all %}
+                            <span class="px-2 py-0.5 text-xs rounded bg-green-100 text-green-800">{{ camo.camouflage_name }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- TDS Download -->
+                <div class="mt-4 pt-3 border-t">
+                    {% if article.tds_documents.exists %}
+                        <a href="{{ article.tds_documents.first.file.url }}" target="_blank"
+                            class="inline-flex items-center text-blue-600 hover:underline text-sm">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                            Download TDS
+                        </a>
+                    {% else %}
+                        <span class="text-gray-400 text-sm">No TDS available</span>
+                    {% endif %}
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-span-3 text-center py-8 text-gray-500">
+                No materials found matching your criteria.
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+

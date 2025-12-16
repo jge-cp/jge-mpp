@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', sidebarOpen: false }" 
+      x-init="$watch('darkMode', val => localStorage.setItem('darkMode', val))"
+      :class="{ 'dark': darkMode }">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Multicam Partner Portal{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        multicam: {
+                            sand: '#C4B396',
+                            olive: '#5C5844',
+                            brown: '#6B5C4A',
+                            green: '#4A5442',
+                            tan: '#D4C5A9',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Flowbite CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" rel="stylesheet" />
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    
+    <!-- Global Theme Styles -->
+    <style>
+        [x-cloak] { display: none !important; }
+        
+        :root {
+            --color-bg: #f9fafb;
+            --color-bg-card: #ffffff;
+            --color-bg-elevated: #f3f4f6;
+            --color-bg-input: #f9fafb;
+            --color-text: #111827;
+            --color-text-secondary: #4b5563;
+            --color-text-muted: #6b7280;
+            --color-border: #e5e7eb;
+            --color-border-strong: #d1d5db;
+        }
+        
+        .dark {
+            --color-bg: #000000;
+            --color-bg-card: #0a0a0a;
+            --color-bg-elevated: #111111;
+            --color-bg-input: #0a0a0a;
+            --color-text: #f3f4f6;
+            --color-text-secondary: #d1d5db;
+            --color-text-muted: #9ca3af;
+            --color-border: #374151;
+            --color-border-strong: #4b5563;
+        }
+        
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-text);
+        }
+        
+        h1, h2, h3, h4, h5, h6 { color: var(--color-text); }
+        p, label, span { color: inherit; }
+        a { color: inherit; }
+        
+        .card {
+            background-color: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.625rem 1.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 0.5rem;
+            border: 1px solid #0284c7;
+            background-color: #0284c7;
+            color: white;
+            transition: all 0.15s ease;
+        }
+        .btn-primary:hover {
+            background-color: #0369a1;
+            border-color: #0369a1;
+        }
+        
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.625rem 1.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 0.5rem;
+            border: 1px solid var(--color-border-strong);
+            background-color: var(--color-bg-card);
+            color: var(--color-text);
+            transition: all 0.15s ease;
+        }
+        .btn-secondary:hover {
+            background-color: var(--color-bg-elevated);
+        }
+        
+        .btn-danger {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.625rem 1.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 0.5rem;
+            border: 1px solid #dc2626;
+            background-color: #dc2626;
+            color: white;
+            transition: all 0.15s ease;
+        }
+        .btn-danger:hover {
+            background-color: #b91c1c;
+            border-color: #b91c1c;
+        }
+        
+        .btn-success {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.625rem 1.25rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 0.5rem;
+            border: 1px solid #16a34a;
+            background-color: #16a34a;
+            color: white;
+            transition: all 0.15s ease;
+        }
+        .btn-success:hover {
+            background-color: #15803d;
+            border-color: #15803d;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--color-text);
+        }
+        
+        .form-input,
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        input[type="date"],
+        input[type="tel"],
+        select,
+        textarea {
+            display: block;
+            width: 100%;
+            padding: 0.625rem 0.75rem;
+            font-size: 0.875rem;
+            border: 1px solid var(--color-border);
+            border-radius: 0.5rem;
+            background-color: var(--color-bg-input);
+            color: var(--color-text);
+            transition: border-color 0.15s ease;
+        }
+        
+        .form-input:focus, input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #0284c7;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+        }
+        
+        .form-input::placeholder, input::placeholder, textarea::placeholder {
+            color: var(--color-text-muted);
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border-radius: 9999px;
+            border: 1px solid;
+        }
+        
+        .badge-pending {
+            background-color: rgba(234, 179, 8, 0.1);
+            color: #ca8a04;
+            border-color: #ca8a04;
+        }
+        .dark .badge-pending {
+            background-color: rgba(234, 179, 8, 0.15);
+            color: #fbbf24;
+            border-color: #d97706;
+        }
+        
+        .badge-pending-final {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
+            border-color: #2563eb;
+        }
+        .dark .badge-pending-final {
+            background-color: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border-color: #3b82f6;
+        }
+        
+        .badge-approved {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+            border-color: #16a34a;
+        }
+        .dark .badge-approved {
+            background-color: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+            border-color: #22c55e;
+        }
+        
+        .badge-rejected {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+            border-color: #dc2626;
+        }
+        .dark .badge-rejected {
+            background-color: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border-color: #ef4444;
+        }
+        
+        table { border-color: var(--color-border); }
+        thead { background-color: var(--color-bg-elevated); }
+        th { color: var(--color-text-muted); font-weight: 500; text-transform: uppercase; font-size: 0.75rem; }
+        td { color: var(--color-text); }
+        tbody tr { border-bottom: 1px solid var(--color-border); }
+        tbody tr:hover { background-color: var(--color-bg-elevated); }
+        
+        .text-primary { color: var(--color-text); }
+        .text-secondary { color: var(--color-text-secondary); }
+        .text-muted { color: var(--color-text-muted); }
+        .bg-elevated { background-color: var(--color-bg-elevated); }
+        .border-theme { border-color: var(--color-border); }
+        
+        nav, footer { background-color: var(--color-bg-card); border-color: var(--color-border); }
+        
+        .dropdown-menu {
+            background-color: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+        }
+        
+        .icon-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem;
+            border: 1px solid var(--color-border);
+            background-color: var(--color-bg-elevated);
+        }
+        
+        .stat-card {
+            background-color: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+        }
+        .stat-number { font-size: 1.875rem; font-weight: 700; }
+        .stat-label { font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.25rem; }
+        
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            transition: all 0.15s ease;
+        }
+        .sidebar-link:hover {
+            background-color: var(--color-bg-elevated);
+            color: var(--color-text);
+        }
+        .sidebar-link.active {
+            background-color: rgba(2, 132, 199, 0.1);
+            color: #0284c7;
+        }
+        .dark .sidebar-link.active {
+            background-color: rgba(14, 165, 233, 0.15);
+            color: #38bdf8;
+        }
+        
+        .sidebar-section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--color-text-muted);
+            padding: 0.75rem 0.75rem 0.5rem;
+        }
+        
+        .sidebar-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 1.25rem;
+            height: 1.25rem;
+            padding: 0 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 9999px;
+            background-color: #0284c7;
+            color: white;
+        }
+    </style>
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <!-- Top Navigation Bar -->
+    <nav class="bg-white border-b border-gray-200 px-4 py-2.5 dark:bg-gray-800 dark:border-gray-700 fixed left-0 right-0 top-0 z-50" style="background-color: var(--color-bg-card); border-color: var(--color-border);">
+        <div class="flex flex-wrap justify-between items-center">
+            <div class="flex justify-start items-center">
+                {% block sidebar_toggle %}{% endblock %}
+                
+                <a href="{% url 'core:home' %}" class="flex items-center justify-between mr-4">
+                    <div class="w-8 h-8 bg-gradient-to-br from-multicam-olive to-multicam-green rounded-lg flex items-center justify-center border border-multicam-olive/50 mr-3">
+                        <span class="text-white font-bold text-sm">MC</span>
+                    </div>
+                    <span class="self-center text-xl font-semibold whitespace-nowrap">Multicam</span>
+                </a>
+            </div>
+            
+            <div class="flex items-center lg:order-2 space-x-3">
+                <button @click="darkMode = !darkMode" 
+                        type="button"
+                        class="p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+                        title="Toggle dark mode">
+                    <svg x-show="darkMode" x-cloak class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path>
+                    </svg>
+                    <svg x-show="!darkMode" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                    </svg>
+                </button>
+                
+                {% if user.is_authenticated %}
+                    <!-- Notification Bell -->
+                    <div x-data="{ notifOpen: false }" class="relative">
+                        <button @click="notifOpen = !notifOpen" type="button"
+                                class="relative p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+                                title="Notifications">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                            </svg>
+                            {% if unread_notification_count %}
+                            <span class="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
+                                {{ unread_notification_count|default:0 }}
+                            </span>
+                            {% endif %}
+                        </button>
+                        
+                        <!-- Notification Dropdown -->
+                        <div x-show="notifOpen" x-cloak @click.outside="notifOpen = false" x-transition
+                             class="absolute right-0 mt-2 w-80 rounded-xl shadow-lg z-50 max-h-96 overflow-hidden"
+                             style="background-color: var(--color-bg-card); border: 1px solid var(--color-border);">
+                            <div class="py-3 px-4 border-b flex justify-between items-center" style="border-color: var(--color-border);">
+                                <span class="font-semibold">Notifications</span>
+                                {% if unread_notification_count %}
+                                <a href="{% url 'notifications:mark_all_read' %}" 
+                                   hx-post="{% url 'notifications:mark_all_read' %}"
+                                   hx-swap="none"
+                                   hx-on::after-request="window.location.reload()"
+                                   class="text-xs text-primary-600 hover:text-primary-700">Mark all read</a>
+                                {% endif %}
+                            </div>
+                            <div class="overflow-y-auto max-h-72"
+                                 hx-get="{% url 'notifications:dropdown' %}"
+                                 hx-trigger="revealed"
+                                 hx-swap="innerHTML">
+                                <div class="p-4 text-center text-muted text-sm">
+                                    Loading...
+                                </div>
+                            </div>
+                            <div class="py-2 px-4 border-t text-center" style="border-color: var(--color-border);">
+                                <a href="{% url 'notifications:list' %}" class="text-sm text-primary-600 hover:text-primary-700">View all notifications</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                {% if user.is_authenticated %}
+                    <div x-data="{ open: false }" class="relative">
+                        <button @click="open = !open" type="button"
+                                class="flex items-center text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600">
+                            <span class="sr-only">Open user menu</span>
+                            <div class="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center">
+                                <span class="text-white font-medium text-sm">{{ user.username|slice:":1"|upper }}</span>
+                            </div>
+                        </button>
+                        
+                        <div x-show="open" x-cloak @click.outside="open = false" x-transition
+                             class="absolute right-0 mt-2 w-56 text-base list-none rounded divide-y divide-gray-100 shadow dark:divide-gray-600 rounded-xl z-50"
+                             style="background-color: var(--color-bg-card); border: 1px solid var(--color-border);">
+                            <div class="py-3 px-4">
+                                <span class="block text-sm font-semibold">{{ user.get_full_name|default:user.username }}</span>
+                                <span class="block text-sm truncate text-muted">{{ user.email|default:user.username }}</span>
+                            </div>
+                            <ul class="py-1">
+                                <li>
+                                    <a href="{% url 'dashboard:dashboard_router' %}" class="block py-2 px-4 text-sm hover:bg-gray-100 dark:hover:bg-gray-600">Dashboard</a>
+                                </li>
+                            </ul>
+                            <ul class="py-1">
+                                <li>
+                                    <a href="{% url 'accounts:logout' %}" class="block py-2 px-4 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-600">Sign out</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}" class="btn-primary">Sign In</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    
+    {% block sidebar %}{% endblock %}
+    
+    <main class="{% block main_class %}pt-16{% endblock %}">
+        <div class="{% block content_wrapper_class %}max-w-7xl mx-auto py-6 sm:px-6 lg:px-8{% endblock %}">
+            {% if messages %}
+                <div class="mb-6 space-y-2 px-4 sm:px-0">
+                    {% for message in messages %}
+                        <div x-data="{ show: true }" x-show="show" x-transition
+                             class="flex items-center p-4 rounded-lg border
+                                    {% if message.tags == 'success' %}bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700 text-green-800 dark:text-green-300
+                                    {% elif message.tags == 'error' %}bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-700 text-red-800 dark:text-red-300
+                                    {% elif message.tags == 'warning' %}bg-yellow-50 dark:bg-yellow-900/20 border-yellow-300 dark:border-yellow-700 text-yellow-800 dark:text-yellow-300
+                                    {% else %}bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-300{% endif %}">
+                            <span class="text-sm font-medium">{{ message }}</span>
+                            <button @click="show = false" class="ml-auto p-1 rounded hover:bg-black/10">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+    
+    {% block footer %}
+    <footer class="border-t mt-auto" style="background-color: var(--color-bg-card); border-color: var(--color-border);">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
+                <p class="text-sm text-muted">&copy; {% now "Y" %} Multicam Partner Portal. All rights reserved.</p>
+                <div class="flex space-x-6">
+                    <a href="{% url 'core:about' %}" class="text-sm text-muted hover:text-primary-600">About</a>
+                    <a href="{% url 'core:contact' %}" class="text-sm text-muted hover:text-primary-600">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    {% endblock %}
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+    
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,315 @@
+{% extends 'base.html' %}
+
+{% block title %}Evaluation History - {{ fa.display_name }} - Multicam Partner Portal{% endblock %}
+
+{% block extra_head %}
+<style>
+    .result-pass {
+        background-color: #22c55e !important;
+        color: white !important;
+        font-weight: bold;
+        padding: 2px 8px;
+        border-radius: 4px;
+    }
+    .result-fail {
+        background-color: #ef4444 !important;
+        color: white !important;
+        font-weight: bold;
+        padding: 2px 8px;
+        border-radius: 4px;
+    }
+    .eval-table th {
+        background-color: var(--color-bg-elevated);
+        font-weight: 600;
+        font-size: 0.75rem;
+    }
+    .eval-table td, .eval-table th {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid var(--color-border);
+    }
+    .attempt-section {
+        border: 2px solid var(--color-border);
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+    }
+    .attempt-header {
+        background-color: var(--color-bg-elevated);
+        padding: 1rem;
+        border-bottom: 1px solid var(--color-border);
+        border-radius: 6px 6px 0 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="px-4 py-6">
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-primary">Evaluation History</h1>
+            <p class="text-lg text-muted mt-1">{{ fa.display_name }}</p>
+        </div>
+        <a href="{% url 'inspections:fa_detail' fa.fai_id %}" class="btn-secondary">
+            ← Back to FA Detail
+        </a>
+    </div>
+    
+    <!-- FA Summary -->
+    <div class="card p-6 mb-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+                <dt class="text-sm font-medium text-muted">Current Status</dt>
+                <dd class="mt-1">
+                    {% if fa.status == 'approved' %}
+                        <span class="badge-success">Approved</span>
+                    {% elif fa.status == 'rejected' %}
+                        <span class="badge-danger">Rejected</span>
+                    {% elif fa.status == 'pending_final' %}
+                        <span class="badge-info">Pending Final Review</span>
+                    {% else %}
+                        <span class="badge-warning">Pending Primary Review</span>
+                    {% endif %}
+                </dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Partner</dt>
+                <dd class="mt-1 text-primary">{{ fa.vendor.company_name }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Fabric Style</dt>
+                <dd class="mt-1 text-primary">{{ fa.fabric_style }}</dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-muted">Total Attempts</dt>
+                <dd class="mt-1 text-primary font-semibold">{{ evaluation_history|length }}</dd>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Evaluation History by Attempt -->
+    {% for attempt_num, stages in evaluation_history.items %}
+    <div class="attempt-section">
+        <div class="attempt-header flex justify-between items-center">
+            <h2 class="text-xl font-bold">Attempt #{{ attempt_num }}</h2>
+            <div>
+                {% if stages.primary and stages.final %}
+                    {% if stages.final.all_pass %}
+                        <span class="result-pass">Final: Pass</span>
+                    {% elif stages.final.is_submitted %}
+                        <span class="result-fail">Final: Fail</span>
+                    {% endif %}
+                {% elif stages.primary %}
+                    {% if stages.primary.all_pass %}
+                        <span class="result-pass">Primary: Pass</span>
+                    {% elif stages.primary.is_submitted %}
+                        <span class="result-fail">Primary: Fail</span>
+                    {% else %}
+                        <span class="badge-warning">In Progress</span>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="p-4">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Primary Inspector Evaluation -->
+                <div>
+                    <h3 class="text-lg font-bold mb-3 text-primary">Primary Inspector (1947)</h3>
+                    {% if stages.primary %}
+                    <div class="mb-3">
+                        <p class="text-sm text-muted">
+                            Inspector: {{ stages.primary.inspector.username|default:"Unknown" }}<br>
+                            Date: {{ stages.primary.evaluation_date|date:"M d, Y H:i" }}<br>
+                            Status: {% if stages.primary.is_submitted %}Submitted{% else %}Draft{% endif %}
+                        </p>
+                    </div>
+                    
+                    <!-- Overall Criteria -->
+                    <div class="mb-3">
+                        <h4 class="font-semibold text-sm mb-2">Overall Criteria</h4>
+                        <table class="w-full eval-table text-sm">
+                            <tr>
+                                <td>Pattern Execution</td>
+                                <td class="text-center">
+                                    {% if stages.primary.pattern_execution == 'pass' %}
+                                        <span class="result-pass">Pass</span>
+                                    {% elif stages.primary.pattern_execution == 'fail' %}
+                                        <span class="result-fail">Fail</span>
+                                    {% else %}--{% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Scale</td>
+                                <td class="text-center">
+                                    {% if stages.primary.scale == 'pass' %}
+                                        <span class="result-pass">Pass</span>
+                                    {% elif stages.primary.scale == 'fail' %}
+                                        <span class="result-fail">Fail</span>
+                                    {% else %}--{% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Spectral Reflectance</td>
+                                <td class="text-center">
+                                    {% if stages.primary.spectral_reflectance == 'pass' %}
+                                        <span class="result-pass">Pass</span>
+                                    {% elif stages.primary.spectral_reflectance == 'fail' %}
+                                        <span class="result-fail">Fail</span>
+                                    {% else %}N/A{% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <!-- Color Ratings -->
+                    <div class="mb-3">
+                        <h4 class="font-semibold text-sm mb-2">Color Ratings</h4>
+                        <table class="w-full eval-table text-sm">
+                            <thead>
+                                <tr>
+                                    <th>Color</th>
+                                    <th>Rating</th>
+                                    <th>Result</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for color_eval in stages.primary.color_evaluations.all %}
+                                <tr>
+                                    <td>{{ color_eval.color.color_name }}</td>
+                                    <td class="text-center">{{ color_eval.rating|default:"--" }}</td>
+                                    <td class="text-center">
+                                        {% if color_eval.is_passing %}
+                                            <span class="result-pass">Pass</span>
+                                        {% elif color_eval.rating %}
+                                            <span class="result-fail">Fail</span>
+                                        {% else %}--{% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">No color evaluations</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    {% if stages.primary.comments %}
+                    <div>
+                        <h4 class="font-semibold text-sm mb-2">Comments</h4>
+                        <p class="text-sm text-muted bg-elevated p-2 rounded">{{ stages.primary.comments }}</p>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <p class="text-muted">No primary evaluation recorded</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Final Inspector Evaluation -->
+                <div>
+                    <h3 class="text-lg font-bold mb-3 text-primary">Final Inspector (Crye)</h3>
+                    {% if stages.final %}
+                    <div class="mb-3">
+                        <p class="text-sm text-muted">
+                            Inspector: {{ stages.final.inspector.username|default:"Unknown" }}<br>
+                            Date: {{ stages.final.evaluation_date|date:"M d, Y H:i" }}<br>
+                            Status: {% if stages.final.is_submitted %}Submitted{% else %}Draft{% endif %}
+                        </p>
+                    </div>
+                    
+                    <!-- Overall Criteria -->
+                    <div class="mb-3">
+                        <h4 class="font-semibold text-sm mb-2">Overall Criteria</h4>
+                        <table class="w-full eval-table text-sm">
+                            <tr>
+                                <td>Pattern Execution</td>
+                                <td class="text-center">
+                                    {% if stages.final.pattern_execution == 'pass' %}
+                                        <span class="result-pass">Pass</span>
+                                    {% elif stages.final.pattern_execution == 'fail' %}
+                                        <span class="result-fail">Fail</span>
+                                    {% else %}--{% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Scale</td>
+                                <td class="text-center">
+                                    {% if stages.final.scale == 'pass' %}
+                                        <span class="result-pass">Pass</span>
+                                    {% elif stages.final.scale == 'fail' %}
+                                        <span class="result-fail">Fail</span>
+                                    {% else %}--{% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Spectral Reflectance</td>
+                                <td class="text-center">
+                                    {% if stages.final.spectral_reflectance == 'pass' %}
+                                        <span class="result-pass">Pass</span>
+                                    {% elif stages.final.spectral_reflectance == 'fail' %}
+                                        <span class="result-fail">Fail</span>
+                                    {% else %}N/A{% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <!-- Color Ratings -->
+                    <div class="mb-3">
+                        <h4 class="font-semibold text-sm mb-2">Color Ratings</h4>
+                        <table class="w-full eval-table text-sm">
+                            <thead>
+                                <tr>
+                                    <th>Color</th>
+                                    <th>Rating</th>
+                                    <th>Result</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for color_eval in stages.final.color_evaluations.all %}
+                                <tr>
+                                    <td>{{ color_eval.color.color_name }}</td>
+                                    <td class="text-center">{{ color_eval.rating|default:"--" }}</td>
+                                    <td class="text-center">
+                                        {% if color_eval.is_passing %}
+                                            <span class="result-pass">Pass</span>
+                                        {% elif color_eval.rating %}
+                                            <span class="result-fail">Fail</span>
+                                        {% else %}--{% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">No color evaluations</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    {% if stages.final.comments %}
+                    <div>
+                        <h4 class="font-semibold text-sm mb-2">Comments</h4>
+                        <p class="text-sm text-muted bg-elevated p-2 rounded">{{ stages.final.comments }}</p>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <p class="text-muted">
+                        {% if stages.primary and stages.primary.all_pass %}
+                            Awaiting final review
+                        {% else %}
+                            Not applicable (Primary review not passed)
+                        {% endif %}
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="card p-6 text-center">
+        <p class="text-muted">No evaluation history available for this First Article.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+

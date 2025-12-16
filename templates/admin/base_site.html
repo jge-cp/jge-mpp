@@ -1,0 +1,84 @@
+{% extends "admin/base_site.html" %}
+
+{% block extrahead %}
+{{ block.super }}
+<script>
+// Fix for popup closing issue - ensure opener exists before popup_response.js runs
+// This MUST run before Django's popup_response.js script
+(function() {
+    if (window.location.search.includes('_popup=1')) {
+        // If opener is null, create a dummy opener that just closes the window
+        if (!window.opener) {
+            window.opener = {
+                dismissAddRelatedObjectPopup: function(win, value, obj) {
+                    console.log('Popup: Closing window (no opener)');
+                    if (win && typeof win.close === 'function') {
+                        win.close();
+                    } else {
+                        window.close();
+                    }
+                },
+                dismissChangeRelatedObjectPopup: function(win, value, obj, newValue) {
+                    console.log('Popup: Closing window (change, no opener)');
+                    if (win && typeof win.close === 'function') {
+                        win.close();
+                    } else {
+                        window.close();
+                    }
+                },
+                dismissDeleteRelatedObjectPopup: function(win, value) {
+                    console.log('Popup: Closing window (delete, no opener)');
+                    if (win && typeof win.close === 'function') {
+                        win.close();
+                    } else {
+                        window.close();
+                    }
+                }
+            };
+        } else {
+            // Opener exists, but make sure it has the required functions
+            if (typeof window.opener.dismissAddRelatedObjectPopup !== 'function') {
+                window.opener.dismissAddRelatedObjectPopup = function(win, value, obj) {
+                    console.log('Popup: Closing window (opener missing function)');
+                    if (win && typeof win.close === 'function') {
+                        win.close();
+                    } else {
+                        window.close();
+                    }
+                };
+            }
+            if (typeof window.opener.dismissChangeRelatedObjectPopup !== 'function') {
+                window.opener.dismissChangeRelatedObjectPopup = function(win, value, obj, newValue) {
+                    if (win && typeof win.close === 'function') {
+                        win.close();
+                    } else {
+                        window.close();
+                    }
+                };
+            }
+            if (typeof window.opener.dismissDeleteRelatedObjectPopup !== 'function') {
+                window.opener.dismissDeleteRelatedObjectPopup = function(win, value) {
+                    if (win && typeof win.close === 'function') {
+                        win.close();
+                    } else {
+                        window.close();
+                    }
+                };
+            }
+        }
+        
+        // Also catch any errors that slip through
+        window.addEventListener('error', function(e) {
+            if (e.message && (e.message.includes('dismissAddRelatedObjectPopup') || e.message.includes('Cannot read properties of null'))) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Popup: Error caught, closing window');
+                window.close();
+                return false;
+            }
+        }, true);
+    }
+})();
+</script>
+{% endblock %}
+

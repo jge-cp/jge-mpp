@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}RM Suppliers - Multicam Partner Portal{% endblock %}
+
+{% block content %}
+<div class="px-4 py-6">
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">RM Suppliers List</h1>
+        <p class="text-gray-600 mt-1">Raw Material Suppliers offering MC products</p>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for supplier in suppliers %}
+            <a href="{% url 'core:fp_rm_supplier_detail' supplier.pk %}" class="block bg-white shadow rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <h3 class="text-lg font-bold text-gray-900 mb-2">{{ supplier.company_name }}</h3>
+                <dl class="space-y-2 text-sm">
+                    <div class="flex items-start">
+                        <dt class="text-gray-500 w-20 flex-shrink-0">Contact:</dt>
+                        <dd class="text-gray-900">{{ supplier.technical_contact|default:"-" }}</dd>
+                    </div>
+                    <div class="flex items-start">
+                        <dt class="text-gray-500 w-20 flex-shrink-0">Email:</dt>
+                        <dd class="text-gray-900 break-all">{{ supplier.technical_email }}</dd>
+                    </div>
+                    {% if supplier.city or supplier.country %}
+                    <div class="flex items-start">
+                        <dt class="text-gray-500 w-20 flex-shrink-0">Location:</dt>
+                        <dd class="text-gray-900">{{ supplier.city }}{% if supplier.city and supplier.country %}, {% endif %}{{ supplier.country }}</dd>
+                    </div>
+                    {% endif %}
+                    {% if supplier.telephone %}
+                    <div class="flex items-start">
+                        <dt class="text-gray-500 w-20 flex-shrink-0">Phone:</dt>
+                        <dd class="text-gray-900">{{ supplier.telephone }}</dd>
+                    </div>
+                    {% endif %}
+                </dl>
+                <div class="mt-4 pt-3 border-t flex justify-between items-center">
+                    <span class="text-sm text-gray-500">{{ supplier.article_count }} article{{ supplier.article_count|pluralize }}</span>
+                    <span class="text-blue-600 text-sm font-medium">View Details →</span>
+                </div>
+            </a>
+        {% empty %}
+            <div class="col-span-3 text-center py-8 text-gray-500">
+                No RM Suppliers found.
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Accounting - Monthly Reports Queue - Multicam Partner Portal{% endblock %}
+
+{% block content %}
+<div class="px-4 py-6">
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">Monthly Reports - Accounting</h1>
+        <p class="text-gray-600 mt-1">Review and process printer monthly reports</p>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white rounded-lg shadow p-4">
+            <p class="text-sm text-gray-500">Total Yardage</p>
+            <p class="text-2xl font-bold text-blue-600">{{ totals.total_yardage|floatformat:0 }}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-4">
+            <p class="text-sm text-gray-500">Submitted</p>
+            <p class="text-2xl font-bold text-yellow-600">{{ totals.submitted_count }}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-4">
+            <p class="text-sm text-gray-500">Reviewed</p>
+            <p class="text-2xl font-bold text-blue-600">{{ totals.reviewed_count }}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-4">
+            <p class="text-sm text-gray-500">Invoiced</p>
+            <p class="text-2xl font-bold text-green-600">{{ totals.invoiced_count }}</p>
+        </div>
+    </div>
+    
+    <!-- Filters -->
+    <div class="bg-white rounded-lg shadow p-4 mb-6">
+        <div class="flex flex-wrap gap-2">
+            <a href="?status=all" class="px-4 py-2 rounded {% if status_filter == 'all' %}bg-blue-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
+                All
+            </a>
+            <a href="?status=submitted" class="px-4 py-2 rounded {% if status_filter == 'submitted' %}bg-yellow-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
+                Submitted ({{ totals.submitted_count }})
+            </a>
+            <a href="?status=reviewed" class="px-4 py-2 rounded {% if status_filter == 'reviewed' %}bg-blue-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
+                Reviewed ({{ totals.reviewed_count }})
+            </a>
+            <a href="?status=invoiced" class="px-4 py-2 rounded {% if status_filter == 'invoiced' %}bg-green-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
+                Invoiced ({{ totals.invoiced_count }})
+            </a>
+        </div>
+    </div>
+    
+    <!-- Reports Table -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-md">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Report ID</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Printer</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Period</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">MC Variant</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Yardage</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice Ref</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for report in reports %}
+                    <tr class="hover:bg-gray-50 {% if report.status == 'submitted' %}bg-yellow-50{% endif %}">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <a href="{% url 'inspections:accounting_review' report.report_id %}" class="text-blue-600 hover:underline font-medium">
+                                #{{ report.report_id }}
+                            </a>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ report.printer.company_name }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {{ report.period_from|date:"M d" }} - {{ report.period_to|date:"M d, Y" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ report.customer_name }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {{ report.mc_variant.camouflage_name }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ report.yardage_produced }} yds
+                            {% if report.non_license_fee_printing %}
+                                <span class="ml-1 text-xs text-gray-500">(Non-License)</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 text-xs rounded-full 
+                                {% if report.status == 'invoiced' %}bg-green-100 text-green-800
+                                {% elif report.status == 'reviewed' %}bg-blue-100 text-blue-800
+                                {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                {{ report.get_status_display }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                            {{ report.invoice_reference|default:"-" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            <a href="{% url 'inspections:accounting_review' report.report_id %}" class="text-blue-600 hover:underline">
+                                Review
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="9" class="px-6 py-4 text-center text-gray-500">
+                            No reports found.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+

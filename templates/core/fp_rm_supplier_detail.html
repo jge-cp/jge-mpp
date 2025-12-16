@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ supplier.company_name }} - Multicam Partner Portal{% endblock %}
+
+{% block content %}
+<div class="px-4 py-6">
+    <div class="mb-6">
+        <a href="{% url 'core:fp_rm_suppliers_list' %}" class="text-blue-600 hover:underline">&larr; Back to Suppliers</a>
+        <h1 class="text-3xl font-bold text-gray-900 mt-2">{{ supplier.company_name }}</h1>
+    </div>
+    
+    <!-- Supplier Info -->
+    <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Contact Information</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <p class="text-sm text-gray-500">Technical Contact</p>
+                <p class="font-medium">{{ supplier.technical_contact|default:"-" }}</p>
+                <p class="text-gray-600">{{ supplier.technical_email }}</p>
+            </div>
+            {% if supplier.commercial_contact %}
+            <div>
+                <p class="text-sm text-gray-500">Commercial Contact</p>
+                <p class="font-medium">{{ supplier.commercial_contact }}</p>
+                <p class="text-gray-600">{{ supplier.commercial_email }}</p>
+            </div>
+            {% endif %}
+            {% if supplier.get_full_address %}
+            <div>
+                <p class="text-sm text-gray-500">Address</p>
+                <p class="font-medium">{{ supplier.get_full_address }}</p>
+            </div>
+            {% endif %}
+            {% if supplier.telephone %}
+            <div>
+                <p class="text-sm text-gray-500">Phone</p>
+                <p class="font-medium">{{ supplier.telephone }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Products -->
+    <div class="bg-white shadow rounded-lg p-6">
+        <h2 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Products ({{ articles.count }})</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Composition</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Construction</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Weight</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TDS</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for article in articles %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4">
+                                <div class="font-medium text-gray-900">{{ article.product_name }}</div>
+                                {% if article.product_code %}
+                                    <div class="text-sm text-gray-500">{{ article.product_code }}</div>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-600">
+                                {{ article.composition }}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-600">
+                                {{ article.get_construction_display }}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-600">
+                                {{ article.get_weight_group_display }}
+                                {% if article.weight_value %}
+                                    <br><span class="text-xs">{{ article.weight_value }} oz/yd²</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 text-sm">
+                                {% if article.tds_documents.exists %}
+                                    <a href="{{ article.tds_documents.first.file.url }}" target="_blank" class="text-blue-600 hover:underline">
+                                        Download
+                                    </a>
+                                {% else %}
+                                    <span class="text-gray-400">N/A</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                                No products found.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

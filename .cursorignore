@@ -1,0 +1,45 @@
+# Virtual environment
+venv/
+
+# Database
+db.sqlite3
+*.db
+
+# Static files (collected)
+staticfiles/
+
+# Media uploads
+media/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# IDE
+.idea/
+.vscode/
+
+# Environment
+.env
+.env.*
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node (if any)
+node_modules/
+
+# Coverage
+htmlcov/
+.coverage
+
+# Migrations (keep models, but migrations are auto-generated)
+# */migrations/*.py
+# !*/migrations/__init__.py
+

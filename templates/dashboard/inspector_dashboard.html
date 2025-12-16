@@ -1,0 +1,233 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Inspector Dashboard - Multicam Partner Portal{% endblock %}
+
+{% block dashboard_content %}
+    <!-- Alerts -->
+    {% if alerts %}
+    <div class="mb-6 space-y-2">
+        {% for alert in alerts %}
+        <div class="flex items-center p-4 bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 rounded-r-lg">
+            <svg class="w-5 h-5 text-yellow-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+            <span class="text-yellow-800 dark:text-yellow-300 text-sm">{{ alert.message }}</span>
+            {% if alert.link %}
+            <a href="{{ alert.link }}" class="ml-auto text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-300 font-medium text-sm">View →</a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if is_primary %}
+    <!-- PRIMARY INSPECTOR VIEW -->
+    
+    <!-- First Article Queue -->
+    <div class="card mb-6">
+        <div class="p-4 border-b" style="border-color: var(--color-border);">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-bold">First Article Queue</h2>
+                <span class="badge badge-pending">{{ fa_pending }} pending</span>
+            </div>
+        </div>
+        <div class="p-4">
+            {% if priority_fas %}
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr>
+                                <th class="px-3 py-2 text-left">First Article</th>
+                                <th class="px-3 py-2 text-left">Partner</th>
+                                <th class="px-3 py-2 text-left">Submitted</th>
+                                <th class="px-3 py-2 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fa in priority_fas %}
+                            <tr>
+                                <td class="px-3 py-3 font-medium">{{ fa.display_name }}</td>
+                                <td class="px-3 py-3 text-secondary">{{ fa.vendor.company_name }}</td>
+                                <td class="px-3 py-3 text-muted">{{ fa.submission_date|timesince }} ago</td>
+                                <td class="px-3 py-3 text-right">
+                                    <a href="{% url 'inspections:fa_review' fa.fai_id %}" class="text-yellow-600 hover:text-yellow-700 font-medium">Review</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <a href="{% url 'inspections:fa_review_queue_primary' %}" class="block mt-4 text-center text-primary-600 hover:text-primary-700 text-sm">
+                    View All First Article Queue →
+                </a>
+            {% else %}
+                <div class="text-center py-8">
+                    <svg class="w-12 h-12 mx-auto text-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <p class="text-muted">No pending First Article reviews</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Lot Queue -->
+    <div class="card mb-6">
+        <div class="p-4 border-b" style="border-color: var(--color-border);">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-bold">Lot Review Queue</h2>
+                <span class="badge badge-pending">{{ lot_pending }} pending</span>
+            </div>
+        </div>
+        <div class="p-4">
+            {% if priority_lots %}
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr>
+                                <th class="px-3 py-2 text-left">Lot</th>
+                                <th class="px-3 py-2 text-left">Partner</th>
+                                <th class="px-3 py-2 text-left">Submitted</th>
+                                <th class="px-3 py-2 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for lot in priority_lots %}
+                            <tr>
+                                <td class="px-3 py-3 font-medium">{{ lot.display_name }}</td>
+                                <td class="px-3 py-3 text-secondary">{{ lot.vendor.company_name }}</td>
+                                <td class="px-3 py-3 text-muted">{{ lot.submission_date|timesince }} ago</td>
+                                <td class="px-3 py-3 text-right">
+                                    <a href="{% url 'inspections:lot_review' lot.lot_id %}" class="text-amber-600 hover:text-amber-700 font-medium">Review</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <a href="{% url 'inspections:lot_review_queue' %}" class="block mt-4 text-center text-primary-600 hover:text-primary-700 text-sm">
+                    View All Lot Queue →
+                </a>
+            {% else %}
+                <div class="text-center py-8">
+                    <svg class="w-12 h-12 mx-auto text-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <p class="text-muted">No pending Lot reviews</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recent Submissions -->
+    <div class="card">
+        <div class="p-4 border-b" style="border-color: var(--color-border);">
+            <h2 class="text-lg font-bold">Recent Submissions</h2>
+        </div>
+        <div class="p-4">
+            {% if recent_fa_submissions %}
+                <div class="space-y-3">
+                    {% for fa in recent_fa_submissions %}
+                    <div class="flex items-center justify-between text-sm p-3 rounded-lg" style="background-color: var(--color-bg-elevated);">
+                        <div class="min-w-0 flex-1 mr-2">
+                            <a href="{% url 'inspections:fa_review' fa.fai_id %}" class="text-primary-600 hover:text-primary-700 font-medium truncate block">{{ fa.display_name }}</a>
+                            <p class="text-xs text-muted">{{ fa.vendor.company_name }}</p>
+                        </div>
+                        <span class="badge flex-shrink-0
+                            {% if fa.status == 'approved' %}badge-approved
+                            {% elif fa.status == 'rejected' %}badge-rejected
+                            {% elif fa.status == 'pending_final' %}badge-pending-final
+                            {% else %}badge-pending{% endif %}">
+                            {{ fa.get_status_display }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted text-sm text-center py-4">No recent submissions</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    {% elif is_final %}
+    <!-- FINAL INSPECTOR VIEW -->
+    
+    <!-- Final First Article Queue -->
+    <div class="card mb-6">
+        <div class="p-4 border-b" style="border-color: var(--color-border);">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-bold">First Article Queue</h2>
+                <span class="badge badge-pending-final">{{ fa_pending_final }} pending</span>
+            </div>
+        </div>
+        <div class="p-4">
+            {% if priority_fas %}
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr>
+                                <th class="px-3 py-2 text-left">First Article</th>
+                                <th class="px-3 py-2 text-left">Partner</th>
+                                <th class="px-3 py-2 text-left">Primary Review</th>
+                                <th class="px-3 py-2 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fa in priority_fas %}
+                            <tr>
+                                <td class="px-3 py-3 font-medium">{{ fa.display_name }}</td>
+                                <td class="px-3 py-3 text-secondary">{{ fa.vendor.company_name }}</td>
+                                <td class="px-3 py-3 text-muted">{{ fa.primary_review_date|date:"M d, Y"|default:"N/A" }}</td>
+                                <td class="px-3 py-3 text-right">
+                                    <a href="{% url 'inspections:fa_review' fa.fai_id %}" class="text-blue-600 hover:text-blue-700 font-medium">Final Review</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <a href="{% url 'inspections:fa_review_queue_final' %}" class="block mt-4 text-center text-primary-600 hover:text-primary-700 text-sm">
+                    View All First Article Queue →
+                </a>
+            {% else %}
+                <div class="text-center py-8">
+                    <svg class="w-12 h-12 mx-auto text-muted mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <p class="text-muted">No pending final reviews</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recent Submissions -->
+    <div class="card">
+        <div class="p-4 border-b" style="border-color: var(--color-border);">
+            <h2 class="text-lg font-bold">Recent Submissions</h2>
+        </div>
+        <div class="p-4">
+            {% if recent_fa_submissions %}
+                <div class="space-y-3">
+                    {% for fa in recent_fa_submissions %}
+                    <div class="flex items-center justify-between text-sm p-3 rounded-lg" style="background-color: var(--color-bg-elevated);">
+                        <div class="min-w-0 flex-1 mr-2">
+                            <a href="{% url 'inspections:fa_review' fa.fai_id %}" class="text-primary-600 hover:text-primary-700 font-medium truncate block">{{ fa.display_name }}</a>
+                            <p class="text-xs text-muted">{{ fa.vendor.company_name }}</p>
+                        </div>
+                        <span class="badge flex-shrink-0
+                            {% if fa.status == 'approved' %}badge-approved
+                            {% elif fa.status == 'rejected' %}badge-rejected
+                            {% elif fa.status == 'pending_final' %}badge-pending-final
+                            {% else %}badge-pending{% endif %}">
+                            {{ fa.get_status_display }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted text-sm text-center py-4">No recent submissions</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+{% endblock %}

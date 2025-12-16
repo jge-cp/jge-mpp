@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}FP Supplier Dashboard - Multicam Partner Portal{% endblock %}
+
+{% block content %}
+<div class="px-4 py-6">
+    <!-- Header with Partner Badge and Info -->
+    <div class="bg-white rounded-lg shadow p-6 mb-8">
+        <div class="flex items-start justify-between">
+            <div class="flex items-center space-x-4">
+                <!-- Partner Level Badge - Gold Elite for FP -->
+                <div class="flex-shrink-0">
+                    <div class="w-20 h-20 bg-gradient-to-br from-yellow-500 to-yellow-700 rounded-lg flex flex-col items-center justify-center text-white text-center p-1">
+                        <span class="text-xs font-bold">GOLD</span>
+                        <span class="text-[8px] leading-tight">MultiCam</span>
+                        <span class="text-[7px] leading-tight">ELITE</span>
+                        <span class="text-[7px] leading-tight">GARMENT</span>
+                        <span class="text-[7px] leading-tight">PARTNER</span>
+                    </div>
+                </div>
+                <!-- Company Info -->
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">{{ profile.company_name }}</h1>
+                    <p class="text-sm text-gray-600">
+                        Contact: {{ profile.technical_contact|default:"Not specified" }}
+                    </p>
+                    <p class="text-sm text-gray-600">
+                        Mail: {{ profile.technical_email }}
+                    </p>
+                    <p class="text-sm text-gray-600">
+                        Address: {{ profile.get_full_address|default:"Not specified" }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Navigation Buttons -->
+    <div class="grid grid-cols-1 md:grid-cols-1 gap-6 mb-8 max-w-2xl">
+        <!-- RM Library -->
+        <a href="{% url 'core:fp_rm_library' %}" class="block bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg shadow p-6 transition-all transform hover:scale-105">
+            <div class="flex items-center space-x-4">
+                <div class="bg-white/20 rounded-lg p-3">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold">RM Library</h3>
+                    <p class="text-sm text-white/80">Browse approved fabrics and materials</p>
+                </div>
+            </div>
+        </a>
+        
+        <!-- RM Suppliers List -->
+        <a href="{% url 'core:fp_rm_suppliers_list' %}" class="block bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg shadow p-6 transition-all transform hover:scale-105">
+            <div class="flex items-center space-x-4">
+                <div class="bg-white/20 rounded-lg p-3">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold">RM Suppliers List</h3>
+                    <p class="text-sm text-white/80">View raw material suppliers and contacts</p>
+                </div>
+            </div>
+        </a>
+        
+        <!-- Ordering Marketing Package -->
+        <a href="{% url 'core:fp_marketing_order' %}" class="block bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-lg shadow p-6 transition-all transform hover:scale-105">
+            <div class="flex items-center space-x-4">
+                <div class="bg-white/20 rounded-lg p-3">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold">Ordering Marketing Package</h3>
+                    <p class="text-sm text-white/80">Order woven tabs, hangtags, and branding materials</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">Marketing Orders</h3>
+            <p class="text-3xl font-bold text-blue-600">{{ order_count }}</p>
+            <p class="text-sm text-gray-500 mt-1">Total orders placed</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">Account Status</h3>
+            <p class="text-xl font-bold text-green-600">Active</p>
+            <p class="text-sm text-gray-500 mt-1">Elite Garment Partner</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Multicam Partner Portal{% endblock %}
+
+{% block content %}
+<div class="px-4 py-12">
+    <div class="text-center max-w-3xl mx-auto">
+        <!-- Logo -->
+        <div class="w-24 h-24 bg-gradient-to-br from-multicam-olive to-multicam-green rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-lg border border-multicam-olive/50">
+            <span class="text-white font-bold text-3xl">MC</span>
+        </div>
+        
+        <h1 class="text-4xl font-bold mb-4">Multicam Partner Portal</h1>
+        <p class="text-xl text-secondary mb-8">
+            Manage First Article Inspections, Lot Acceptances, and Production Reporting
+        </p>
+        
+        {% if user.is_authenticated %}
+            <a href="{% url 'dashboard:dashboard_router' %}" class="btn-primary text-lg px-8 py-3 inline-flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path>
+                </svg>
+                Go to Dashboard
+            </a>
+        {% else %}
+            <a href="{% url 'accounts:login' %}" class="btn-primary text-lg px-8 py-3 inline-flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                </svg>
+                Sign In
+            </a>
+        {% endif %}
+    </div>
+    
+    <!-- Features Section -->
+    <div class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div class="card p-6 text-center">
+            <div class="icon-container w-14 h-14 bg-primary-100 dark:bg-primary-900/30 border-primary-200 dark:border-primary-700 mx-auto mb-4">
+                <svg class="w-7 h-7 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                </svg>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">First Article Inspections</h3>
+            <p class="text-sm text-muted">Submit and track First Article approval through two-stage inspection process</p>
+        </div>
+        
+        <div class="card p-6 text-center">
+            <div class="icon-container w-14 h-14 bg-green-100 dark:bg-green-900/30 border-green-200 dark:border-green-700 mx-auto mb-4">
+                <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                </svg>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">Lot Acceptances</h3>
+            <p class="text-sm text-muted">Submit production lots for quality inspection and approval</p>
+        </div>
+        
+        <div class="card p-6 text-center">
+            <div class="icon-container w-14 h-14 bg-purple-100 dark:bg-purple-900/30 border-purple-200 dark:border-purple-700 mx-auto mb-4">
+                <svg class="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">Production Reporting</h3>
+            <p class="text-sm text-muted">Monthly production reports for license fee calculation</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
