@@ -175,6 +175,11 @@ git push origin main          # Push to GitHub
 - **Main Branch**: main
 - **Remote**: origin
 
+### When Django Server is Running
+If the Django dev server is running in a terminal, either:
+1. **Stop the server** (Ctrl+C) before running git commands, OR
+2. **Open a new terminal** in Cursor (Cmd+Shift+`) for git commands
+
 ### Troubleshooting
 - **`spawn /bin/bash ENOENT` error**: Restart Cursor - this is a session glitch
 - **SSL certificate errors**: Use `required_permissions: ["all"]` for push commands
