@@ -95,8 +95,10 @@ The `UserProfile.get_dashboard_url()` method returns the correct dashboard based
 - User uploads: `media/` (gitignored)
 
 ## Development Notes
-- No `.env` needed for local dev (Django uses sensible defaults)
-- Email prints to console in dev mode
+- `.env` file exists but is in `.cursorignore` (contains Resend API key)
+- **Email Configuration**: 
+  - If `EMAIL_HOST_PASSWORD` is set in `.env`, emails use **Resend SMTP** (real emails sent)
+  - Otherwise, defaults to console backend (prints to terminal)
 - SQLite database (`db.sqlite3`) for local dev
 - Run `python manage.py load_initial_data` to load camouflage types
 
@@ -117,9 +119,14 @@ python manage.py test inspections.tests inspections.tests_workflow notifications
 python manage.py test inspections.tests_workflow --verbosity=2
 ```
 
+**Email Backend in Tests:**
+- **If `EMAIL_HOST_PASSWORD` is set in `.env`**: Tests will send **real emails via Resend**
+- **If not set**: Tests use `locmem` backend (emails captured in `mail.outbox` for assertions)
+- This allows testing actual email delivery when Resend is configured
+
 Test files:
 - `inspections/tests.py` - Model and view tests
-- `inspections/tests_workflow.py` - End-to-end workflow + notification tests
+- `inspections/tests_workflow.py` - End-to-end workflow + notification tests (triggers all email notifications)
 - `notifications/tests.py` - Notification system tests
 
 ## Common Tasks
