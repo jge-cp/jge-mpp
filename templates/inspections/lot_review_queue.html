@@ -15,19 +15,20 @@
                             <p class="text-sm font-medium text-blue-600 truncate">
                                 {{ lot.display_name }}
                             </p>
-                            <div class="ml-2 flex-shrink-0 flex">
-                                <span class="badge-warning">Pending</span>
+                            <div class="ml-2 flex-shrink-0 flex flex-col items-end">
+                                <span class="badge-warning">Ready for Review</span>
+                                <span class="text-xs text-yellow-600 mt-1">Waiting {{ lot.submission_date|timesince }}</span>
                             </div>
                         </div>
                         <div class="mt-2 sm:flex sm:justify-between">
                             <div class="sm:flex">
                                 <p class="flex items-center text-sm text-muted">
-                                    {{ lot.vendor.company_name }} | Lot #: {{ lot.lot_lot_number }} | {{ lot.number_of_yards_printed }} yards
+                                    <span class="font-medium">{{ lot.vendor.company_name }}</span> | Lot #: {{ lot.lot_lot_number }} | {{ lot.number_of_yards_printed }} yards | {{ lot.number_of_samples }} samples
                                 </p>
                             </div>
                             <div class="mt-2 flex items-center text-sm text-muted sm:mt-0">
                                 <p>
-                                    Submitted: {{ lot.submission_date|date:"M d, Y" }}
+                                    {{ lot.original_fa.multicam_variant.camouflage_name }} | {{ lot.submission_date|date:"M d, Y" }}
                                 </p>
                             </div>
                         </div>

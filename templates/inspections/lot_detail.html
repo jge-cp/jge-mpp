@@ -19,11 +19,14 @@
                 <dt class="text-sm font-medium text-muted">Status</dt>
                 <dd class="mt-1">
                     {% if lot.status == 'approved' %}
-                        <span class="badge-success">Approved</span>
+                        <span class="badge-success">✓ Approved</span>
+                        <p class="text-xs text-green-600 mt-1">Ready for Production{% if lot.primary_inspector %} - Reviewed by {{ lot.primary_inspector.get_full_name|default:lot.primary_inspector.username }}{% endif %}</p>
                     {% elif lot.status == 'rejected' %}
-                        <span class="badge-danger">Rejected</span>
+                        <span class="badge-danger">✗ Rejected</span>
+                        <p class="text-xs text-red-600 mt-1">{% if lot.primary_inspector %}Rejected by {{ lot.primary_inspector.get_full_name|default:lot.primary_inspector.username }} - {% endif %}See review comments below</p>
                     {% else %}
-                        <span class="badge-warning">Pending</span>
+                        <span class="badge-warning">Awaiting Review</span>
+                        <p class="text-xs text-yellow-600 mt-1">Submitted {{ lot.submission_date|timesince }} ago</p>
                     {% endif %}
                 </dd>
             </div>

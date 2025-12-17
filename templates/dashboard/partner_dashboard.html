@@ -71,9 +71,11 @@
                     </div>
                     <div class="text-right">
                         <span class="badge {% if fa.status == 'approved' %}badge-approved{% elif fa.status == 'rejected' %}badge-rejected{% elif fa.status == 'pending_final' %}badge-pending-final{% else %}badge-pending{% endif %}">
-                            {{ fa.get_status_display }}
+                            {% if fa.status == 'approved' %}✓ Approved{% elif fa.status == 'rejected' %}✗ Rejected{% elif fa.status == 'pending_final' %}Awaiting Final{% else %}Awaiting Primary{% endif %}
                         </span>
-                        <p class="text-xs text-muted mt-1">{{ fa.submission_date|date:"M d, Y" }}</p>
+                        <p class="text-xs {% if fa.status == 'approved' %}text-green-600{% elif fa.status == 'rejected' %}text-red-600{% elif fa.status == 'pending_final' %}text-blue-600{% else %}text-yellow-600{% endif %} mt-1">
+                            {% if fa.status == 'approved' %}Passed Both Reviews{% elif fa.status == 'rejected' %}{% if fa.final_inspector %}Failed Final{% else %}Failed Primary{% endif %}{% elif fa.status == 'pending_final' %}✓ Passed Primary{% else %}{{ fa.submission_date|timesince }} ago{% endif %}
+                        </p>
                     </div>
                 </div>
             {% empty %}
@@ -102,9 +104,11 @@
                     </div>
                     <div class="text-right">
                         <span class="badge {% if lot.status == 'approved' %}badge-approved{% elif lot.status == 'rejected' %}badge-rejected{% else %}badge-pending{% endif %}">
-                            {{ lot.get_status_display }}
+                            {% if lot.status == 'approved' %}✓ Approved{% elif lot.status == 'rejected' %}✗ Rejected{% else %}Awaiting Review{% endif %}
                         </span>
-                        <p class="text-xs text-muted mt-1">{{ lot.submission_date|date:"M d, Y" }}</p>
+                        <p class="text-xs {% if lot.status == 'approved' %}text-green-600{% elif lot.status == 'rejected' %}text-red-600{% else %}text-yellow-600{% endif %} mt-1">
+                            {% if lot.status == 'approved' %}Ready for Production{% elif lot.status == 'rejected' %}See Review Comments{% else %}{{ lot.submission_date|timesince }} ago{% endif %}
+                        </p>
                     </div>
                 </div>
             {% endfor %}

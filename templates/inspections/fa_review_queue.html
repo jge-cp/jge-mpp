@@ -15,23 +15,25 @@
                             <p class="text-sm font-medium text-blue-600 truncate">
                                 {{ fa.display_name }}
                             </p>
-                            <div class="ml-2 flex-shrink-0 flex">
+                            <div class="ml-2 flex-shrink-0 flex flex-col items-end">
                                 {% if fa.status == 'pending_final' %}
-                                    <span class="badge-info">Pending Final Review</span>
+                                    <span class="badge-info">Ready for Final Review</span>
+                                    <span class="text-xs text-blue-600 mt-1">✓ Passed Primary Review{% if fa.primary_inspector %} by {{ fa.primary_inspector.get_full_name|default:fa.primary_inspector.username }}{% endif %}</span>
                                 {% else %}
-                                    <span class="badge-warning">Pending Primary Review</span>
+                                    <span class="badge-warning">Ready for Primary Review</span>
+                                    <span class="text-xs text-yellow-600 mt-1">Waiting {{ fa.submission_date|timesince }}</span>
                                 {% endif %}
                             </div>
                         </div>
                         <div class="mt-2 sm:flex sm:justify-between">
                             <div class="sm:flex">
                                 <p class="flex items-center text-sm text-muted">
-                                    {{ fa.vendor.company_name }} | FA Lot #: {{ fa.fa_lot_number }}
+                                    <span class="font-medium">{{ fa.vendor.company_name }}</span> | FA Lot #: {{ fa.fa_lot_number }} | {{ fa.multicam_variant.camouflage_name }}
                                 </p>
                             </div>
                             <div class="mt-2 flex items-center text-sm text-muted sm:mt-0">
                                 <p>
-                                    Submitted: {{ fa.submission_date|date:"M d, Y" }}
+                                    {{ fa.submission_date|date:"M d, Y" }}
                                 </p>
                             </div>
                         </div>

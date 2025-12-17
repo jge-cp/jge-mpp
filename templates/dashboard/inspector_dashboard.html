@@ -133,13 +133,18 @@
                             <a href="{% url 'inspections:fa_review' fa.fai_id %}" class="text-primary-600 hover:text-primary-700 font-medium truncate block">{{ fa.display_name }}</a>
                             <p class="text-xs text-muted">{{ fa.vendor.company_name }}</p>
                         </div>
-                        <span class="badge flex-shrink-0
-                            {% if fa.status == 'approved' %}badge-approved
-                            {% elif fa.status == 'rejected' %}badge-rejected
-                            {% elif fa.status == 'pending_final' %}badge-pending-final
-                            {% else %}badge-pending{% endif %}">
-                            {{ fa.get_status_display }}
-                        </span>
+                        <div class="text-right flex-shrink-0">
+                            <span class="badge
+                                {% if fa.status == 'approved' %}badge-approved
+                                {% elif fa.status == 'rejected' %}badge-rejected
+                                {% elif fa.status == 'pending_final' %}badge-pending-final
+                                {% else %}badge-pending{% endif %}">
+                                {% if fa.status == 'approved' %}✓ Approved{% elif fa.status == 'rejected' %}✗ Rejected{% elif fa.status == 'pending_final' %}Awaiting Final{% else %}Awaiting Primary{% endif %}
+                            </span>
+                            <p class="text-xs {% if fa.status == 'approved' %}text-green-600{% elif fa.status == 'rejected' %}text-red-600{% elif fa.status == 'pending_final' %}text-blue-600{% else %}text-yellow-600{% endif %} mt-1">
+                                {% if fa.status == 'approved' %}Passed Both{% elif fa.status == 'rejected' %}{% if fa.final_inspector %}at Final{% else %}at Primary{% endif %}{% elif fa.status == 'pending_final' %}✓ Primary OK{% else %}Pending{% endif %}
+                            </p>
+                        </div>
                     </div>
                     {% endfor %}
                 </div>
@@ -214,13 +219,18 @@
                             <a href="{% url 'inspections:fa_review' fa.fai_id %}" class="text-primary-600 hover:text-primary-700 font-medium truncate block">{{ fa.display_name }}</a>
                             <p class="text-xs text-muted">{{ fa.vendor.company_name }}</p>
                         </div>
-                        <span class="badge flex-shrink-0
-                            {% if fa.status == 'approved' %}badge-approved
-                            {% elif fa.status == 'rejected' %}badge-rejected
-                            {% elif fa.status == 'pending_final' %}badge-pending-final
-                            {% else %}badge-pending{% endif %}">
-                            {{ fa.get_status_display }}
-                        </span>
+                        <div class="text-right flex-shrink-0">
+                            <span class="badge
+                                {% if fa.status == 'approved' %}badge-approved
+                                {% elif fa.status == 'rejected' %}badge-rejected
+                                {% elif fa.status == 'pending_final' %}badge-pending-final
+                                {% else %}badge-pending{% endif %}">
+                                {% if fa.status == 'approved' %}✓ Approved{% elif fa.status == 'rejected' %}✗ Rejected{% elif fa.status == 'pending_final' %}Awaiting Final{% else %}Awaiting Primary{% endif %}
+                            </span>
+                            <p class="text-xs {% if fa.status == 'approved' %}text-green-600{% elif fa.status == 'rejected' %}text-red-600{% elif fa.status == 'pending_final' %}text-blue-600{% else %}text-yellow-600{% endif %} mt-1">
+                                {% if fa.status == 'approved' %}Passed Both{% elif fa.status == 'rejected' %}{% if fa.final_inspector %}at Final{% else %}at Primary{% endif %}{% elif fa.status == 'pending_final' %}✓ Primary OK{% else %}Pending{% endif %}
+                            </p>
+                        </div>
                     </div>
                     {% endfor %}
                 </div>

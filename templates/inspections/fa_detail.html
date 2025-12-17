@@ -50,13 +50,25 @@
                 <dt class="text-sm font-medium text-muted">Status</dt>
                 <dd class="mt-1">
                     {% if fa.status == 'approved' %}
-                        <span class="badge-success">Approved</span>
+                        <span class="badge-success">✓ Fully Approved</span>
+                        <p class="text-xs text-green-600 mt-1">Passed Primary & Final Review</p>
                     {% elif fa.status == 'rejected' %}
-                        <span class="badge-danger">Rejected</span>
+                        <span class="badge-danger">✗ Rejected</span>
+                        <p class="text-xs text-red-600 mt-1">
+                            {% if fa.final_inspector %}
+                                Rejected at Final Review by {{ fa.final_inspector.get_full_name|default:fa.final_inspector.username }}
+                            {% elif fa.primary_inspector %}
+                                Rejected at Primary Review by {{ fa.primary_inspector.get_full_name|default:fa.primary_inspector.username }}
+                            {% else %}
+                                Rejection details in evaluation history
+                            {% endif %}
+                        </p>
                     {% elif fa.status == 'pending_final' %}
-                        <span class="badge-info">Pending Final Review</span>
+                        <span class="badge-info">Awaiting Final Review</span>
+                        <p class="text-xs text-blue-600 mt-1">✓ Passed Primary Review{% if fa.primary_inspector %} by {{ fa.primary_inspector.get_full_name|default:fa.primary_inspector.username }}{% endif %}</p>
                     {% else %}
-                        <span class="badge-warning">Pending Primary Review</span>
+                        <span class="badge-warning">Awaiting Primary Review</span>
+                        <p class="text-xs text-yellow-600 mt-1">Submitted {{ fa.submission_date|timesince }} ago</p>
                     {% endif %}
                 </dd>
             </div>
