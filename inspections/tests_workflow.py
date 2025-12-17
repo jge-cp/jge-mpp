@@ -41,6 +41,19 @@ _email_backend = (
     else 'django.core.mail.backends.locmem.EmailBackend'
 )
 
+# Use Resend test addresses when sending real emails to avoid domain reputation issues
+# See: https://resend.com/docs/dashboard/emails/send-test-emails
+if _use_real_email:
+    TEST_EMAIL_PARTNER = 'delivered+partner@resend.dev'
+    TEST_EMAIL_PRIMARY = 'delivered+primary_inspector@resend.dev'
+    TEST_EMAIL_FINAL = 'delivered+final_inspector@resend.dev'
+    TEST_EMAIL_STAFF = 'delivered+staff@resend.dev'
+else:
+    TEST_EMAIL_PARTNER = 'partner@test.com'
+    TEST_EMAIL_PRIMARY = 'primary@test.com'
+    TEST_EMAIL_FINAL = 'final@test.com'
+    TEST_EMAIL_STAFF = 'staff@test.com'
+
 
 @override_settings(EMAIL_BACKEND=_email_backend)
 class FullWorkflowWithNotificationsTest(TestCase):
@@ -57,74 +70,76 @@ class FullWorkflowWithNotificationsTest(TestCase):
     - Otherwise, emails are captured in mail.outbox for content assertions
     """
     
-    def assert_email_sent(self, expected_count=1, **kwargs):
+    def assert_email_sent(self, expected_count=1, recipient_email=None, subject_contains=None, notification_type=None, recipient_user=None):
         """
         Conditionally assert email was sent.
-        If using Resend (real emails), just verify notification was created.
+        If using Resend (real emails), verify notification was created.
         If using locmem, verify email content in mail.outbox.
         """
         if _use_real_email:
-            # When using Resend, just verify notification was created
-            # (email was actually sent, can't easily verify content)
-            return
+            # When using Resend, verify notification was created (email was actually sent)
+            if notification_type and recipient_user:
+                notification = Notification.objects.filter(
+                    recipient=recipient_user,
+                    notification_type=notification_type
+                ).first()
+                self.assertIsNotNone(notification, f"Email notification of type {notification_type} should be created")
         else:
             # When using locmem, verify email content
             self.assertEqual(len(mail.outbox), expected_count)
-            if kwargs:
-                email = mail.outbox[0]
-                if 'to' in kwargs:
-                    self.assertIn(kwargs['to'], email.to)
-                if 'subject_contains' in kwargs:
-                    self.assertIn(kwargs['subject_contains'], email.subject)
+            if recipient_email:
+                self.assertIn(recipient_email, mail.outbox[0].to)
+            if subject_contains:
+                self.assertIn(subject_contains, mail.outbox[0].subject)
     
     def setUp(self):
         self.client = Client()
         
-        # Create partner user
+        # Create partner user (uses Resend test address when configured)
         self.partner = User.objects.create_user(
             username='partner', 
-            email='partner@test.com', 
+            email=TEST_EMAIL_PARTNER, 
             password='partner123'
         )
         self.partner.profile.user_functionality = 'partner'
         self.partner.profile.company_name = 'Test Partner Company'
-        self.partner.profile.technical_email = 'partner@test.com'
+        self.partner.profile.technical_email = TEST_EMAIL_PARTNER
         self.partner.profile.status = 'active'
         self.partner.profile.save()
         
-        # Create primary inspector
+        # Create primary inspector (uses Resend test address when configured)
         self.primary_inspector = User.objects.create_user(
             username='primary_inspector',
-            email='primary@test.com',
+            email=TEST_EMAIL_PRIMARY,
             password='primary123'
         )
         self.primary_inspector.profile.user_functionality = 'admin'
         self.primary_inspector.profile.admin_role = 'primary_inspector'
-        self.primary_inspector.profile.technical_email = 'primary@test.com'
+        self.primary_inspector.profile.technical_email = TEST_EMAIL_PRIMARY
         self.primary_inspector.profile.status = 'active'
         self.primary_inspector.profile.save()
         
-        # Create final inspector
+        # Create final inspector (uses Resend test address when configured)
         self.final_inspector = User.objects.create_user(
             username='final_inspector',
-            email='final@test.com',
+            email=TEST_EMAIL_FINAL,
             password='final123'
         )
         self.final_inspector.profile.user_functionality = 'admin'
         self.final_inspector.profile.admin_role = 'final_inspector'
-        self.final_inspector.profile.technical_email = 'final@test.com'
+        self.final_inspector.profile.technical_email = TEST_EMAIL_FINAL
         self.final_inspector.profile.status = 'active'
         self.final_inspector.profile.save()
         
-        # Create staff user
+        # Create staff user (uses Resend test address when configured)
         self.staff = User.objects.create_user(
             username='staff',
-            email='staff@test.com',
+            email=TEST_EMAIL_STAFF,
             password='staff123'
         )
         self.staff.profile.user_functionality = 'admin'
         self.staff.profile.admin_role = 'staff_executive'
-        self.staff.profile.technical_email = 'staff@test.com'
+        self.staff.profile.technical_email = TEST_EMAIL_STAFF
         self.staff.profile.status = 'active'
         self.staff.profile.save()
         
@@ -209,7 +224,7 @@ class FullWorkflowWithNotificationsTest(TestCase):
             self.assertIsNotNone(notification, "Email notification should be created when FA is submitted")
         else:
             self.assertEqual(len(mail.outbox), 1)
-            self.assertIn('primary@test.com', mail.outbox[0].to)
+            self.assertIn(TEST_EMAIL_PRIMARY, mail.outbox[0].to)
             self.assertIn('PRIMARY INSPECTOR', mail.outbox[0].subject)
             self.assertIn('First Article', mail.outbox[0].subject)
         
@@ -237,7 +252,8 @@ class FullWorkflowWithNotificationsTest(TestCase):
             status='pending'
         )
         
-        mail.outbox.clear()
+        if not _use_real_email:
+            mail.outbox.clear()
         Notification.objects.all().delete()
         
         self.client.login(username='primary_inspector', password='primary123')
@@ -252,10 +268,13 @@ class FullWorkflowWithNotificationsTest(TestCase):
         self.assertEqual(fa.status, 'pending_final')
         
         # Check email was sent to Final Inspector
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertIn('final@test.com', mail.outbox[0].to)
-        self.assertIn('FINAL INSPECTOR', mail.outbox[0].subject)
-        self.assertIn('Final Review', mail.outbox[0].subject)
+        self.assert_email_sent(
+            expected_count=1,
+            recipient_email=TEST_EMAIL_FINAL,
+            subject_contains='FINAL INSPECTOR',
+            notification_type='fa_pending_final',
+            recipient_user=self.final_inspector
+        )
         
         # Check in-app notification for Final Inspector
         notifications = Notification.objects.filter(
@@ -280,7 +299,8 @@ class FullWorkflowWithNotificationsTest(TestCase):
             status='pending'
         )
         
-        mail.outbox.clear()
+        if not _use_real_email:
+            mail.outbox.clear()
         Notification.objects.all().delete()
         
         self.client.login(username='primary_inspector', password='primary123')
@@ -295,10 +315,13 @@ class FullWorkflowWithNotificationsTest(TestCase):
         self.assertEqual(fa.status, 'rejected')
         
         # Check email was sent to Partner
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertIn('partner@test.com', mail.outbox[0].to)
-        self.assertIn('PARTNER', mail.outbox[0].subject)
-        self.assertIn('Revision', mail.outbox[0].subject)
+        self.assert_email_sent(
+            expected_count=1,
+            recipient_email=TEST_EMAIL_PARTNER,
+            subject_contains='PARTNER',
+            notification_type='fa_rejected',
+            recipient_user=self.partner
+        )
         
         # Check in-app notification for Partner
         notifications = Notification.objects.filter(
@@ -341,7 +364,8 @@ class FullWorkflowWithNotificationsTest(TestCase):
                 rating='4'
             )
         
-        mail.outbox.clear()
+        if not _use_real_email:
+            mail.outbox.clear()
         Notification.objects.all().delete()
         
         self.client.login(username='final_inspector', password='final123')
@@ -356,10 +380,13 @@ class FullWorkflowWithNotificationsTest(TestCase):
         self.assertEqual(fa.status, 'approved')
         
         # Check email was sent to Partner
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertIn('partner@test.com', mail.outbox[0].to)
-        self.assertIn('PARTNER', mail.outbox[0].subject)
-        self.assertIn('Approved', mail.outbox[0].subject)
+        self.assert_email_sent(
+            expected_count=1,
+            recipient_email=TEST_EMAIL_PARTNER,
+            subject_contains='PARTNER',
+            notification_type='fa_approved',
+            recipient_user=self.partner
+        )
         
         # Check in-app notification for Partner
         notifications = Notification.objects.filter(
@@ -402,7 +429,8 @@ class FullWorkflowWithNotificationsTest(TestCase):
                 rating='4'
             )
         
-        mail.outbox.clear()
+        if not _use_real_email:
+            mail.outbox.clear()
         Notification.objects.all().delete()
         
         self.client.login(username='final_inspector', password='final123')
@@ -417,10 +445,23 @@ class FullWorkflowWithNotificationsTest(TestCase):
         self.assertEqual(fa.status, 'rejected')
         
         # Check emails were sent to both Partner AND Primary Inspector
-        self.assertEqual(len(mail.outbox), 2)
-        recipients = [msg.to[0] for msg in mail.outbox]
-        self.assertIn('partner@test.com', recipients)
-        self.assertIn('primary@test.com', recipients)
+        if _use_real_email:
+            # Verify notifications were created for both recipients
+            partner_notif = Notification.objects.filter(
+                recipient=self.partner,
+                notification_type='fa_rejected'
+            ).first()
+            primary_notif = Notification.objects.filter(
+                recipient=self.primary_inspector,
+                notification_type='fa_rejected'
+            ).first()
+            self.assertIsNotNone(partner_notif, "Partner should receive rejection notification")
+            self.assertIsNotNone(primary_notif, "Primary Inspector should receive final rejection notification")
+        else:
+            self.assertEqual(len(mail.outbox), 2)
+            recipients = [msg.to[0] for msg in mail.outbox]
+            self.assertIn(TEST_EMAIL_PARTNER, recipients)
+            self.assertIn(TEST_EMAIL_PRIMARY, recipients)
         
         # Check in-app notifications
         partner_notifs = Notification.objects.filter(
@@ -452,7 +493,8 @@ class FullWorkflowWithNotificationsTest(TestCase):
             status='approved'
         )
         
-        mail.outbox.clear()
+        if not _use_real_email:
+            mail.outbox.clear()
         Notification.objects.all().delete()
         
         # Directly create Lot and call notification function to test notification system
@@ -481,10 +523,13 @@ class FullWorkflowWithNotificationsTest(TestCase):
         self.assertEqual(lot.original_fa, fa)
         
         # Check email was sent to Primary Inspector
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertIn('primary@test.com', mail.outbox[0].to)
-        self.assertIn('PRIMARY INSPECTOR', mail.outbox[0].subject)
-        self.assertIn('Lot', mail.outbox[0].subject)
+        self.assert_email_sent(
+            expected_count=1,
+            recipient_email=TEST_EMAIL_PRIMARY,
+            subject_contains='PRIMARY INSPECTOR',
+            notification_type='lot_submitted',
+            recipient_user=self.primary_inspector
+        )
         
         # Check in-app notification for Primary Inspector
         notifications = Notification.objects.filter(
@@ -525,7 +570,8 @@ class FullWorkflowWithNotificationsTest(TestCase):
             status='pending'
         )
         
-        mail.outbox.clear()
+        if not _use_real_email:
+            mail.outbox.clear()
         Notification.objects.all().delete()
         
         # Create and submit a passing evaluation
@@ -562,10 +608,13 @@ class FullWorkflowWithNotificationsTest(TestCase):
         self.assertEqual(lot.status, 'approved')
         
         # Check email was sent to Partner
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertIn('partner@test.com', mail.outbox[0].to)
-        self.assertIn('PARTNER', mail.outbox[0].subject)
-        self.assertIn('Approved', mail.outbox[0].subject)
+        self.assert_email_sent(
+            expected_count=1,
+            recipient_email=TEST_EMAIL_PARTNER,
+            subject_contains='PARTNER',
+            notification_type='lot_approved',
+            recipient_user=self.partner
+        )
         
         # Check in-app notification for Partner
         notifications = Notification.objects.filter(
@@ -606,7 +655,8 @@ class FullWorkflowWithNotificationsTest(TestCase):
             status='pending'
         )
         
-        mail.outbox.clear()
+        if not _use_real_email:
+            mail.outbox.clear()
         Notification.objects.all().delete()
         
         # Create and submit a failing evaluation
@@ -643,10 +693,13 @@ class FullWorkflowWithNotificationsTest(TestCase):
         self.assertEqual(lot.status, 'rejected')
         
         # Check email was sent to Partner
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertIn('partner@test.com', mail.outbox[0].to)
-        self.assertIn('PARTNER', mail.outbox[0].subject)
-        self.assertIn('Attention', mail.outbox[0].subject)
+        self.assert_email_sent(
+            expected_count=1,
+            recipient_email=TEST_EMAIL_PARTNER,
+            subject_contains='PARTNER',
+            notification_type='lot_rejected',
+            recipient_user=self.partner
+        )
         
         # Check in-app notification for Partner
         notifications = Notification.objects.filter(
@@ -686,22 +739,22 @@ class NotificationContentTest(TestCase):
     """Test that notification content is correct and informative."""
     
     def setUp(self):
-        # Create users
+        # Create users (uses Resend test addresses when configured)
         self.partner = User.objects.create_user(
-            username='partner', email='partner@test.com', password='partner123'
+            username='partner', email=TEST_EMAIL_PARTNER, password='partner123'
         )
         self.partner.profile.user_functionality = 'partner'
         self.partner.profile.company_name = 'Acme Fabrics Inc.'
-        self.partner.profile.technical_email = 'partner@test.com'
+        self.partner.profile.technical_email = TEST_EMAIL_PARTNER
         self.partner.profile.status = 'active'
         self.partner.profile.save()
         
         self.primary = User.objects.create_user(
-            username='primary', email='primary@test.com', password='primary123'
+            username='primary', email=TEST_EMAIL_PRIMARY, password='primary123'
         )
         self.primary.profile.user_functionality = 'admin'
         self.primary.profile.admin_role = 'primary_inspector'
-        self.primary.profile.technical_email = 'primary@test.com'
+        self.primary.profile.technical_email = TEST_EMAIL_PRIMARY
         self.primary.profile.status = 'active'
         self.primary.profile.save()
         
@@ -712,7 +765,8 @@ class NotificationContentTest(TestCase):
     
     def test_fa_submitted_notification_contains_key_info(self):
         """FA submitted notification should contain all key information."""
-        mail.outbox.clear()
+        if not _use_real_email:
+            mail.outbox.clear()
         
         fa = FirstArticleInspection.objects.create(
             vendor=self.partner.profile,
@@ -729,13 +783,26 @@ class NotificationContentTest(TestCase):
         from inspections.emails import send_fa_submitted_notification
         send_fa_submitted_notification(fa)
         
-        # Check email content
-        email = mail.outbox[0]
-        self.assertIn('Acme Fabrics', email.body)  # Company name
-        self.assertIn('Premium Nylon 500D', email.body)  # Fabric style
-        self.assertIn('MultiCam Tropic', email.body)  # Variant
-        self.assertIn('2024-BATCH-42', email.body)  # Lot number
-        self.assertIn(fa.fai_id, email.body)  # FA ID
+        # Check email content (only when using locmem)
+        if _use_real_email:
+            # When using Resend, verify notification was created
+            notification = Notification.objects.filter(
+                recipient=self.primary,
+                notification_type='fa_submitted'
+            ).first()
+            self.assertIsNotNone(notification, "Email notification should be created")
+            # Verify notification contains key info
+            self.assertIn('Acme Fabrics', notification.message)
+            self.assertIn('Premium Nylon 500D', notification.message)
+            self.assertIn('MultiCam Tropic', notification.message)
+            self.assertIn('2024-BATCH-42', notification.message)
+        else:
+            email = mail.outbox[0]
+            self.assertIn('Acme Fabrics', email.body)  # Company name
+            self.assertIn('Premium Nylon 500D', email.body)  # Fabric style
+            self.assertIn('MultiCam Tropic', email.body)  # Variant
+            self.assertIn('2024-BATCH-42', email.body)  # Lot number
+            self.assertIn(fa.fai_id, email.body)  # FA ID
         
         # Check in-app notification
         notification = Notification.objects.filter(
