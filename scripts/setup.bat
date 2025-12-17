@@ -130,6 +130,13 @@ if "%WITH_TEST_USERS%"=="true" (
     echo.
 )
 
+echo Email Configuration (Optional):
+echo   By default, emails print to console.
+echo   To send real emails via Resend, create .env file:
+echo     EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+echo     EMAIL_HOST_PASSWORD=your-resend-api-key
+echo   Get API key: https://resend.com/api-keys
+echo.
 echo For more information, see Docs\DEVELOPMENT.md
 echo.
 

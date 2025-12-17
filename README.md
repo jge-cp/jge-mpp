@@ -54,7 +54,20 @@ python manage.py setup_test_users
 python manage.py runserver
 ```
 
-**No `.env` file needed for local development!**
+### Email Configuration (Optional)
+
+By default, emails print to the console. To send real emails via Resend:
+
+1. Create a `.env` file in the project root:
+```bash
+EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+EMAIL_HOST_PASSWORD=your-resend-api-key-here
+```
+
+2. Get your Resend API key from https://resend.com/api-keys
+
+**Without `.env`**: Emails print to console (good for development)  
+**With `.env`**: Emails send via Resend (good for testing actual delivery)
 
 ### Test Users
 
