@@ -50,6 +50,10 @@ python manage.py load_initial_data
 # Create test users (optional)
 python manage.py setup_test_users
 
+# Create test data with sample FAs and Lots (optional)
+python manage.py create_test_data         # Add to existing data
+python manage.py create_test_data --clear # Clear first, then add
+
 # Run server
 python manage.py runserver
 ```
@@ -79,6 +83,19 @@ If you ran setup with `--with-test-users`, use these credentials:
 | primary_inspector | primary_inspector123 | Primary Inspector |
 | final_inspector | final_inspector123 | Final Inspector |
 | staff | staff123 | Staff Executive |
+
+### Test Data
+
+Run `python manage.py create_test_data` to create sample FAs and Lots for testing:
+
+| Item | Status | Description |
+|------|--------|-------------|
+| FA1 | Approved | Passed both primary and final review |
+| FA2 | Pending Final | Passed primary, awaiting final review |
+| FA3 | Pending | Awaiting primary review |
+| LOT1 | Approved | Linked to FA1, fully inspected |
+
+Use `--clear` flag to wipe existing data before creating fresh test data.
 
 ---
 
