@@ -311,7 +311,7 @@ def lot_list(request):
 
 @login_required
 def lot_detail(request, lot_id):
-    """Lot detail view"""
+    """Lot detail view - Partners see their own, inspectors/staff see all"""
     profile = getattr(request.user, 'profile', None)
     if not profile:
         from accounts.models import UserProfile
@@ -320,7 +320,13 @@ def lot_detail(request, lot_id):
             company_name=request.user.email.split('@')[0] if '@' in request.user.email else request.user.username,
             technical_email=request.user.email,
         )
-    lot = get_object_or_404(LotAcceptance, lot_id=lot_id, vendor=profile)
+    
+    # Partners can only see their own lots, inspectors/staff can see all
+    if profile.is_partner():
+        lot = get_object_or_404(LotAcceptance, lot_id=lot_id, vendor=profile)
+    else:
+        lot = get_object_or_404(LotAcceptance, lot_id=lot_id)
+    
     return render(request, 'inspections/lot_detail.html', {'lot': lot})
 
 
