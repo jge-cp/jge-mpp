@@ -133,7 +133,8 @@
         
         <!-- Sample Evaluations -->
         {% for sample in sample_evaluations %}
-        <div class="mb-6 last:mb-0">
+        {% with is_even=forloop.counter|divisibleby:2 %}
+        <div class="mb-6 last:mb-0 {% if is_even %}bg-gray-50 dark:bg-gray-800{% endif %} p-4 rounded-lg">
             <h3 class="text-lg font-medium mb-3 flex items-center gap-2">
                 Sample {{ sample.sample_number }}: {{ sample.sample_id }}
                 {% if sample.pattern_execution == 'pass' and sample.scale == 'pass' and sample.spectral_reflectance == 'pass' %}
@@ -146,7 +147,7 @@
             <div class="overflow-x-auto">
                 <table class="eval-table w-full">
                     <thead>
-                        <tr class="bg-gray-50 dark:bg-gray-800">
+                        <tr class="{% if is_even %}bg-gray-100 dark:bg-gray-700{% else %}bg-gray-50 dark:bg-gray-800{% endif %}">
                             <th class="text-left px-4 py-2">Criteria</th>
                             <th class="text-center px-4 py-2">Rating</th>
                         </tr>
@@ -199,7 +200,7 @@
                 <div class="overflow-x-auto">
                     <table class="eval-table w-full">
                         <thead>
-                            <tr class="bg-gray-50 dark:bg-gray-800">
+                            <tr class="{% if is_even %}bg-gray-100 dark:bg-gray-700{% else %}bg-gray-50 dark:bg-gray-800{% endif %}">
                                 <th class="text-left px-4 py-2">Color</th>
                                 <th class="text-center px-4 py-2">Rating</th>
                                 <th class="text-left px-4 py-2">Status</th>
@@ -235,6 +236,7 @@
             </div>
             {% endif %}
         </div>
+        {% endwith %}
         {% endfor %}
     </div>
     {% elif lot.status == 'pending' %}
