@@ -189,8 +189,10 @@ If the Django dev server is running in a terminal, either:
 
 ### Troubleshooting
 - **`spawn /bin/bash ENOENT` error**: Restart Cursor - this is a session glitch
-- **SSL certificate errors**: Use `required_permissions: ["all"]` for push commands
-- **`xcrun_db` warnings**: Ignore - harmless macOS noise
+- **Sandbox permission errors** (`xcrun_db`, `unable to create temporary file`, `failed to insert into database`): 
+  **ALWAYS use `required_permissions: ["all"]` for ALL git commands** (add, commit, push, pull, etc.)
+  The sandbox restricts git from writing to system temp directories it needs.
+- **`xcrun_db` warnings in output**: Ignore - harmless macOS noise (different from the fatal error above)
 - **Push rejected (fetch first)**: Run `git pull origin main --rebase` then push again
 
 ### GitHub MCP Tools (Backup)
