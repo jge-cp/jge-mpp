@@ -4,6 +4,40 @@
 
 {% block extra_head %}
 <style>
+    /* Evaluation table styling */
+    .eval-table {
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    .eval-table thead th {
+        padding: 0.75rem 1rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--color-text-muted);
+        background-color: var(--color-bg-elevated);
+        border-bottom: 1px solid var(--color-border);
+    }
+    .eval-table tbody td {
+        padding: 0.75rem 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid var(--color-border);
+    }
+    .eval-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    
+    /* Override input/select padding within tables for tighter fit */
+    .eval-table select,
+    .eval-table input[type="text"] {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+    }
+    .eval-table select {
+        padding-right: 2rem;
+    }
+    
     /* Evaluation result indicators - VERY VISUAL */
     .result-pass {
         background-color: #16a34a !important;
