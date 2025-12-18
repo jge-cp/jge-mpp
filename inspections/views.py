@@ -327,7 +327,22 @@ def lot_detail(request, lot_id):
     else:
         lot = get_object_or_404(LotAcceptance, lot_id=lot_id)
     
-    return render(request, 'inspections/lot_detail.html', {'lot': lot})
+    # Get evaluation with sample evaluations and color evaluations
+    evaluation = lot.evaluations.filter(is_submitted=True).first()
+    sample_evaluations = []
+    if evaluation:
+        sample_evaluations = evaluation.sample_evaluations.all().prefetch_related('color_evaluations__color')
+    
+    # Can user review this lot? (Primary inspector and lot is pending)
+    can_review = profile.is_primary_inspector() and lot.status == 'pending'
+    
+    context = {
+        'lot': lot,
+        'evaluation': evaluation,
+        'sample_evaluations': sample_evaluations,
+        'can_review': can_review,
+    }
+    return render(request, 'inspections/lot_detail.html', context)
 
 
 @login_required

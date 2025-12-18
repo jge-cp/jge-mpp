@@ -244,6 +244,31 @@ class Command(BaseCommand):
         
         self.stdout.write(self.style.SUCCESS(f'  ✓ LOT1: {lot1.lot_id} - APPROVED (linked to FA1)'))
         
+        # =====================================================
+        # LOT 2: PENDING (linked to FA1, awaiting review)
+        # =====================================================
+        lot2 = LotAcceptance.objects.create(
+            vendor=partner,
+            original_fa=fa1,
+            fabric_style=fa1.fabric_style,
+            shade_standard=fa1.shade_standard,
+            shade_standard_number=fa1.shade_standard_number or '',
+            spectral_reflectance_requirement=fa1.spectral_reflectance_requirement,
+            original_fa_lot_number=fa1.fa_lot_number,
+            lot_lot_number='LOT-PROD-002',
+            number_of_yards_printed=3000,
+            number_of_samples=2,
+            individual_sample_numbers='LOT-PROD-002-1, LOT-PROD-002-2',
+            date_of_printing=date.today() - timedelta(days=2),
+            date_shipped=date.today() - timedelta(days=1),
+            submitter_first_name='Alice',
+            submitter_last_name='Williams',
+            submitted=True,
+            status='pending',
+        )
+        
+        self.stdout.write(self.style.SUCCESS(f'  ✓ LOT2: {lot2.lot_id} - PENDING (awaiting review)'))
+        
         # Summary
         self.stdout.write('')
         self.stdout.write(self.style.SUCCESS('=' * 50))
@@ -258,6 +283,7 @@ Summary:
   
   Lots: {LotAcceptance.objects.count()} total
     - {lot1.lot_id}: APPROVED
+    - {lot2.lot_id}: PENDING (awaiting review)
 
 Test Users:
   - partner / partner123
