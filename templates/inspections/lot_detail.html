@@ -209,8 +209,7 @@
                             {% for color_eval in sample.color_evaluations.all %}
                             <tr>
                                 <td class="px-4 py-2">
-                                    <span class="inline-block w-3 h-3 rounded-full mr-2" style="background-color: {{ color_eval.color.hex_code }};"></span>
-                                    {{ color_eval.color.name }}
+                                    {{ color_eval.color.color_name }}
                                 </td>
                                 <td class="text-center px-4 py-2">
                                     {% if color_eval.rating %}
