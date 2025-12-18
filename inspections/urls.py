@@ -14,6 +14,7 @@ urlpatterns = [
     # Lot URLs - Partner facing
     path('lot/submit/', views.lot_submit, name='lot_submit'),
     path('lot/fa-details/<str:fai_id>/', views.get_fa_details, name='get_fa_details'),
+    path('lot/fa-details-json/<str:fai_id>/', views.get_fa_details_json, name='get_fa_details_json'),
     path('lot/list/', views.lot_list, name='lot_list'),
     path('lot/<str:lot_id>/', views.lot_detail, name='lot_detail'),
     

@@ -33,7 +33,8 @@ class FirstArticleInspectionForm(forms.ModelForm):
             'date_of_printing',
             'first_article_ship_date',
             'tracking_number',
-            'name_of_printer_representative',
+            'submitter_first_name',
+            'submitter_last_name',
         ]
         widgets = {
             'fabric_style': forms.TextInput(attrs={
@@ -57,8 +58,11 @@ class FirstArticleInspectionForm(forms.ModelForm):
             'tracking_number': forms.TextInput(attrs={
                 'placeholder': 'Optional tracking number'
             }),
-            'name_of_printer_representative': forms.TextInput(attrs={
-                'placeholder': 'Last, First'
+            'submitter_first_name': forms.TextInput(attrs={
+                'placeholder': 'First name'
+            }),
+            'submitter_last_name': forms.TextInput(attrs={
+                'placeholder': 'Last name'
             }),
         }
     
@@ -78,12 +82,11 @@ class LotAcceptanceForm(forms.ModelForm):
             'original_fa',
             'lot_lot_number',
             'number_of_yards_printed',
-            'number_of_samples',
-            'individual_sample_numbers',
             'date_of_printing',
             'date_shipped',
             'tracking_number',
-            'name_of_submitter',
+            'submitter_first_name',
+            'submitter_last_name',
         ]
         widgets = {
             'original_fa': forms.Select(attrs={
@@ -95,12 +98,9 @@ class LotAcceptanceForm(forms.ModelForm):
             }),
             'number_of_yards_printed': forms.NumberInput(attrs={
                 'min': '1',
-                'placeholder': 'Enter yards printed'
-            }),
-            'number_of_samples': forms.Select(attrs={}),
-            'individual_sample_numbers': forms.Textarea(attrs={
-                'rows': 3,
-                'placeholder': 'Comma-separated sample numbers'
+                'placeholder': 'Enter yards printed',
+                'x-model': 'yardsP printed',
+                '@input': 'updateSampleCount()',
             }),
             'date_of_printing': forms.DateInput(attrs={
                 'type': 'date'
@@ -111,8 +111,11 @@ class LotAcceptanceForm(forms.ModelForm):
             'tracking_number': forms.TextInput(attrs={
                 'placeholder': 'Optional tracking number'
             }),
-            'name_of_submitter': forms.TextInput(attrs={
-                'placeholder': 'Last, First'
+            'submitter_first_name': forms.TextInput(attrs={
+                'placeholder': 'First name'
+            }),
+            'submitter_last_name': forms.TextInput(attrs={
+                'placeholder': 'Last name'
             }),
         }
     
@@ -134,13 +137,6 @@ class LotAcceptanceForm(forms.ModelForm):
         else:
             self.fields['original_fa'].queryset = FirstArticleInspection.objects.none()
             self.fields['original_fa'].help_text = 'Please log in to see approved First Article Inspections.'
-        
-        # Sample count choices
-        self.fields['number_of_samples'].choices = [
-            (2, '2 samples (Simple evaluation)'),
-            (3, '3 samples (Standard evaluation)'),
-            (6, '6+ samples (Complex evaluation)'),
-        ]
 
 
 class FAEvaluationForm(forms.ModelForm):

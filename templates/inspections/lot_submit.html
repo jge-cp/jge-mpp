@@ -3,7 +3,7 @@
 {% block title %}Submit Lot - Multicam Partner Portal{% endblock %}
 
 {% block content %}
-<div class="px-4 py-6">
+<div class="px-4 py-6" x-data="lotForm()">
     <h1 class="text-3xl font-bold mb-6">Submit Lot for Acceptance</h1>
     <div class="card p-6">
         <form method="post" enctype="multipart/form-data">
@@ -14,13 +14,9 @@
                     Select Approved First Article *
                 </label>
                 <select name="original_fa" id="{{ form.original_fa.id_for_label }}"
-                        class="form-input"
-                        hx-get="{% url 'inspections:get_fa_details' 'PLACEHOLDER' %}"
-                        hx-trigger="change"
-                        hx-target="#fa-details"
-                        hx-swap="innerHTML"
-                        x-data
-                        @change="$el.setAttribute('hx-get', '{% url 'inspections:get_fa_details' 'PLACEHOLDER' %}'.replace('PLACEHOLDER', $el.value)); htmx.trigger($el, 'htmx:configRequest')">
+                        class="form-select"
+                        x-model="selectedFa"
+                        @change="fetchFaDetails()">
                     <option value="">-- Select an Approved First Article --</option>
                     {% for fa in form.original_fa.field.queryset %}
                         <option value="{{ fa.fai_id }}">{{ fa.display_name }}</option>
@@ -33,9 +29,43 @@
             </div>
             
             <div id="fa-details" class="mb-6">
-                <div class="bg-elevated rounded-lg p-4 border border-theme">
-                    <p class="text-sm text-muted">Select an approved First Article to see its details</p>
-                </div>
+                <template x-if="!faDetails">
+                    <div class="bg-elevated rounded-lg p-4 border border-theme">
+                        <p class="text-sm text-muted">Select an approved First Article to see its details</p>
+                    </div>
+                </template>
+                <template x-if="faDetails">
+                    <div class="bg-elevated rounded-lg p-4 border border-theme">
+                        <h3 class="font-bold mb-3">Selected First Article Details</h3>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <span class="text-muted">Fabric Style</span>
+                                <p class="font-medium" x-text="faDetails.fabric_style"></p>
+                            </div>
+                            <div>
+                                <span class="text-muted">MultiCam Variant</span>
+                                <p class="font-medium" x-text="faDetails.multicam_variant"></p>
+                            </div>
+                            <div>
+                                <span class="text-muted">FA Lot Number</span>
+                                <p class="font-medium" x-text="faDetails.fa_lot_number"></p>
+                            </div>
+                            <div>
+                                <span class="text-muted">Shade Standard</span>
+                                <p class="font-medium" x-text="faDetails.shade_standard"></p>
+                            </div>
+                            <div>
+                                <span class="text-muted">Spectral Reflectance Req.</span>
+                                <p class="font-medium" x-text="faDetails.spectral_reflectance"></p>
+                            </div>
+                            <div>
+                                <span class="text-muted">Approved Date</span>
+                                <p class="font-medium" x-text="faDetails.approved_date"></p>
+                            </div>
+                        </div>
+                        <p class="text-xs text-muted mt-3">These values will be automatically applied to your Lot submission.</p>
+                    </div>
+                </template>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -54,20 +84,32 @@
                     <label class="form-label" for="{{ form.number_of_yards_printed.id_for_label }}">
                         Number of Yards Printed *
                     </label>
-                    {{ form.number_of_yards_printed }}
+                    <input type="number" 
+                           name="number_of_yards_printed" 
+                           id="{{ form.number_of_yards_printed.id_for_label }}"
+                           class="form-input"
+                           min="1"
+                           placeholder="Enter yards printed"
+                           x-model="yardsPrinted"
+                           @input="updateSampleCount()">
                     {% if form.number_of_yards_printed.errors %}
                         <p class="text-red-500 text-xs mt-1">{{ form.number_of_yards_printed.errors.0 }}</p>
                     {% endif %}
                 </div>
                 
                 <div>
-                    <label class="form-label" for="{{ form.number_of_samples.id_for_label }}">
-                        Number of Samples *
+                    <label class="form-label">
+                        Number of Samples (auto-calculated)
                     </label>
-                    {{ form.number_of_samples }}
-                    {% if form.number_of_samples.errors %}
-                        <p class="text-red-500 text-xs mt-1">{{ form.number_of_samples.errors.0 }}</p>
-                    {% endif %}
+                    <div class="form-input bg-gray-100 dark:bg-gray-800 cursor-not-allowed">
+                        <span x-text="sampleCount || '--'"></span>
+                        <span class="text-muted text-sm ml-2" x-show="sampleCount">samples required</span>
+                    </div>
+                    <p class="text-xs text-muted mt-1">
+                        0-800 yards = 2 samples, 801-22,000 = 3 samples, 22,001+ = 5 samples
+                    </p>
+                    <!-- Hidden input for form submission -->
+                    <input type="hidden" name="number_of_samples" :value="sampleCount">
                 </div>
                 
                 <div>
@@ -93,27 +135,64 @@
                     </label>
                     {{ form.tracking_number }}
                 </div>
-                
+            </div>
+            
+            <!-- Submitter Name - separate first/last -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
-                    <label class="form-label" for="{{ form.name_of_submitter.id_for_label }}">
-                        Name of Submitter *
+                    <label class="form-label" for="{{ form.submitter_first_name.id_for_label }}">
+                        Submitter First Name *
                     </label>
-                    {{ form.name_of_submitter }}
-                    {% if form.name_of_submitter.errors %}
-                        <p class="text-red-500 text-xs mt-1">{{ form.name_of_submitter.errors.0 }}</p>
+                    {{ form.submitter_first_name }}
+                    {% if form.submitter_first_name.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.submitter_first_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="form-label" for="{{ form.submitter_last_name.id_for_label }}">
+                        Submitter Last Name *
+                    </label>
+                    {{ form.submitter_last_name }}
+                    {% if form.submitter_last_name.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.submitter_last_name.errors.0 }}</p>
                     {% endif %}
                 </div>
             </div>
             
+            <!-- Dynamic Sample Number Inputs -->
             <div class="mb-6">
-                <label class="form-label" for="{{ form.individual_sample_numbers.id_for_label }}">
+                <label class="form-label">
                     Individual Sample Numbers *
+                    <span class="text-muted font-normal" x-show="sampleCount">
+                        (<span x-text="sampleCount"></span> required)
+                    </span>
                 </label>
-                {{ form.individual_sample_numbers }}
-                {% if form.individual_sample_numbers.errors %}
-                    <p class="text-red-500 text-xs mt-1">{{ form.individual_sample_numbers.errors.0 }}</p>
-                {% endif %}
-                <p class="text-xs text-muted mt-1">Comma-separated list (e.g., 10010043849-1, 10010043849-2, 10010043849-3)</p>
+                
+                <template x-if="!sampleCount">
+                    <div class="bg-elevated rounded-lg p-4 border border-theme">
+                        <p class="text-sm text-muted">Enter Number of Yards Printed to generate sample fields</p>
+                    </div>
+                </template>
+                
+                <template x-if="sampleCount">
+                    <div class="space-y-3">
+                        <template x-for="(sample, index) in sampleInputs" :key="index">
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm text-muted w-24" x-text="'Sample ' + (index + 1) + ':'"></span>
+                                <input type="text" 
+                                       :name="'sample_number_' + (index + 1)"
+                                       class="form-input flex-1"
+                                       :placeholder="'Enter sample ' + (index + 1) + ' number'"
+                                       x-model="sampleInputs[index]"
+                                       required>
+                            </div>
+                        </template>
+                        <p class="text-xs text-muted">Enter unique identifier for each sample (e.g., LOT-001-1, LOT-001-2)</p>
+                    </div>
+                </template>
+                
+                <!-- Hidden field to store combined sample numbers -->
+                <input type="hidden" name="individual_sample_numbers" :value="sampleInputs.filter(s => s).join(', ')">
             </div>
             
             <div class="mb-6">
@@ -131,7 +210,7 @@
                    class="btn-secondary">
                     Cancel
                 </a>
-                <button type="submit" class="btn-primary">
+                <button type="submit" class="btn-primary" :disabled="!isFormValid()">
                     Submit Lot
                 </button>
             </div>
@@ -140,27 +219,68 @@
 </div>
 
 <script>
-// Initialize HTMX with dynamic URL for FA details
-document.addEventListener('DOMContentLoaded', function() {
-    const faSelect = document.querySelector('select[name="original_fa"]');
-    if (faSelect) {
-        faSelect.addEventListener('change', function() {
-            const faiId = this.value;
-            if (faiId) {
-                htmx.ajax('GET', '{% url "inspections:get_fa_details" "PLACEHOLDER" %}'.replace('PLACEHOLDER', faiId), {
-                    target: '#fa-details',
-                    swap: 'innerHTML'
-                });
-            } else {
-                document.getElementById('fa-details').innerHTML = `
-                    <div class="bg-elevated rounded-lg p-4 border border-theme">
-                        <p class="text-sm text-muted">Select an approved First Article to see its details</p>
-                    </div>
-                `;
+function lotForm() {
+    return {
+        selectedFa: '',
+        faDetails: null,
+        yardsPrinted: '',
+        sampleCount: 0,
+        sampleInputs: [],
+        
+        init() {
+            // Initialize with any existing values
+            this.updateSampleCount();
+        },
+        
+        updateSampleCount() {
+            const yards = parseInt(this.yardsPrinted) || 0;
+            let newCount = 0;
+            
+            if (yards > 0) {
+                if (yards <= 800) {
+                    newCount = 2;
+                } else if (yards <= 22000) {
+                    newCount = 3;
+                } else {
+                    newCount = 5;
+                }
             }
-        });
+            
+            // Only update inputs if count changed
+            if (newCount !== this.sampleCount) {
+                this.sampleCount = newCount;
+                // Preserve existing values when possible
+                const oldInputs = [...this.sampleInputs];
+                this.sampleInputs = Array(newCount).fill('').map((_, i) => oldInputs[i] || '');
+            }
+        },
+        
+        async fetchFaDetails() {
+            if (!this.selectedFa) {
+                this.faDetails = null;
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/portal/lot/fa-details-json/${this.selectedFa}/`);
+                if (response.ok) {
+                    this.faDetails = await response.json();
+                }
+            } catch (error) {
+                console.error('Error fetching FA details:', error);
+            }
+        },
+        
+        isFormValid() {
+            if (!this.selectedFa) return false;
+            if (!this.yardsPrinted || parseInt(this.yardsPrinted) < 1) return false;
+            if (this.sampleCount === 0) return false;
+            
+            // Check all sample inputs have values
+            const filledSamples = this.sampleInputs.filter(s => s && s.trim()).length;
+            return filledSamples === this.sampleCount;
+        }
     }
-});
+}
 </script>
 {% endblock %}
-

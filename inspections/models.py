@@ -137,7 +137,13 @@ class FirstArticleInspection(models.Model):
     
     # FREEFORM (from FA Main)
     tracking_number = models.CharField(max_length=50, blank=True)
-    name_of_printer_representative = models.CharField(max_length=50)
+    submitter_first_name = models.CharField(max_length=50, default='')
+    submitter_last_name = models.CharField(max_length=50, default='')
+    
+    @property
+    def submitter_full_name(self):
+        """Return full name as 'Last, First' format"""
+        return f"{self.submitter_last_name}, {self.submitter_first_name}".strip(', ')
     
     # BOOLEAN (from FA Main)
     submitted = models.BooleanField(default=False)
@@ -416,7 +422,13 @@ class LotAcceptance(models.Model):
     date_of_printing = models.DateField()
     date_shipped = models.DateField(null=True, blank=True)
     tracking_number = models.CharField(max_length=50, blank=True)
-    name_of_submitter = models.CharField(max_length=50)
+    submitter_first_name = models.CharField(max_length=50, default='')
+    submitter_last_name = models.CharField(max_length=50, default='')
+    
+    @property
+    def submitter_full_name(self):
+        """Return full name as 'Last, First' format"""
+        return f"{self.submitter_last_name}, {self.submitter_first_name}".strip(', ')
     
     # Link to original FA (CRITICAL!)
     original_fa = models.ForeignKey(

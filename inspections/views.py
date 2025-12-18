@@ -193,6 +193,12 @@ def lot_submit(request):
             lot = form.save(commit=False)
             lot.vendor = profile
             
+            # Get individual sample numbers from hidden field
+            lot.individual_sample_numbers = request.POST.get('individual_sample_numbers', '')
+            
+            # Get number of samples from hidden field (auto-calculated)
+            lot.number_of_samples = int(request.POST.get('number_of_samples', 2))
+            
             # Auto-populate fields from original FA
             original_fa = form.cleaned_data['original_fa']
             lot.fabric_style = original_fa.fabric_style
@@ -257,6 +263,29 @@ def get_fa_details(request, fai_id):
         pass
     
     return render(request, 'inspections/partials/fa_details_preview.html', {'fa': None})
+
+
+@login_required
+def get_fa_details_json(request, fai_id):
+    """JSON endpoint to get FA details for lot submission (Alpine.js)"""
+    from django.http import JsonResponse
+    try:
+        fa = FirstArticleInspection.objects.get(fai_id=fai_id)
+        # Verify user has access to this FA
+        profile = getattr(request.user, 'profile', None)
+        if profile and fa.vendor == profile and fa.status == 'approved':
+            return JsonResponse({
+                'fabric_style': fa.fabric_style,
+                'multicam_variant': fa.multicam_variant.camouflage_name if fa.multicam_variant else '',
+                'fa_lot_number': fa.fa_lot_number,
+                'shade_standard': fa.get_shade_standard_display(),
+                'spectral_reflectance': fa.get_spectral_reflectance_requirement_display(),
+                'approved_date': fa.final_review_date.strftime('%b %d, %Y') if fa.final_review_date else '',
+            })
+    except FirstArticleInspection.DoesNotExist:
+        pass
+    
+    return JsonResponse({'error': 'FA not found'}, status=404)
 
 
 @login_required
