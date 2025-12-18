@@ -375,25 +375,38 @@ def fa_review(request, fai_id):
     is_primary_review = fa.status == 'pending'
     is_final_review = fa.status == 'pending_final'
     is_completed = fa.status in ['approved', 'rejected']
-    is_read_only = is_completed  # Read-only for completed FAs
+    
+    # Check if primary inspector is viewing their own evaluation during final review
+    is_primary_viewing_pending_final = (
+        is_final_review and 
+        profile.is_primary_inspector() and 
+        not profile.is_final_inspector()
+    )
+    
+    # Determine read-only status
+    # - Completed FAs are always read-only
+    # - Primary viewing pending_final: read-only if final has started, editable if not
+    is_read_only = is_completed
+    final_has_started = False
+    
+    if is_primary_viewing_pending_final:
+        # Check if final inspector has started their review
+        final_eval = fa.get_latest_evaluation('final')
+        final_has_started = final_eval is not None
+        is_read_only = final_has_started  # Read-only if final has started
     
     # Determine stage based on FA status and user role
-    # For completed FAs, determine stage based on who's viewing
-    if is_completed:
-        # Get the latest evaluation to determine which stage to show
-        latest_eval = fa.get_latest_evaluation('final') or fa.get_latest_evaluation('primary')
-        if latest_eval:
-            # Show the stage that matches the user's role, or the latest if they're full_admin
-            if profile.is_primary_inspector():
-                stage = 'primary'
-            elif profile.is_final_inspector():
-                stage = 'final'
-            else:
-                stage = latest_eval.stage
-        else:
+    if is_completed or is_primary_viewing_pending_final:
+        # For completed FAs or primary viewing pending_final, show their own stage
+        if profile.is_primary_inspector():
             stage = 'primary'
+        elif profile.is_final_inspector():
+            stage = 'final'
+        else:
+            latest_eval = fa.get_latest_evaluation('final') or fa.get_latest_evaluation('primary')
+            stage = latest_eval.stage if latest_eval else 'primary'
     else:
-        # Check if user has permission for this stage
+        # Active review - check permissions
         if is_primary_review and not (profile.is_primary_inspector() or profile.admin_role == 'full_admin'):
             messages.error(request, 'Only Primary Inspectors can review FAs at this stage.')
             return redirect('inspections:fa_review_queue_final')
@@ -408,14 +421,18 @@ def fa_review(request, fai_id):
     # Get current attempt number (for resubmissions)
     current_attempt = fa.get_current_attempt_number()
     
-    # For completed FAs, show existing evaluations (read-only)
-    if is_completed:
+    # For completed FAs OR primary viewing pending_final, show existing evaluations
+    if is_completed or is_primary_viewing_pending_final:
         # Get the latest submitted evaluation for the requested stage
         evaluation = fa.get_latest_evaluation(stage)
         if not evaluation:
             # Fall back to showing whatever evaluation exists
             evaluation = fa.get_latest_evaluation('final') or fa.get_latest_evaluation('primary')
         created = False
+        
+        # Update current_attempt to match the evaluation we're viewing
+        if evaluation:
+            current_attempt = evaluation.attempt_number
     # Get or create evaluation for this stage (for pending FAs)
     elif stage == 'primary':
         # Check if we need a NEW attempt (after resubmission)
@@ -607,6 +624,8 @@ def fa_review(request, fai_id):
         'is_final_review': is_final_review,
         'is_completed': is_completed,
         'is_read_only': is_read_only,
+        'is_primary_viewing_pending_final': is_primary_viewing_pending_final,
+        'final_has_started': final_has_started,
         'review_stage': stage,
         'primary_evaluation': primary_evaluation,
         'primary_eval_for_display': primary_eval_for_display,
