@@ -375,6 +375,7 @@ def fa_review(request, fai_id):
     is_primary_review = fa.status == 'pending'
     is_final_review = fa.status == 'pending_final'
     is_completed = fa.status in ['approved', 'rejected']
+    is_read_only = is_completed  # Read-only for completed FAs
     
     # Determine stage based on FA status and user role
     # For completed FAs, determine stage based on who's viewing
@@ -407,8 +408,16 @@ def fa_review(request, fai_id):
     # Get current attempt number (for resubmissions)
     current_attempt = fa.get_current_attempt_number()
     
-    # Get or create evaluation for this stage
-    if stage == 'primary':
+    # For completed FAs, show existing evaluations (read-only)
+    if is_completed:
+        # Get the latest submitted evaluation for the requested stage
+        evaluation = fa.get_latest_evaluation(stage)
+        if not evaluation:
+            # Fall back to showing whatever evaluation exists
+            evaluation = fa.get_latest_evaluation('final') or fa.get_latest_evaluation('primary')
+        created = False
+    # Get or create evaluation for this stage (for pending FAs)
+    elif stage == 'primary':
         # Check if there's an existing evaluation for this attempt
         try:
             evaluation = FAEvaluation.objects.get(
@@ -449,8 +458,8 @@ def fa_review(request, fai_id):
     # Get variant colors for this FA
     variant_colors = fa.multicam_variant.colors.all().order_by('position')
     
-    if request.method == 'POST':
-        # Process the evaluation form
+    if request.method == 'POST' and not is_read_only:
+        # Process the evaluation form (only for pending FAs)
         eval_form = FAEvaluationForm(request.POST, instance=evaluation, fa=fa)
         
         if eval_form.is_valid():
@@ -556,6 +565,10 @@ def fa_review(request, fai_id):
     # Get evaluation history for this FA
     evaluation_history = fa.get_evaluation_history()
     
+    # Get both evaluations for display (so we can show both primary and final)
+    primary_eval_for_display = fa.get_latest_evaluation('primary')
+    final_eval_for_display = fa.get_latest_evaluation('final')
+    
     context = {
         'fa': fa,
         'evaluation': evaluation,
@@ -564,11 +577,13 @@ def fa_review(request, fai_id):
         'is_primary_review': is_primary_review,
         'is_final_review': is_final_review,
         'is_completed': is_completed,
-        'is_read_only': False,  # Inspectors can always edit
+        'is_read_only': is_read_only,
         'review_stage': stage,
         'primary_evaluation': primary_evaluation,
+        'primary_eval_for_display': primary_eval_for_display,
+        'final_eval_for_display': final_eval_for_display,
         'evaluation_history': evaluation_history,
-        'current_attempt': evaluation.attempt_number,
+        'current_attempt': evaluation.attempt_number if evaluation else 1,
     }
     return render(request, 'inspections/fa_review.html', context)
 

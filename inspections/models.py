@@ -804,12 +804,28 @@ class FAEvaluation(models.Model):
         return 'pass' if self.all_pass else 'fail'
     
     def submit(self):
-        """Mark evaluation as submitted and update FA status"""
+        """Mark evaluation as submitted and update FA status and inspector fields"""
         from django.utils import timezone
         
         self.is_submitted = True
         self.submitted_at = timezone.now()
         self.save()
+        
+        # Update FA inspector fields based on stage
+        if self.stage == 'primary':
+            self.fa.primary_inspector = self.inspector
+            self.fa.primary_review_date = timezone.now().date()
+            self.fa.primary_comments = self.comments
+            self.fa.primary_pattern_execution = self.pattern_execution
+            self.fa.primary_scale = self.scale
+            self.fa.primary_spectral_reflectance = self.spectral_reflectance
+        else:  # final stage
+            self.fa.final_inspector = self.inspector
+            self.fa.final_review_date = timezone.now().date()
+            self.fa.final_comments = self.comments
+            self.fa.final_pattern_execution = self.pattern_execution
+            self.fa.final_scale = self.scale
+            self.fa.final_spectral_reflectance = self.spectral_reflectance
         
         # Update FA status based on result
         if self.all_pass:

@@ -124,6 +124,76 @@
         </div>
     </div>
     
+    <!-- Review Status Summary (always show if any reviews exist) -->
+    {% if primary_eval_for_display or final_eval_for_display %}
+    <div class="mb-6 card p-4">
+        <h2 class="text-lg font-bold mb-4 border-b border-theme pb-2">Review Status</h2>
+        <div class="grid md:grid-cols-2 gap-4">
+            <!-- Primary Review Status -->
+            <div class="p-4 rounded-lg {% if primary_eval_for_display and primary_eval_for_display.is_submitted %}{% if primary_eval_for_display.all_pass %}bg-green-50 dark:bg-green-900/20 border border-green-300 dark:border-green-700{% else %}bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-700{% endif %}{% else %}bg-gray-50 dark:bg-gray-900/20 border border-gray-300 dark:border-gray-700{% endif %}">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="font-bold text-primary">Primary Review</span>
+                    {% if primary_eval_for_display and primary_eval_for_display.is_submitted %}
+                        {% if primary_eval_for_display.all_pass %}
+                            <span class="result-pass">✓ PASSED</span>
+                        {% else %}
+                            <span class="result-fail">✗ FAILED</span>
+                        {% endif %}
+                    {% else %}
+                        <span class="result-pending">PENDING</span>
+                    {% endif %}
+                </div>
+                {% if primary_eval_for_display and primary_eval_for_display.is_submitted %}
+                    <p class="text-sm text-muted">
+                        Reviewed by: <span class="font-medium">{{ primary_eval_for_display.inspector.get_full_name|default:primary_eval_for_display.inspector.username }}</span>
+                    </p>
+                    <p class="text-sm text-muted">
+                        Date: {{ primary_eval_for_display.submitted_at|date:"M d, Y H:i" }}
+                    </p>
+                    {% if primary_eval_for_display.comments %}
+                        <p class="text-sm mt-2 italic">"{{ primary_eval_for_display.comments }}"</p>
+                    {% endif %}
+                {% else %}
+                    <p class="text-sm text-muted">Awaiting primary inspector review</p>
+                {% endif %}
+            </div>
+            
+            <!-- Final Review Status -->
+            <div class="p-4 rounded-lg {% if final_eval_for_display and final_eval_for_display.is_submitted %}{% if final_eval_for_display.all_pass %}bg-green-50 dark:bg-green-900/20 border border-green-300 dark:border-green-700{% else %}bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-700{% endif %}{% elif fa.status == 'pending_final' %}bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700{% else %}bg-gray-50 dark:bg-gray-900/20 border border-gray-300 dark:border-gray-700{% endif %}">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="font-bold text-primary">Final Review</span>
+                    {% if final_eval_for_display and final_eval_for_display.is_submitted %}
+                        {% if final_eval_for_display.all_pass %}
+                            <span class="result-pass">✓ PASSED</span>
+                        {% else %}
+                            <span class="result-fail">✗ FAILED</span>
+                        {% endif %}
+                    {% elif fa.status == 'pending_final' %}
+                        <span class="bg-yellow-500 text-white font-bold px-3 py-1 rounded">AWAITING</span>
+                    {% else %}
+                        <span class="result-pending">--</span>
+                    {% endif %}
+                </div>
+                {% if final_eval_for_display and final_eval_for_display.is_submitted %}
+                    <p class="text-sm text-muted">
+                        Reviewed by: <span class="font-medium">{{ final_eval_for_display.inspector.get_full_name|default:final_eval_for_display.inspector.username }}</span>
+                    </p>
+                    <p class="text-sm text-muted">
+                        Date: {{ final_eval_for_display.submitted_at|date:"M d, Y H:i" }}
+                    </p>
+                    {% if final_eval_for_display.comments %}
+                        <p class="text-sm mt-2 italic">"{{ final_eval_for_display.comments }}"</p>
+                    {% endif %}
+                {% elif fa.status == 'pending_final' %}
+                    <p class="text-sm text-muted">Awaiting final inspector review</p>
+                {% else %}
+                    <p class="text-sm text-muted">Requires primary approval first</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
     {% if is_read_only %}
     <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded">
         <p class="text-blue-800 dark:text-blue-200">
