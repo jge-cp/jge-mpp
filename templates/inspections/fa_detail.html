@@ -106,109 +106,139 @@
     <!-- Evaluation Summary -->
     {% if evaluation_history %}
     <div class="card p-6 mb-6">
-        <h2 class="text-xl font-bold mb-4 border-b border-theme pb-2">Latest Evaluation</h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Primary Evaluation Summary -->
-            <div class="border border-theme rounded p-4">
-                <h3 class="font-bold mb-3">Primary Inspector (1947)</h3>
-                {% for attempt_num, stages in evaluation_history.items %}
-                    {% if forloop.first %}
-                        {% if stages.primary %}
-                            <div class="space-y-2 text-sm">
-                                <p>
-                                    <span class="text-muted">Inspector:</span>
-                                    <span class="text-primary">{{ stages.primary.inspector.username|default:"N/A" }}</span>
-                                </p>
-                                <p>
-                                    <span class="text-muted">Date:</span>
-                                    <span class="text-primary">{{ stages.primary.evaluation_date|date:"M d, Y H:i" }}</span>
-                                </p>
-                                <p>
-                                    <span class="text-muted">Result:</span>
-                                    {% if stages.primary.is_submitted %}
-                                        {% if stages.primary.all_pass %}
-                                            <span class="result-pass">Pass</span>
-                                        {% else %}
-                                            <span class="result-fail">Fail</span>
-                                        {% endif %}
-                                    {% else %}
-                                        <span class="badge-warning">In Progress</span>
-                                    {% endif %}
-                                </p>
-                                {% if stages.primary.comments %}
-                                <p>
-                                    <span class="text-muted">Comments:</span>
-                                    <span class="text-primary">{{ stages.primary.comments|truncatewords:30 }}</span>
-                                </p>
-                                {% endif %}
-                            </div>
-                        {% else %}
-                            <p class="text-muted">Awaiting primary review</p>
-                        {% endif %}
-                    {% endif %}
-                {% empty %}
-                    <p class="text-muted">Awaiting primary review</p>
-                {% endfor %}
-            </div>
+        {% for attempt_num, stages in evaluation_history.items %}
+            {% if forloop.first %}
+            <h2 class="text-xl font-bold mb-4 border-b border-theme pb-2">
+                Latest Evaluation 
+                <span class="ml-2 text-sm font-normal bg-purple-600 text-white px-2 py-1 rounded">Attempt #{{ attempt_num }}</span>
+            </h2>
             
-            <!-- Final Evaluation Summary -->
-            <div class="border border-theme rounded p-4">
-                <h3 class="font-bold mb-3">Final Inspector (Crye)</h3>
-                {% for attempt_num, stages in evaluation_history.items %}
-                    {% if forloop.first %}
-                        {% if stages.final %}
-                            <div class="space-y-2 text-sm">
-                                <p>
-                                    <span class="text-muted">Inspector:</span>
-                                    <span class="text-primary">{{ stages.final.inspector.username|default:"N/A" }}</span>
-                                </p>
-                                <p>
-                                    <span class="text-muted">Date:</span>
-                                    <span class="text-primary">{{ stages.final.evaluation_date|date:"M d, Y H:i" }}</span>
-                                </p>
-                                <p>
-                                    <span class="text-muted">Result:</span>
-                                    {% if stages.final.is_submitted %}
-                                        {% if stages.final.all_pass %}
-                                            <span class="result-pass">Pass</span>
-                                        {% else %}
-                                            <span class="result-fail">Fail</span>
-                                        {% endif %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Primary Evaluation Summary -->
+                <div class="border border-theme rounded p-4">
+                    <h3 class="font-bold mb-3">Primary Inspector</h3>
+                    {% if stages.primary %}
+                        <div class="space-y-2 text-sm">
+                            <p>
+                                <span class="text-muted">Attempt:</span>
+                                <span class="text-purple-600 font-medium">#{{ stages.primary.attempt_number }}</span>
+                            </p>
+                            <p>
+                                <span class="text-muted">Inspector:</span>
+                                <span class="text-primary">{{ stages.primary.inspector.username|default:"N/A" }}</span>
+                            </p>
+                            <p>
+                                <span class="text-muted">Date:</span>
+                                <span class="text-primary">{{ stages.primary.submitted_at|date:"M d, Y H:i"|default:stages.primary.evaluation_date|date:"M d, Y H:i" }}</span>
+                            </p>
+                            <p>
+                                <span class="text-muted">Result:</span>
+                                {% if stages.primary.is_submitted %}
+                                    {% if stages.primary.all_pass %}
+                                        <span class="result-pass">Pass</span>
                                     {% else %}
-                                        <span class="badge-warning">In Progress</span>
+                                        <span class="result-fail">Fail</span>
                                     {% endif %}
-                                </p>
-                                {% if stages.final.comments %}
-                                <p>
-                                    <span class="text-muted">Comments:</span>
-                                    <span class="text-primary">{{ stages.final.comments|truncatewords:30 }}</span>
-                                </p>
-                                {% endif %}
-                            </div>
-                        {% else %}
-                            <p class="text-muted">
-                                {% if stages.primary and stages.primary.all_pass %}
-                                    Awaiting final review
                                 {% else %}
-                                    Not applicable (Primary review not passed)
+                                    <span class="badge-warning">In Progress</span>
                                 {% endif %}
                             </p>
-                        {% endif %}
+                            {% if stages.primary.comments %}
+                            <p>
+                                <span class="text-muted">Comments:</span>
+                                <span class="text-primary">{{ stages.primary.comments|truncatewords:30 }}</span>
+                            </p>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Awaiting primary review</p>
                     {% endif %}
-                {% empty %}
-                    <p class="text-muted">Awaiting primary review</p>
+                </div>
+                
+                <!-- Final Evaluation Summary -->
+                <div class="border border-theme rounded p-4">
+                    <h3 class="font-bold mb-3">Final Inspector</h3>
+                    {% if stages.final %}
+                        <div class="space-y-2 text-sm">
+                            <p>
+                                <span class="text-muted">Attempt:</span>
+                                <span class="text-purple-600 font-medium">#{{ stages.final.attempt_number }}</span>
+                            </p>
+                            <p>
+                                <span class="text-muted">Inspector:</span>
+                                <span class="text-primary">{{ stages.final.inspector.username|default:"N/A" }}</span>
+                            </p>
+                            <p>
+                                <span class="text-muted">Date:</span>
+                                <span class="text-primary">{{ stages.final.submitted_at|date:"M d, Y H:i"|default:stages.final.evaluation_date|date:"M d, Y H:i" }}</span>
+                            </p>
+                            <p>
+                                <span class="text-muted">Result:</span>
+                                {% if stages.final.is_submitted %}
+                                    {% if stages.final.all_pass %}
+                                        <span class="result-pass">Pass</span>
+                                    {% else %}
+                                        <span class="result-fail">Fail</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="badge-warning">In Progress</span>
+                                {% endif %}
+                            </p>
+                            {% if stages.final.comments %}
+                            <p>
+                                <span class="text-muted">Comments:</span>
+                                <span class="text-primary">{{ stages.final.comments|truncatewords:30 }}</span>
+                            </p>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">
+                            {% if stages.primary and stages.primary.all_pass %}
+                                Awaiting final review
+                            {% else %}
+                                Not applicable (Primary review not passed)
+                            {% endif %}
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        {% empty %}
+            <h2 class="text-xl font-bold mb-4 border-b border-theme pb-2">Evaluation Status</h2>
+            <p class="text-muted">Awaiting primary review</p>
+        {% endfor %}
+        
+        {% if evaluation_history|length > 1 %}
+        <div class="mt-6 p-4 bg-gray-50 dark:bg-gray-900 rounded">
+            <h3 class="font-bold mb-3">Previous Attempts ({{ evaluation_history|length }} total)</h3>
+            <div class="space-y-2">
+                {% for attempt_num, stages in evaluation_history.items %}
+                    {% if not forloop.first %}
+                    <div class="flex items-center justify-between text-sm p-2 rounded border border-gray-300 dark:border-gray-700">
+                        <span class="font-medium">Attempt #{{ attempt_num }}</span>
+                        <div class="flex space-x-4">
+                            <span>
+                                Primary: 
+                                {% if stages.primary and stages.primary.is_submitted %}
+                                    {% if stages.primary.all_pass %}<span class="text-green-600">✓ Pass</span>{% else %}<span class="text-red-600">✗ Fail</span>{% endif %}
+                                {% else %}
+                                    <span class="text-gray-500">--</span>
+                                {% endif %}
+                            </span>
+                            <span>
+                                Final: 
+                                {% if stages.final and stages.final.is_submitted %}
+                                    {% if stages.final.all_pass %}<span class="text-green-600">✓ Pass</span>{% else %}<span class="text-red-600">✗ Fail</span>{% endif %}
+                                {% else %}
+                                    <span class="text-gray-500">--</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    {% endif %}
                 {% endfor %}
             </div>
         </div>
-        
-        {% if evaluation_history|length > 1 %}
-        <p class="mt-4 text-sm text-muted">
-            This First Article has been reviewed {{ evaluation_history|length }} time(s).
-            <a href="{% url 'inspections:fa_evaluation_history' fa.fai_id %}" class="text-blue-600 hover:underline">
-                View complete history →
-            </a>
-        </p>
         {% endif %}
     </div>
     {% endif %}

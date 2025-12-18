@@ -107,13 +107,17 @@
             <p class="text-lg text-muted mt-1">{{ fa.display_name }}</p>
         </div>
         <div class="flex items-center space-x-3">
+            <!-- Attempt Number Badge -->
+            <span class="bg-purple-600 text-white text-sm px-3 py-1 rounded font-bold">
+                ATTEMPT #{{ current_attempt }}
+            </span>
             {% if is_read_only %}
                 <span class="bg-gray-600 text-white text-sm px-3 py-1 rounded font-bold">VIEW ONLY</span>
             {% endif %}
             {% if is_primary_review %}
-                <span class="badge-warning text-lg px-4 py-2">Primary Review (1947)</span>
+                <span class="badge-warning text-lg px-4 py-2">Primary Review</span>
             {% elif is_final_review %}
-                <span class="badge-info text-lg px-4 py-2">Final Review (Crye)</span>
+                <span class="badge-info text-lg px-4 py-2">Final Review</span>
             {% elif is_completed %}
                 {% if fa.status == 'approved' %}
                     <span class="status-approved">✓ APPROVED</span>
@@ -127,7 +131,10 @@
     <!-- Review Status Summary (always show if any reviews exist) -->
     {% if primary_eval_for_display or final_eval_for_display %}
     <div class="mb-6 card p-4">
-        <h2 class="text-lg font-bold mb-4 border-b border-theme pb-2">Review Status</h2>
+        <h2 class="text-lg font-bold mb-4 border-b border-theme pb-2">
+            Review Status 
+            <span class="text-sm font-normal text-muted ml-2">(Current Attempt: #{{ current_attempt }})</span>
+        </h2>
         <div class="grid md:grid-cols-2 gap-4">
             <!-- Primary Review Status -->
             <div class="p-4 rounded-lg {% if primary_eval_for_display and primary_eval_for_display.is_submitted %}{% if primary_eval_for_display.all_pass %}bg-green-50 dark:bg-green-900/20 border border-green-300 dark:border-green-700{% else %}bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-700{% endif %}{% else %}bg-gray-50 dark:bg-gray-900/20 border border-gray-300 dark:border-gray-700{% endif %}">
@@ -144,6 +151,9 @@
                     {% endif %}
                 </div>
                 {% if primary_eval_for_display and primary_eval_for_display.is_submitted %}
+                    <p class="text-sm text-muted">
+                        <span class="font-medium text-purple-600">Attempt #{{ primary_eval_for_display.attempt_number }}</span>
+                    </p>
                     <p class="text-sm text-muted">
                         Reviewed by: <span class="font-medium">{{ primary_eval_for_display.inspector.get_full_name|default:primary_eval_for_display.inspector.username }}</span>
                     </p>
@@ -176,6 +186,9 @@
                 </div>
                 {% if final_eval_for_display and final_eval_for_display.is_submitted %}
                     <p class="text-sm text-muted">
+                        <span class="font-medium text-purple-600">Attempt #{{ final_eval_for_display.attempt_number }}</span>
+                    </p>
+                    <p class="text-sm text-muted">
                         Reviewed by: <span class="font-medium">{{ final_eval_for_display.inspector.get_full_name|default:final_eval_for_display.inspector.username }}</span>
                     </p>
                     <p class="text-sm text-muted">
@@ -191,6 +204,58 @@
                 {% endif %}
             </div>
         </div>
+    </div>
+    {% endif %}
+    
+    <!-- Evaluation History (show if more than one attempt) -->
+    {% if evaluation_history and evaluation_history|length > 1 %}
+    <div class="mb-6 card p-4">
+        <details class="group">
+            <summary class="cursor-pointer flex items-center justify-between">
+                <h2 class="text-lg font-bold">Evaluation History ({{ evaluation_history|length }} Attempts)</h2>
+                <span class="text-muted group-open:rotate-180 transition-transform">▼</span>
+            </summary>
+            <div class="mt-4 space-y-3">
+                {% for attempt_num, evals in evaluation_history.items %}
+                <div class="p-3 rounded border {% if attempt_num == current_attempt %}border-purple-500 bg-purple-50 dark:bg-purple-900/20{% else %}border-gray-300 dark:border-gray-700{% endif %}">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-bold">Attempt #{{ attempt_num }}</span>
+                        {% if attempt_num == current_attempt %}
+                            <span class="text-xs bg-purple-600 text-white px-2 py-1 rounded">CURRENT</span>
+                        {% endif %}
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-2 text-sm">
+                        <div>
+                            <span class="text-muted">Primary:</span>
+                            {% if evals.primary and evals.primary.is_submitted %}
+                                {% if evals.primary.all_pass %}
+                                    <span class="text-green-600 font-medium">✓ PASS</span>
+                                {% else %}
+                                    <span class="text-red-600 font-medium">✗ FAIL</span>
+                                {% endif %}
+                                <span class="text-muted text-xs">by {{ evals.primary.inspector.username }} on {{ evals.primary.submitted_at|date:"M d" }}</span>
+                            {% else %}
+                                <span class="text-gray-500">--</span>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <span class="text-muted">Final:</span>
+                            {% if evals.final and evals.final.is_submitted %}
+                                {% if evals.final.all_pass %}
+                                    <span class="text-green-600 font-medium">✓ PASS</span>
+                                {% else %}
+                                    <span class="text-red-600 font-medium">✗ FAIL</span>
+                                {% endif %}
+                                <span class="text-muted text-xs">by {{ evals.final.inspector.username }} on {{ evals.final.submitted_at|date:"M d" }}</span>
+                            {% else %}
+                                <span class="text-gray-500">--</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </details>
     </div>
     {% endif %}
     

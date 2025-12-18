@@ -418,6 +418,25 @@ def fa_review(request, fai_id):
         created = False
     # Get or create evaluation for this stage (for pending FAs)
     elif stage == 'primary':
+        # Check if we need a NEW attempt (after resubmission)
+        # A new attempt is needed if:
+        # 1. There's an existing submitted primary for the current attempt, OR
+        # 2. The FA was rejected (meaning both primary and final from last attempt are done)
+        last_primary = fa.get_latest_evaluation('primary')
+        last_final = fa.get_latest_evaluation('final')
+        
+        need_new_attempt = False
+        if last_primary and last_primary.is_submitted:
+            # If final also exists and submitted (whether pass or fail), need new attempt
+            if last_final and last_final.is_submitted:
+                need_new_attempt = True
+            # If primary failed, also need new attempt
+            elif not last_primary.all_pass:
+                need_new_attempt = True
+        
+        if need_new_attempt:
+            current_attempt = fa.get_next_attempt_number()
+        
         # Check if there's an existing evaluation for this attempt
         try:
             evaluation = FAEvaluation.objects.get(
@@ -425,16 +444,19 @@ def fa_review(request, fai_id):
             )
             created = False
         except FAEvaluation.DoesNotExist:
-            # If last primary was rejected, start new attempt
-            last_primary = fa.get_latest_evaluation('primary')
-            if last_primary and last_primary.is_submitted and not last_primary.all_pass:
-                current_attempt = fa.get_next_attempt_number()
             evaluation = FAEvaluation.objects.create(
                 fa=fa, stage=stage, attempt_number=current_attempt, inspector=request.user
             )
             created = True
     else:
-        # Final review - use same attempt as the latest submitted primary
+        # Final review - use the attempt number from the LATEST SUBMITTED PRIMARY
+        latest_submitted_primary = fa.evaluations.filter(
+            stage='primary', is_submitted=True
+        ).order_by('-attempt_number').first()
+        
+        if latest_submitted_primary:
+            current_attempt = latest_submitted_primary.attempt_number
+        
         evaluation, created = FAEvaluation.objects.get_or_create(
                 fa=fa,
                 stage=stage,
@@ -442,10 +464,17 @@ def fa_review(request, fai_id):
                 defaults={'inspector': request.user}
             )
     
-    # Get primary evaluation for reference (latest submitted one)
-    primary_evaluation = fa.get_latest_evaluation('primary')
-    if primary_evaluation and not primary_evaluation.is_submitted:
-        primary_evaluation = None  # Don't show unsubmitted primary
+    # Get primary evaluation for reference - use the one from the SAME attempt as current evaluation
+    if evaluation:
+        primary_evaluation = fa.evaluations.filter(
+            stage='primary', 
+            attempt_number=evaluation.attempt_number,
+            is_submitted=True
+        ).first()
+    else:
+        primary_evaluation = fa.get_latest_evaluation('primary')
+        if primary_evaluation and not primary_evaluation.is_submitted:
+            primary_evaluation = None
     
     # For final review, pre-load primary inspector's ratings if evaluation is new
     if is_final_review and created and primary_evaluation:

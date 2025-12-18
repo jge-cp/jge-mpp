@@ -278,6 +278,11 @@ class FirstArticleInspection(models.Model):
         latest = self.evaluations.order_by('-attempt_number').first()
         return latest.attempt_number if latest else 1
     
+    @property
+    def current_attempt(self):
+        """Property version for template access"""
+        return self.get_current_attempt_number()
+    
     def get_next_attempt_number(self):
         """Get the next attempt number for a new evaluation round"""
         return self.get_current_attempt_number() + 1
