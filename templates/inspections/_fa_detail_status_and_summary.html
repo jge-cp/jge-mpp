@@ -4,6 +4,14 @@
   <h2 class="text-xl font-bold mb-4 border-b border-theme pb-2">Submission Details</h2>
   <dl class="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2 md:grid-cols-3">
     <div>
+      <dt class="text-sm font-medium text-muted">Company</dt>
+      <dd class="mt-1 text-primary font-semibold">{{ fa.company.name|default:fa.vendor.company_name }}</dd>
+    </div>
+    <div>
+      <dt class="text-sm font-medium text-muted">Submitted By</dt>
+      <dd class="mt-1 text-primary">{{ fa.submitter_full_name|default:"-" }}</dd>
+    </div>
+    <div>
       <dt class="text-sm font-medium text-muted">Fabric Style</dt>
       <dd class="mt-1 text-primary">{{ fa.fabric_style }}</dd>
     </div>

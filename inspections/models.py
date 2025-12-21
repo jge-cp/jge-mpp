@@ -80,14 +80,39 @@ class FirstArticleInspection(models.Model):
         ('fail', 'Fail'),
     ]
     
-    # Auto-generated ID: {company}-FA-{sequence}
+    # Auto-generated ID: {company_code}-FA-{sequence}
     fai_id = models.CharField(max_length=50, primary_key=True)
     
-    # Vendor (partner) - system generated
+    # Company that owns this FA (scoped visibility for partners)
+    company = models.ForeignKey(
+        'accounts.PartnerCompany',
+        on_delete=models.PROTECT,
+        related_name='fa_submissions',
+        null=True,  # Nullable for migration; new FAs should always have company
+        blank=True,
+        help_text='Partner company that owns this FA'
+    )
+    
+    # Vendor (partner user who submitted) - legacy FK, kept for backwards compat
+    # For new submissions, also populate submitter_* snapshot fields
     vendor = models.ForeignKey(
         'accounts.UserProfile',
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,  # Changed from CASCADE: preserve FA even if user deleted
+        null=True,
+        blank=True,
         related_name='fa_submissions'
+    )
+    
+    # Immutable submitter snapshot (audit trail - survives user deletion)
+    submitter_user_id = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text='Original User ID at time of submission (immutable)'
+    )
+    submitter_email = models.EmailField(
+        blank=True,
+        default='',
+        help_text='Submitter email at time of submission (immutable)'
     )
     
     # System generated unique ID
@@ -356,18 +381,48 @@ class FirstArticleInspection(models.Model):
             return fa.get_next_attempt_number()
     
     def save(self, *args, **kwargs):
-        """Auto-generate fai_id and fsid if not set"""
+        """Auto-generate fai_id and fsid if not set, populate company and submitter snapshot"""
         # Concurrency hardening:
         # This ID is derived from "last record + 1" which can race under concurrent creates.
         # We keep the same external format, but retry on integrity collisions.
+        
+        # Auto-populate company from vendor if not set (for new submissions)
+        if not self.company_id and self.vendor:
+            self.company = self.vendor.company
+        
+        # Populate immutable submitter snapshot on first save
+        if self._state.adding and self.vendor:
+            if not self.submitter_user_id:
+                self.submitter_user_id = self.vendor.user_id
+            if not self.submitter_email:
+                self.submitter_email = self.vendor.user.email or ''
+            if not self.submitter_first_name:
+                self.submitter_first_name = self.vendor.user.first_name or ''
+            if not self.submitter_last_name:
+                self.submitter_last_name = self.vendor.user.last_name or ''
+        
         max_attempts = 5
         for attempt in range(max_attempts):
             if not self.fai_id:
-                # Generate fai_id: {company}-FA-{sequence}
-                company_prefix = re.sub(r'[^A-Z0-9]', '', self.vendor.company_name.upper())[:10]
-                last_fa = FirstArticleInspection.objects.filter(
-                    vendor=self.vendor
-                ).order_by('-fai_id').first()
+                # Generate fai_id: {company_code}-FA-{sequence}
+                # Use company.code if available, else derive from vendor
+                if self.company:
+                    company_prefix = self.company.code
+                elif self.vendor:
+                    company_prefix = self.vendor.get_company_code()
+                else:
+                    company_prefix = 'UNKNOWN'
+                
+                # Sequence is per-company (not per-vendor)
+                if self.company:
+                    last_fa = FirstArticleInspection.objects.filter(
+                        company=self.company
+                    ).order_by('-fai_id').first()
+                else:
+                    # Fallback for legacy: per-vendor
+                    last_fa = FirstArticleInspection.objects.filter(
+                        vendor=self.vendor
+                    ).order_by('-fai_id').first()
                 
                 if last_fa and last_fa.fai_id:
                     match = re.search(r'-FA-(\d+)', last_fa.fai_id)
@@ -420,14 +475,38 @@ class LotAcceptance(models.Model):
         ('fail', 'Fail'),
     ]
     
-    # Auto-generated ID: {company}-LOT-{sequence}
+    # Auto-generated ID: {company_code}-LOT-{sequence}
     lot_id = models.CharField(max_length=50, primary_key=True)
     
-    # Vendor (partner) - system generated
+    # Company that owns this Lot (scoped visibility for partners)
+    company = models.ForeignKey(
+        'accounts.PartnerCompany',
+        on_delete=models.PROTECT,
+        related_name='lot_submissions',
+        null=True,  # Nullable for migration; new Lots should always have company
+        blank=True,
+        help_text='Partner company that owns this Lot'
+    )
+    
+    # Vendor (partner user who submitted) - legacy FK, kept for backwards compat
     vendor = models.ForeignKey(
         'accounts.UserProfile',
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,  # Changed from CASCADE: preserve Lot even if user deleted
+        null=True,
+        blank=True,
         related_name='lot_submissions'
+    )
+    
+    # Immutable submitter snapshot (audit trail - survives user deletion)
+    submitter_user_id = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text='Original User ID at time of submission (immutable)'
+    )
+    submitter_email = models.EmailField(
+        blank=True,
+        default='',
+        help_text='Submitter email at time of submission (immutable)'
     )
     
     # System generated unique ID
@@ -559,15 +638,45 @@ class LotAcceptance(models.Model):
         return self.display_name
     
     def save(self, *args, **kwargs):
-        """Auto-generate lot_id, fsid, sample count, and sample IDs if not set"""
+        """Auto-generate lot_id, fsid, sample count, sample IDs, populate company and submitter snapshot"""
+        
+        # Auto-populate company from vendor if not set (for new submissions)
+        if not self.company_id and self.vendor:
+            self.company = self.vendor.company
+        
+        # Populate immutable submitter snapshot on first save
+        if self._state.adding and self.vendor:
+            if not self.submitter_user_id:
+                self.submitter_user_id = self.vendor.user_id
+            if not self.submitter_email:
+                self.submitter_email = self.vendor.user.email or ''
+            if not self.submitter_first_name:
+                self.submitter_first_name = self.vendor.user.first_name or ''
+            if not self.submitter_last_name:
+                self.submitter_last_name = self.vendor.user.last_name or ''
+        
         max_attempts = 5
         for attempt in range(max_attempts):
             if not self.lot_id:
-                # Generate lot_id: {company}-LOT-{sequence}
-                company_prefix = re.sub(r'[^A-Z0-9]', '', self.vendor.company_name.upper())[:10]
-                last_lot = LotAcceptance.objects.filter(
-                    vendor=self.vendor
-                ).order_by('-lot_id').first()
+                # Generate lot_id: {company_code}-LOT-{sequence}
+                # Use company.code if available, else derive from vendor
+                if self.company:
+                    company_prefix = self.company.code
+                elif self.vendor:
+                    company_prefix = self.vendor.get_company_code()
+                else:
+                    company_prefix = 'UNKNOWN'
+                
+                # Sequence is per-company (not per-vendor)
+                if self.company:
+                    last_lot = LotAcceptance.objects.filter(
+                        company=self.company
+                    ).order_by('-lot_id').first()
+                else:
+                    # Fallback for legacy: per-vendor
+                    last_lot = LotAcceptance.objects.filter(
+                        vendor=self.vendor
+                    ).order_by('-lot_id').first()
                 
                 if last_lot and last_lot.lot_id:
                     match = re.search(r'-LOT-(\d+)', last_lot.lot_id)

@@ -77,12 +77,15 @@ EMAIL_HOST_PASSWORD=your-resend-api-key-here
 
 If you ran setup with `--with-test-users`, use these credentials:
 
-| Username | Password | Role |
-|----------|----------|------|
-| partner | partner123 | Partner |
-| primary_inspector | primary_inspector123 | Primary Inspector |
-| final_inspector | final_inspector123 | Final Inspector |
-| staff | staff123 | Staff Executive |
+| Username | Password | Role | Company |
+|----------|----------|------|---------|
+| partner | partner123 | Partner | TESTCO |
+| partner2 | partner2123 | Partner | TESTCO |
+| primary_inspector | primary_inspector123 | Primary Inspector | - |
+| final_inspector | final_inspector123 | Final Inspector | - |
+| staff | staff123 | Staff Executive | - |
+
+**Note:** `partner` and `partner2` both belong to the same company (TESTCO). FAs/Lots submitted by either are visible to both.
 
 ### Test Data
 
@@ -107,6 +110,14 @@ Use `--clear` flag to wipe existing data before creating fresh test data.
 | **Primary Inspector** | First FA review + all Lot reviews |
 | **Final Inspector** | Final FA review only |
 | **Staff** | Dashboard access (executive/finance/operations) |
+
+## Partner Companies
+
+Partners belong to a **PartnerCompany** for multi-user access:
+
+- **Company Code**: Short ID used in FA/Lot prefixes (e.g., `ACME-FA-0001`)
+- **Multi-User Access**: All employees in a company see the same FAs/Lots
+- **Submitter Audit Trail**: Original submitter is recorded immutably (survives user deletion)
 
 ## Two-Stage FA Workflow
 

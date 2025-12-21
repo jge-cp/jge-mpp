@@ -72,6 +72,55 @@ profile.is_staff()             # Staff (executive/finance/operations)
 
 ---
 
+## Partner Companies
+
+Partners belong to a **PartnerCompany** which groups multiple users (employees) under one organization.
+
+### Key Concepts
+
+- **Company Code**: A short alphanumeric identifier (e.g., `ACME`) used in FA/Lot ID prefixes (`ACME-FA-0001`). Set once per company and should not change after FAs exist.
+- **Multi-User Access**: All users in a company can see all of that company's FAs and Lots. FAs/Lots are scoped by company, not by individual user.
+- **Submitter Audit Trail**: When an FA or Lot is submitted, the submitting user's details are snapshotted (name, email, user ID). This audit trail survives even if the user is later deleted.
+
+### Data Model
+
+```python
+# PartnerCompany - represents an organization
+PartnerCompany:
+  - code (unique, e.g., "ACME")
+  - name (full company name)
+  - contact_name, contact_email, contact_phone
+  - address fields (admin-only visibility)
+  - status (active/inactive/suspended)
+
+# UserProfile links to PartnerCompany
+UserProfile:
+  - company (FK to PartnerCompany, nullable for admins)
+  - company_name (legacy field for backwards compat)
+
+# FA/Lot ownership
+FirstArticleInspection / LotAcceptance:
+  - company (FK to PartnerCompany - used for visibility scoping)
+  - vendor (FK to UserProfile - legacy, kept for compat)
+  - submitter_user_id, submitter_email, submitter_first_name, submitter_last_name (immutable audit trail)
+```
+
+### Visibility Rules
+
+| User Type | Sees FAs/Lots |
+|-----------|---------------|
+| **Partner** | Only their company's FAs/Lots (all employees see same data) |
+| **Inspector/Staff** | All FAs/Lots across all companies |
+
+### ID Generation
+
+FA and Lot IDs are generated using the company code:
+- Format: `{COMPANY_CODE}-FA-{SEQUENCE}` or `{COMPANY_CODE}-LOT-{SEQUENCE}`
+- Example: `ACME-FA-0001`, `ACME-LOT-0003`
+- Sequence is per-company (not per-user)
+
+---
+
 ## Workflows
 
 ### Two-Stage First Article (FA) Workflow

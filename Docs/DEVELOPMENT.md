@@ -334,12 +334,17 @@ python manage.py setup_test_users
 
 Creates these users with passwords `{username}123`:
 
-| Username | Role |
-|----------|------|
-| partner | Partner |
-| primary_inspector | Primary Inspector |
-| final_inspector | Final Inspector |
-| staff | Staff Executive |
+| Username | Role | Company |
+|----------|------|---------|
+| partner | Partner | TESTCO |
+| partner2 | Partner | TESTCO |
+| primary_inspector | Primary Inspector | - |
+| final_inspector | Final Inspector | - |
+| staff | Staff Executive | - |
+
+Also creates a **Test Partner Company** with code `TESTCO`. Both `partner` and `partner2` belong to this company, demonstrating:
+- Multi-user company access (both see the same FAs/Lots)
+- Company-scoped FA/Lot IDs (e.g., `TESTCO-FA-0001`)
 
 ---
 

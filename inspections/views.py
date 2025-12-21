@@ -65,7 +65,7 @@ def fa_submit(request):
 
 @login_required
 def fa_list(request):
-    """FA list/history view - Partners see their own, inspectors/staff see all"""
+    """FA list/history view - Partners see their company's FAs, inspectors/staff see all"""
     profile = getattr(request.user, 'profile', None)
     if not profile:
         from accounts.models import UserProfile
@@ -75,18 +75,23 @@ def fa_list(request):
             technical_email=request.user.email,
         )
     
-    # Partners see only their FAs, inspectors/staff see all
+    # Partners see their company's FAs (all employees see company submissions)
+    # Inspectors/staff see all
     if profile.is_partner():
-        fas = FirstArticleInspection.objects.filter(vendor=profile).order_by('-submission_date')
+        if profile.company:
+            fas = FirstArticleInspection.objects.filter(company=profile.company).order_by('-submission_date')
+        else:
+            # Fallback for legacy users without company FK
+            fas = FirstArticleInspection.objects.filter(vendor=profile).order_by('-submission_date')
     else:
-        fas = FirstArticleInspection.objects.select_related('vendor').order_by('-submission_date')
+        fas = FirstArticleInspection.objects.select_related('vendor', 'company').order_by('-submission_date')
     
     return render(request, 'inspections/fa_list.html', {'fas': fas, 'profile': profile})
 
 
 @login_required
 def fa_detail(request, fai_id):
-    """FA detail view - accessible by vendor or any inspector/staff"""
+    """FA detail view - accessible by company members or any inspector/staff"""
     profile = getattr(request.user, 'profile', None)
     if not profile:
         from accounts.models import UserProfile
@@ -96,19 +101,31 @@ def fa_detail(request, fai_id):
             technical_email=request.user.email,
         )
     
-    # Partners can only see their own FAs, inspectors/staff can see all
+    # Partners can only see their company's FAs, inspectors/staff can see all
     if profile.is_partner():
-        fa = get_object_or_404(FirstArticleInspection, fai_id=fai_id, vendor=profile)
+        if profile.company:
+            fa = get_object_or_404(FirstArticleInspection, fai_id=fai_id, company=profile.company)
+        else:
+            # Fallback for legacy users without company FK
+            fa = get_object_or_404(FirstArticleInspection, fai_id=fai_id, vendor=profile)
     else:
         fa = get_object_or_404(FirstArticleInspection, fai_id=fai_id)
     
     # Get evaluation history
     evaluation_history = fa.get_evaluation_history()
     
+    # Partner can resubmit if they belong to the owning company
+    can_resubmit = fa.can_resubmit() and profile.is_partner()
+    if can_resubmit:
+        if profile.company:
+            can_resubmit = fa.company == profile.company
+        else:
+            can_resubmit = fa.vendor == profile
+    
     context = {
         'fa': fa,
         'evaluation_history': evaluation_history,
-        'can_resubmit': fa.can_resubmit() and profile.is_partner() and fa.vendor == profile,
+        'can_resubmit': can_resubmit,
     }
     if request.headers.get('HX-Request'):
         return render(request, 'inspections/_fa_detail_status_and_summary.html', context)
@@ -123,7 +140,11 @@ def fa_resubmit(request, fai_id):
         messages.error(request, 'Only partners can resubmit First Articles.')
         return redirect('dashboard:partner_dashboard')
     
-    fa = get_object_or_404(FirstArticleInspection, fai_id=fai_id, vendor=profile)
+    # Partner can resubmit FAs belonging to their company
+    if profile.company:
+        fa = get_object_or_404(FirstArticleInspection, fai_id=fai_id, company=profile.company)
+    else:
+        fa = get_object_or_404(FirstArticleInspection, fai_id=fai_id, vendor=profile)
     
     if not fa.can_resubmit():
         messages.error(request, 'This First Article cannot be resubmitted. Only rejected FAs can be resubmitted.')
@@ -156,9 +177,12 @@ def fa_evaluation_history(request, fai_id):
         messages.error(request, 'User profile not found.')
         return redirect('dashboard:partner_dashboard')
     
-    # Partners can only see their own FAs, inspectors/staff can see all
+    # Partners can only see their company's FAs, inspectors/staff can see all
     if profile.is_partner():
-        fa = get_object_or_404(FirstArticleInspection, fai_id=fai_id, vendor=profile)
+        if profile.company:
+            fa = get_object_or_404(FirstArticleInspection, fai_id=fai_id, company=profile.company)
+        else:
+            fa = get_object_or_404(FirstArticleInspection, fai_id=fai_id, vendor=profile)
     else:
         fa = get_object_or_404(FirstArticleInspection, fai_id=fai_id)
     
@@ -241,12 +265,18 @@ def lot_submit(request):
     else:
         form = LotAcceptanceForm(user=request.user)
         
-        # Check if user has any approved FAs
+        # Check if company has any approved FAs
         if profile:
-            approved_fas_count = FirstArticleInspection.objects.filter(
-                vendor=profile,
-                status='approved'
-            ).count()
+            if profile.company:
+                approved_fas_count = FirstArticleInspection.objects.filter(
+                    company=profile.company,
+                    status='approved'
+                ).count()
+            else:
+                approved_fas_count = FirstArticleInspection.objects.filter(
+                    vendor=profile,
+                    status='approved'
+                ).count()
             if approved_fas_count == 0:
                 messages.warning(
                     request,
@@ -262,10 +292,16 @@ def get_fa_details(request, fai_id):
     """HTMX endpoint to get FA details for lot submission preview"""
     try:
         fa = FirstArticleInspection.objects.get(fai_id=fai_id)
-        # Verify user has access to this FA
+        # Verify user has access to this FA (company-based or legacy vendor-based)
         profile = getattr(request.user, 'profile', None)
-        if profile and fa.vendor == profile and fa.status == 'approved':
-            return render(request, 'inspections/partials/fa_details_preview.html', {'fa': fa})
+        if profile and fa.status == 'approved':
+            has_access = False
+            if profile.company and fa.company == profile.company:
+                has_access = True
+            elif fa.vendor == profile:
+                has_access = True
+            if has_access:
+                return render(request, 'inspections/partials/fa_details_preview.html', {'fa': fa})
     except FirstArticleInspection.DoesNotExist:
         pass
     
@@ -278,17 +314,23 @@ def get_fa_details_json(request, fai_id):
     from django.http import JsonResponse
     try:
         fa = FirstArticleInspection.objects.get(fai_id=fai_id)
-        # Verify user has access to this FA
+        # Verify user has access to this FA (company-based or legacy vendor-based)
         profile = getattr(request.user, 'profile', None)
-        if profile and fa.vendor == profile and fa.status == 'approved':
-            return JsonResponse({
-                'fabric_style': fa.fabric_style,
-                'multicam_variant': fa.multicam_variant.camouflage_name if fa.multicam_variant else '',
-                'fa_lot_number': fa.fa_lot_number,
-                'shade_standard': fa.get_shade_standard_display(),
-                'spectral_reflectance': fa.get_spectral_reflectance_requirement_display(),
-                'approved_date': fa.final_review_date.strftime('%b %d, %Y') if fa.final_review_date else '',
-            })
+        if profile and fa.status == 'approved':
+            has_access = False
+            if profile.company and fa.company == profile.company:
+                has_access = True
+            elif fa.vendor == profile:
+                has_access = True
+            if has_access:
+                return JsonResponse({
+                    'fabric_style': fa.fabric_style,
+                    'multicam_variant': fa.multicam_variant.camouflage_name if fa.multicam_variant else '',
+                    'fa_lot_number': fa.fa_lot_number,
+                    'shade_standard': fa.get_shade_standard_display(),
+                    'spectral_reflectance': fa.get_spectral_reflectance_requirement_display(),
+                    'approved_date': fa.final_review_date.strftime('%b %d, %Y') if fa.final_review_date else '',
+                })
     except FirstArticleInspection.DoesNotExist:
         pass
     
@@ -297,7 +339,7 @@ def get_fa_details_json(request, fai_id):
 
 @login_required
 def lot_list(request):
-    """Lot list/history view - Partners see their own, inspectors/staff see all"""
+    """Lot list/history view - Partners see their company's Lots, inspectors/staff see all"""
     profile = getattr(request.user, 'profile', None)
     if not profile:
         from accounts.models import UserProfile
@@ -307,18 +349,23 @@ def lot_list(request):
             technical_email=request.user.email,
         )
     
-    # Partners see only their Lots, inspectors/staff see all
+    # Partners see their company's Lots (all employees see company submissions)
+    # Inspectors/staff see all
     if profile.is_partner():
-        lots = LotAcceptance.objects.filter(vendor=profile).order_by('-submission_date')
+        if profile.company:
+            lots = LotAcceptance.objects.filter(company=profile.company).order_by('-submission_date')
+        else:
+            # Fallback for legacy users without company FK
+            lots = LotAcceptance.objects.filter(vendor=profile).order_by('-submission_date')
     else:
-        lots = LotAcceptance.objects.select_related('vendor').order_by('-submission_date')
+        lots = LotAcceptance.objects.select_related('vendor', 'company').order_by('-submission_date')
     
     return render(request, 'inspections/lot_list.html', {'lots': lots, 'profile': profile})
 
 
 @login_required
 def lot_detail(request, lot_id):
-    """Lot detail view - Partners see their own, inspectors/staff see all"""
+    """Lot detail view - Partners see their company's Lots, inspectors/staff see all"""
     profile = getattr(request.user, 'profile', None)
     if not profile:
         from accounts.models import UserProfile
@@ -328,9 +375,13 @@ def lot_detail(request, lot_id):
             technical_email=request.user.email,
         )
     
-    # Partners can only see their own lots, inspectors/staff can see all
+    # Partners can only see their company's lots, inspectors/staff can see all
     if profile.is_partner():
-        lot = get_object_or_404(LotAcceptance, lot_id=lot_id, vendor=profile)
+        if profile.company:
+            lot = get_object_or_404(LotAcceptance, lot_id=lot_id, company=profile.company)
+        else:
+            # Fallback for legacy users without company FK
+            lot = get_object_or_404(LotAcceptance, lot_id=lot_id, vendor=profile)
     else:
         lot = get_object_or_404(LotAcceptance, lot_id=lot_id)
     

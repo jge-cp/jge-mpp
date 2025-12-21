@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 from unfold.admin import ModelAdmin, TabularInline
-from .models import UserProfile
+from .models import UserProfile, PartnerCompany
 
 
 class UserProfileInline(TabularInline):
@@ -11,8 +11,9 @@ class UserProfileInline(TabularInline):
     can_delete = False
     verbose_name_plural = 'Profile'
     fk_name = 'user'
-    fields = ['user_functionality', 'admin_role', 'company_name', 'status']
+    fields = ['user_functionality', 'admin_role', 'company', 'company_name', 'status']
     readonly_fields = ['company_name']
+    autocomplete_fields = ['company']
 
 
 # Unregister the default User admin
@@ -32,12 +33,44 @@ class UserAdmin(BaseUserAdmin):
     get_user_type.short_description = 'User Type'
 
 
+@admin.register(PartnerCompany)
+class PartnerCompanyAdmin(ModelAdmin):
+    """Admin for Partner Companies"""
+    list_display = ['name', 'code', 'status', 'contact_name', 'contact_email', 'created_at']
+    list_filter = ['status']
+    search_fields = ['name', 'code', 'contact_name', 'contact_email']
+    readonly_fields = ['created_at', 'updated_at']
+    ordering = ['name']
+    
+    fieldsets = (
+        ('Company Identity', {
+            'fields': ('code', 'name', 'status'),
+            'description': 'The code is used for FA/Lot ID prefixes (e.g., ACME-FA-0001). Set it once and do not change after FAs exist.'
+        }),
+        ('Primary Contact', {
+            'fields': ('contact_name', 'contact_email', 'contact_phone'),
+        }),
+        ('Address', {
+            'fields': ('street', 'city', 'state', 'country', 'postal_code'),
+            'classes': ('collapse',)
+        }),
+        ('Notes', {
+            'fields': ('notes',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+
 @admin.register(UserProfile)
 class UserProfileAdmin(ModelAdmin):
-    list_display = ['company_name', 'user', 'user_functionality', 'admin_role', 'status', 'technical_email']
-    list_filter = ['user_functionality', 'admin_role', 'status', 'partner_type']
-    search_fields = ['company_name', 'technical_email', 'commercial_email']
+    list_display = ['company_name', 'user', 'company', 'user_functionality', 'admin_role', 'status', 'technical_email']
+    list_filter = ['user_functionality', 'admin_role', 'status', 'partner_type', 'company']
+    search_fields = ['company_name', 'technical_email', 'commercial_email', 'company__name', 'company__code']
     readonly_fields = ['created_at', 'updated_at']
+    autocomplete_fields = ['company']
     actions = ['reset_to_default_permissions']
     
     @admin.action(description='Reset selected profiles to default permissions')
@@ -58,6 +91,10 @@ class UserProfileAdmin(ModelAdmin):
         ('User Account', {
             'fields': ('user', 'user_functionality', 'admin_role', 'status')
         }),
+        ('Partner Company', {
+            'fields': ('company',),
+            'description': 'Link this user to a Partner Company. All users in a company can see the company\'s FAs and Lots.',
+        }),
         ('Portal Permissions', {
             'fields': (
                 'can_submit_fa', 'can_submit_lots', 'can_submit_reports',
@@ -68,9 +105,11 @@ class UserProfileAdmin(ModelAdmin):
             ),
             'description': 'These are the actual portal permissions. They are set automatically based on User Type but can be customized.',
         }),
-        ('Company Information', {
+        ('Legacy Company Information', {
             'fields': ('company_name', 'technical_email', 'technical_contact', 
-                      'commercial_email', 'commercial_contact')
+                      'commercial_email', 'commercial_contact'),
+            'description': 'Legacy fields - use Partner Company above for new users.',
+            'classes': ('collapse',)
         }),
         ('Address', {
             'fields': ('street', 'number', 'city', 'state', 'country', 'telephone'),

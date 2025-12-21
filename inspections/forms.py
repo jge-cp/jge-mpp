@@ -122,12 +122,21 @@ class LotAcceptanceForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
-        # Only show approved FAs for this user
+        # Only show approved FAs for this user's company (or legacy per-user)
         if user and hasattr(user, 'profile'):
-            approved_fas = FirstArticleInspection.objects.filter(
-                vendor=user.profile,
-                status='approved'
-            ).order_by('-submission_date')
+            profile = user.profile
+            if profile.company:
+                # Company-based: show all approved FAs for the company
+                approved_fas = FirstArticleInspection.objects.filter(
+                    company=profile.company,
+                    status='approved'
+                ).order_by('-submission_date')
+            else:
+                # Legacy: show only this user's approved FAs
+                approved_fas = FirstArticleInspection.objects.filter(
+                    vendor=profile,
+                    status='approved'
+                ).order_by('-submission_date')
             self.fields['original_fa'].queryset = approved_fas
             if not approved_fas.exists():
                 self.fields['original_fa'].help_text = (

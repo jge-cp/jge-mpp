@@ -1,6 +1,74 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import EmailValidator
+import re
+
+
+class PartnerCompany(models.Model):
+    """
+    Represents a Partner company (organization).
+    
+    Multiple users (UserProfile) can belong to one company.
+    FAs and Lots are owned by a company, not by individual users.
+    The `code` is a stable short identifier used in FA/Lot ID prefixes.
+    """
+    
+    STATUS_CHOICES = [
+        ('active', 'Active'),
+        ('inactive', 'Inactive'),
+        ('suspended', 'Suspended'),
+    ]
+    
+    # Unique short code for ID prefixes (e.g., "ACME" → ACME-FA-0001)
+    # Admins set this once; it should not change after FAs/Lots exist.
+    code = models.CharField(
+        max_length=20,
+        unique=True,
+        help_text='Short code for FA/Lot ID prefixes (e.g., ACME). Set once and do not change.'
+    )
+    
+    name = models.CharField(max_length=255, help_text='Full company name')
+    
+    # Primary contact info (admin visibility only for now)
+    contact_name = models.CharField(max_length=255, blank=True)
+    contact_email = models.EmailField(blank=True, validators=[EmailValidator()])
+    contact_phone = models.CharField(max_length=50, blank=True)
+    
+    # Address (admin visibility only)
+    street = models.CharField(max_length=255, blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    state = models.CharField(max_length=100, blank=True)
+    country = models.CharField(max_length=100, blank=True)
+    postal_code = models.CharField(max_length=20, blank=True)
+    
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='active'
+    )
+    
+    notes = models.TextField(blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = 'Partner Company'
+        verbose_name_plural = 'Partner Companies'
+        ordering = ['name']
+        indexes = [
+            models.Index(fields=['code']),
+            models.Index(fields=['status']),
+        ]
+    
+    def __str__(self):
+        return f"{self.name} ({self.code})"
+    
+    def save(self, *args, **kwargs):
+        # Normalize code to uppercase alphanumeric
+        if self.code:
+            self.code = re.sub(r'[^A-Z0-9]', '', self.code.upper())[:20]
+        super().save(*args, **kwargs)
 
 
 class UserProfile(models.Model):
@@ -45,7 +113,19 @@ class UserProfile(models.Model):
     __original_user_functionality = None
     __original_admin_role = None
     
-    # Company information
+    # Link to PartnerCompany (for partners - allows multi-user company access)
+    # Nullable for admin/inspector users who don't belong to a partner company
+    company = models.ForeignKey(
+        PartnerCompany,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='users',
+        help_text='Partner company this user belongs to (for partners only)'
+    )
+    
+    # Legacy company_name field - kept for backwards compatibility during migration
+    # New partners should have company FK set instead
     company_name = models.CharField(max_length=255)
     technical_email = models.EmailField(unique=True, validators=[EmailValidator()])
     technical_contact = models.CharField(max_length=255, blank=True)
@@ -149,7 +229,19 @@ class UserProfile(models.Model):
         self.__original_admin_role = self.__dict__.get('admin_role', '')
     
     def __str__(self):
-        return f"{self.company_name} ({self.get_user_functionality_display()})"
+        display_name = self.company.name if self.company else self.company_name
+        return f"{display_name} ({self.get_user_functionality_display()})"
+    
+    def get_company_display_name(self):
+        """Return the company name (from FK if set, else legacy field)"""
+        return self.company.name if self.company else self.company_name
+    
+    def get_company_code(self):
+        """Return the company code for FA/Lot ID generation"""
+        if self.company:
+            return self.company.code
+        # Fallback for legacy users without company FK: derive from company_name
+        return re.sub(r'[^A-Z0-9]', '', self.company_name.upper())[:10]
     
     def save(self, *args, **kwargs):
         # Check if this is a new instance or if user_functionality/admin_role changed

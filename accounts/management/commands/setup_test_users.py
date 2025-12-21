@@ -1,11 +1,12 @@
 """
 Management command to set up test users for MVP testing.
 Creates: partner, primary_inspector, final_inspector, staff users.
+Creates: Test Partner Company with partner users linked.
 Clears existing test data (except specified users).
 """
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
-from accounts.models import UserProfile
+from accounts.models import UserProfile, PartnerCompany
 from inspections.models import FirstArticleInspection, LotAcceptance, MonthlyReport
 
 
@@ -38,6 +39,21 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f'Cleared {lot_count} Lot Acceptances'))
         self.stdout.write(self.style.SUCCESS(f'Cleared {report_count} Monthly Reports'))
         
+        # Create test Partner Company
+        test_company, created = PartnerCompany.objects.get_or_create(
+            code='TESTCO',
+            defaults={
+                'name': 'Test Partner Company',
+                'contact_name': 'Test Contact',
+                'contact_email': 'contact@testcompany.com',
+                'status': 'active',
+            }
+        )
+        if created:
+            self.stdout.write(self.style.SUCCESS(f'Created Partner Company: {test_company.name} ({test_company.code})'))
+        else:
+            self.stdout.write(self.style.WARNING(f'Partner Company already exists: {test_company.name}'))
+        
         # Delete users except the keep_user and superusers
         users_to_delete = User.objects.exclude(username=keep_user).exclude(is_superuser=True)
         user_count = users_to_delete.count()
@@ -55,8 +71,23 @@ class Command(BaseCommand):
                 'is_staff': False,
                 'profile': {
                     'user_functionality': 'partner',
+                    'company': test_company,
                     'company_name': 'Test Partner Company',
                     'technical_email': 'partner@test.com',
+                }
+            },
+            {
+                'username': 'partner2',
+                'email': 'partner2@test.com',
+                'password': 'partner2123',
+                'first_name': 'Second',
+                'last_name': 'Partner',
+                'is_staff': False,
+                'profile': {
+                    'user_functionality': 'partner',
+                    'company': test_company,
+                    'company_name': 'Test Partner Company',
+                    'technical_email': 'partner2@test.com',
                 }
             },
             {
@@ -128,16 +159,22 @@ class Command(BaseCommand):
             self.stdout.write(f'  → Profile: {profile.get_user_functionality_display()}, {profile.get_admin_role_display() or "N/A"}')
         
         self.stdout.write('')
-        self.stdout.write(self.style.SUCCESS('=' * 50))
+        self.stdout.write(self.style.SUCCESS('=' * 60))
         self.stdout.write(self.style.SUCCESS('Test Users Created:'))
-        self.stdout.write(self.style.SUCCESS('=' * 50))
+        self.stdout.write(self.style.SUCCESS('=' * 60))
         self.stdout.write('')
-        self.stdout.write('| Username          | Password              | Role                |')
-        self.stdout.write('|-------------------|----------------------|---------------------|')
-        self.stdout.write('| partner           | partner123           | Partner             |')
-        self.stdout.write('| primary_inspector | primary_inspector123 | Primary Inspector   |')
-        self.stdout.write('| final_inspector   | final_inspector123   | Final Inspector     |')
-        self.stdout.write('| staff             | staff123             | Staff (Executive)   |')
+        self.stdout.write('| Username          | Password              | Role                | Company     |')
+        self.stdout.write('|-------------------|----------------------|---------------------|-------------|')
+        self.stdout.write('| partner           | partner123           | Partner             | TESTCO      |')
+        self.stdout.write('| partner2          | partner2123          | Partner             | TESTCO      |')
+        self.stdout.write('| primary_inspector | primary_inspector123 | Primary Inspector   | -           |')
+        self.stdout.write('| final_inspector   | final_inspector123   | Final Inspector     | -           |')
+        self.stdout.write('| staff             | staff123             | Staff (Executive)   | -           |')
+        self.stdout.write('')
+        self.stdout.write(self.style.SUCCESS('Partner Company:'))
+        self.stdout.write(f'  {test_company.name} (Code: {test_company.code})')
+        self.stdout.write('  → partner and partner2 both belong to this company')
+        self.stdout.write('  → FAs/Lots submitted by either are visible to both')
         self.stdout.write('')
         self.stdout.write(self.style.SUCCESS('Dashboard URLs:'))
         self.stdout.write('  Partner:   http://localhost:8000/portal/dashboard/partner/')
