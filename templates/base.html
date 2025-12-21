@@ -481,8 +481,7 @@
                                 x-ref="notifDropdownContent"
                                 data-notif-dropdown-content="1"
                                 hx-get="{% url 'notifications:dropdown' %}"
-                                hx-trigger="refresh, every 10s, notifications-changed from:body"
-                                :hx-disable="!notifOpen"
+                                hx-trigger="refresh, notifications-changed from:body"
                                 hx-swap="innerHTML"
                             >
                                 <div class="p-4 text-center text-muted text-sm">
