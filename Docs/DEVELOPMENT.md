@@ -336,15 +336,21 @@ Creates these users with passwords `{username}123`:
 
 | Username | Role | Company |
 |----------|------|---------|
-| partner | Partner | TESTCO |
-| partner2 | Partner | TESTCO |
+| partner1a | Partner | ACME |
+| partner1b | Partner | ACME |
+| partner2a | Partner | GLOBEX |
+| partner2b | Partner | GLOBEX |
 | primary_inspector | Primary Inspector | - |
 | final_inspector | Final Inspector | - |
 | staff | Staff Executive | - |
 
-Also creates a **Test Partner Company** with code `TESTCO`. Both `partner` and `partner2` belong to this company, demonstrating:
-- Multi-user company access (both see the same FAs/Lots)
-- Company-scoped FA/Lot IDs (e.g., `TESTCO-FA-0001`)
+Also creates **2 Test Partner Companies**:
+- **Acme Fabrics Inc** (code: `ACME`) with `partner1a` and `partner1b`
+- **Globex Textiles Ltd** (code: `GLOBEX`) with `partner2a` and `partner2b`
+
+This demonstrates:
+- Multi-user company access (both users in a company see the same FAs/Lots)
+- Company-scoped FA/Lot IDs (e.g., `ACME-FA-0001`, `GLOBEX-LOT-0002`)
 
 ---
 

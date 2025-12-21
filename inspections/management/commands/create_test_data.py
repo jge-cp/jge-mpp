@@ -70,33 +70,41 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('All test data cleared!\n'))
 
     def create_test_data(self):
-        """Create test FAs, Lots, and Evaluations"""
+        """Create test FAs, Lots, and Evaluations for all 4 partner users"""
         self.stdout.write('Creating test data...\n')
         
         # Get or create test users
-        partner = self.get_or_create_user('partner', 'partner')
+        partner1a = self.get_or_create_user('partner1a', 'partner')
+        partner1b = self.get_or_create_user('partner1b', 'partner')
+        partner2a = self.get_or_create_user('partner2a', 'partner')
+        partner2b = self.get_or_create_user('partner2b', 'partner')
         primary_inspector = self.get_or_create_user('primary_inspector', 'primary_inspector')
         final_inspector = self.get_or_create_user('final_inspector', 'final_inspector')
         
         # Get camouflage types
-        camos = list(CamouflageType.objects.all()[:3])
-        if len(camos) < 3:
+        camos = list(CamouflageType.objects.all()[:4])
+        if len(camos) < 4:
             self.stdout.write(self.style.ERROR('Not enough camouflage types! Run: python manage.py load_initial_data'))
             return
         
+        fa_list = []
+        lot_list = []
+        
         # =====================================================
-        # FA 1: FULLY APPROVED (passed primary + final)
+        # COMPANY 1 (ACME) - FAs
         # =====================================================
-        fa1 = FirstArticleInspection.objects.create(
-            vendor=partner,
+        
+        # FA 1A: APPROVED (partner1a) - for creating lots
+        fa1a = FirstArticleInspection.objects.create(
+            vendor=partner1a,
             fabric_style='Nylon 500D Cordura',
             multicam_variant=camos[0],
             shade_standard='alpha',
             spectral_reflectance_requirement='alpha',
             fa_lot_number='LOT-2024-001',
             date_of_printing=date.today() - timedelta(days=10),
-            submitter_first_name='John',
-            submitter_last_name='Smith',
+            submitter_first_name='Alice',
+            submitter_last_name='Anderson',
             status='approved',
             primary_inspector=primary_inspector.user,
             primary_review_date=timezone.now() - timedelta(days=5),
@@ -104,191 +112,204 @@ class Command(BaseCommand):
             final_review_date=timezone.now() - timedelta(days=2),
         )
         
-        # Create primary evaluation for FA1
-        eval1_primary = FAEvaluation.objects.create(
-            fa=fa1,
-            stage='primary',
-            attempt_number=1,
-            inspector=primary_inspector.user,
-            pattern_execution='pass',
-            scale='pass',
-            spectral_reflectance='pass',
-            comments='All criteria met. Good quality.',
-            is_submitted=True,
-            submitted_at=timezone.now() - timedelta(days=5),
-        )
-        self.create_color_evaluations(eval1_primary, camos[0], passing=True)
+        # Create primary and final evaluations for FA1A
+        eval1a_primary = self.create_evaluation(fa1a, 'primary', primary_inspector.user, camos[0], passing=True, days_ago=5)
+        eval1a_final = self.create_evaluation(fa1a, 'final', final_inspector.user, camos[0], passing=True, days_ago=2)
+        fa_list.append(fa1a)
+        self.stdout.write(self.style.SUCCESS(f'  ✓ {fa1a.fai_id}: APPROVED (partner1a from ACME)'))
         
-        # Create final evaluation for FA1
-        eval1_final = FAEvaluation.objects.create(
-            fa=fa1,
-            stage='final',
-            attempt_number=1,
-            inspector=final_inspector.user,
-            pattern_execution='pass',
-            scale='pass',
-            spectral_reflectance='pass',
-            comments='Confirmed. Approved for production.',
-            is_submitted=True,
-            submitted_at=timezone.now() - timedelta(days=2),
-        )
-        self.create_color_evaluations(eval1_final, camos[0], passing=True)
-        
-        self.stdout.write(self.style.SUCCESS(f'  ✓ FA1: {fa1.fai_id} - APPROVED (passed primary + final)'))
-        
-        # =====================================================
-        # FA 2: PENDING FINAL (passed primary, awaiting final)
-        # =====================================================
-        fa2 = FirstArticleInspection.objects.create(
-            vendor=partner,
+        # FA 1B: PENDING FINAL (partner1b) - Company 1
+        fa1b = FirstArticleInspection.objects.create(
+            vendor=partner1b,
             fabric_style='Polyester Ripstop',
             multicam_variant=camos[1],
-            shade_standard='bravo',
-            spectral_reflectance_requirement='bravo',
+            shade_standard='alpha',
+            spectral_reflectance_requirement='alpha',
             fa_lot_number='LOT-2024-002',
             date_of_printing=date.today() - timedelta(days=7),
-            submitter_first_name='Jane',
-            submitter_last_name='Doe',
+            submitter_first_name='Bob',
+            submitter_last_name='Baker',
             status='pending_final',
             primary_inspector=primary_inspector.user,
             primary_review_date=timezone.now() - timedelta(days=3),
         )
-        
-        # Create primary evaluation for FA2
-        eval2_primary = FAEvaluation.objects.create(
-            fa=fa2,
-            stage='primary',
-            attempt_number=1,
-            inspector=primary_inspector.user,
-            pattern_execution='pass',
-            scale='pass',
-            spectral_reflectance='pass',
-            comments='Primary review passed. Ready for final.',
-            is_submitted=True,
-            submitted_at=timezone.now() - timedelta(days=3),
-        )
-        self.create_color_evaluations(eval2_primary, camos[1], passing=True)
-        
-        self.stdout.write(self.style.SUCCESS(f'  ✓ FA2: {fa2.fai_id} - PENDING FINAL (passed primary, awaiting final)'))
+        eval1b_primary = self.create_evaluation(fa1b, 'primary', primary_inspector.user, camos[1], passing=True, days_ago=3)
+        fa_list.append(fa1b)
+        self.stdout.write(self.style.SUCCESS(f'  ✓ {fa1b.fai_id}: PENDING FINAL (partner1b from ACME)'))
         
         # =====================================================
-        # FA 3: PENDING PRIMARY (awaiting first review)
+        # COMPANY 2 (GLOBEX) - FAs
         # =====================================================
-        fa3 = FirstArticleInspection.objects.create(
-            vendor=partner,
-            fabric_style='Cotton Twill',
+        
+        # FA 2A: APPROVED (partner2a) - for creating lots
+        fa2a = FirstArticleInspection.objects.create(
+            vendor=partner2a,
+            fabric_style='Cotton Canvas',
             multicam_variant=camos[2],
             shade_standard='alpha',
-            spectral_reflectance_requirement='charlie',
+            spectral_reflectance_requirement='alpha',
             fa_lot_number='LOT-2024-003',
-            date_of_printing=date.today() - timedelta(days=2),
-            submitter_first_name='Bob',
-            submitter_last_name='Johnson',
+            date_of_printing=date.today() - timedelta(days=12),
+            submitter_first_name='Charlie',
+            submitter_last_name='Chen',
+            status='approved',
+            primary_inspector=primary_inspector.user,
+            primary_review_date=timezone.now() - timedelta(days=7),
+            final_inspector=final_inspector.user,
+            final_review_date=timezone.now() - timedelta(days=4),
+        )
+        eval2a_primary = self.create_evaluation(fa2a, 'primary', primary_inspector.user, camos[2], passing=True, days_ago=7)
+        eval2a_final = self.create_evaluation(fa2a, 'final', final_inspector.user, camos[2], passing=True, days_ago=4)
+        fa_list.append(fa2a)
+        self.stdout.write(self.style.SUCCESS(f'  ✓ {fa2a.fai_id}: APPROVED (partner2a from GLOBEX)'))
+        
+        # FA 2B: PENDING FINAL (partner2b) - Company 2
+        fa2b = FirstArticleInspection.objects.create(
+            vendor=partner2b,
+            fabric_style='Nylon Taffeta',
+            multicam_variant=camos[3],
+            shade_standard='alpha',
+            spectral_reflectance_requirement='alpha',
+            fa_lot_number='LOT-2024-004',
+            date_of_printing=date.today() - timedelta(days=6),
+            submitter_first_name='Diana',
+            submitter_last_name='Davis',
+            status='pending_final',
+            primary_inspector=primary_inspector.user,
+            primary_review_date=timezone.now() - timedelta(days=2),
+        )
+        eval2b_primary = self.create_evaluation(fa2b, 'primary', primary_inspector.user, camos[3], passing=True, days_ago=2)
+        fa_list.append(fa2b)
+        self.stdout.write(self.style.SUCCESS(f'  ✓ {fa2b.fai_id}: PENDING FINAL (partner2b from GLOBEX)'))
+        
+        # =====================================================
+        # COMPANY 1 (ACME) - LOTS (2 pending)
+        # =====================================================
+        
+        # LOT 1A: PENDING (partner1a, linked to FA1A)
+        lot1a = LotAcceptance.objects.create(
+            vendor=partner1a,
+            original_fa=fa1a,
+            fabric_style=fa1a.fabric_style,
+            shade_standard=fa1a.shade_standard,
+            shade_standard_number=fa1a.shade_standard_number or '',
+            spectral_reflectance_requirement=fa1a.spectral_reflectance_requirement,
+            original_fa_lot_number=fa1a.fa_lot_number,
+            lot_lot_number='LOT-PROD-001',
+            number_of_yards_printed=3000,
+            number_of_samples=2,
+            individual_sample_numbers='LOT-PROD-001-1, LOT-PROD-001-2',
+            date_of_printing=date.today() - timedelta(days=3),
+            date_shipped=date.today() - timedelta(days=2),
+            submitter_first_name='Alice',
+            submitter_last_name='Anderson',
+            submitted=True,
             status='pending',
         )
+        lot_list.append(lot1a)
+        self.stdout.write(self.style.SUCCESS(f'  ✓ {lot1a.lot_id}: PENDING (partner1a from ACME)'))
         
-        self.stdout.write(self.style.SUCCESS(f'  ✓ FA3: {fa3.fai_id} - PENDING (awaiting primary review)'))
-        
-        # =====================================================
-        # LOT 1: APPROVED (linked to FA1)
-        # =====================================================
-        lot1 = LotAcceptance.objects.create(
-            vendor=partner,
-            original_fa=fa1,
-            fabric_style=fa1.fabric_style,
-            shade_standard=fa1.shade_standard,
-            shade_standard_number=fa1.shade_standard_number or '',
-            spectral_reflectance_requirement=fa1.spectral_reflectance_requirement,
-            original_fa_lot_number=fa1.fa_lot_number,
-            lot_lot_number='LOT-PROD-001',
-            number_of_yards_printed=5000,
-            number_of_samples=3,
-            individual_sample_numbers='LOT-PROD-001-1, LOT-PROD-001-2, LOT-PROD-001-3',
-            date_of_printing=date.today() - timedelta(days=5),
-            date_shipped=date.today() - timedelta(days=4),
-            submitter_first_name='John',
-            submitter_last_name='Smith',
-            submitted=True,
-            status='approved',
-            inspector=primary_inspector.user,
-            review_date=date.today() - timedelta(days=1),
-            inspector_comments='Lot approved. Quality consistent with FA.',
-        )
-        
-        # Create lot evaluation
-        lot_eval = LotEvaluation.objects.create(
-            lot=lot1,
-            inspector=primary_inspector.user,
-            comments='All samples passed inspection.',
-            is_submitted=True,
-            submitted_at=timezone.now() - timedelta(days=1),
-        )
-        
-        # Create sample evaluations
-        for i in range(1, 4):
-            sample_eval = LotSampleEvaluation.objects.create(
-                lot_evaluation=lot_eval,
-                sample_number=i,
-                sample_id=f'LOT-PROD-001-{i}',
-                pattern_execution='pass',
-                scale='pass',
-                spectral_reflectance='pass',
-            )
-            # Create color evaluations for each sample
-            for color in camos[0].colors.all():
-                LotSampleColorEvaluation.objects.create(
-                    sample_evaluation=sample_eval,
-                    color=color,
-                    rating='4',  # Slight difference - passing
-                )
-        
-        self.stdout.write(self.style.SUCCESS(f'  ✓ LOT1: {lot1.lot_id} - APPROVED (linked to FA1)'))
-        
-        # =====================================================
-        # LOT 2: PENDING (linked to FA1, awaiting review)
-        # =====================================================
-        lot2 = LotAcceptance.objects.create(
-            vendor=partner,
-            original_fa=fa1,
-            fabric_style=fa1.fabric_style,
-            shade_standard=fa1.shade_standard,
-            shade_standard_number=fa1.shade_standard_number or '',
-            spectral_reflectance_requirement=fa1.spectral_reflectance_requirement,
-            original_fa_lot_number=fa1.fa_lot_number,
+        # LOT 1B: PENDING (partner1b, linked to FA1A)
+        lot1b = LotAcceptance.objects.create(
+            vendor=partner1b,
+            original_fa=fa1a,
+            fabric_style=fa1a.fabric_style,
+            shade_standard=fa1a.shade_standard,
+            shade_standard_number=fa1a.shade_standard_number or '',
+            spectral_reflectance_requirement=fa1a.spectral_reflectance_requirement,
+            original_fa_lot_number=fa1a.fa_lot_number,
             lot_lot_number='LOT-PROD-002',
-            number_of_yards_printed=3000,
+            number_of_yards_printed=2500,
             number_of_samples=2,
             individual_sample_numbers='LOT-PROD-002-1, LOT-PROD-002-2',
             date_of_printing=date.today() - timedelta(days=2),
             date_shipped=date.today() - timedelta(days=1),
-            submitter_first_name='Alice',
-            submitter_last_name='Williams',
+            submitter_first_name='Bob',
+            submitter_last_name='Baker',
             submitted=True,
             status='pending',
         )
+        lot_list.append(lot1b)
+        self.stdout.write(self.style.SUCCESS(f'  ✓ {lot1b.lot_id}: PENDING (partner1b from ACME)'))
         
-        self.stdout.write(self.style.SUCCESS(f'  ✓ LOT2: {lot2.lot_id} - PENDING (awaiting review)'))
+        # =====================================================
+        # COMPANY 2 (GLOBEX) - LOTS (2 pending)
+        # =====================================================
+        
+        # LOT 2A: PENDING (partner2a, linked to FA2A)
+        lot2a = LotAcceptance.objects.create(
+            vendor=partner2a,
+            original_fa=fa2a,
+            fabric_style=fa2a.fabric_style,
+            shade_standard=fa2a.shade_standard,
+            shade_standard_number=fa2a.shade_standard_number or '',
+            spectral_reflectance_requirement=fa2a.spectral_reflectance_requirement,
+            original_fa_lot_number=fa2a.fa_lot_number,
+            lot_lot_number='LOT-PROD-003',
+            number_of_yards_printed=4000,
+            number_of_samples=3,
+            individual_sample_numbers='LOT-PROD-003-1, LOT-PROD-003-2, LOT-PROD-003-3',
+            date_of_printing=date.today() - timedelta(days=4),
+            date_shipped=date.today() - timedelta(days=3),
+            submitter_first_name='Charlie',
+            submitter_last_name='Chen',
+            submitted=True,
+            status='pending',
+        )
+        lot_list.append(lot2a)
+        self.stdout.write(self.style.SUCCESS(f'  ✓ {lot2a.lot_id}: PENDING (partner2a from GLOBEX)'))
+        
+        # LOT 2B: PENDING (partner2b, linked to FA2A)
+        lot2b = LotAcceptance.objects.create(
+            vendor=partner2b,
+            original_fa=fa2a,
+            fabric_style=fa2a.fabric_style,
+            shade_standard=fa2a.shade_standard,
+            shade_standard_number=fa2a.shade_standard_number or '',
+            spectral_reflectance_requirement=fa2a.spectral_reflectance_requirement,
+            original_fa_lot_number=fa2a.fa_lot_number,
+            lot_lot_number='LOT-PROD-004',
+            number_of_yards_printed=3500,
+            number_of_samples=2,
+            individual_sample_numbers='LOT-PROD-004-1, LOT-PROD-004-2',
+            date_of_printing=date.today() - timedelta(days=3),
+            date_shipped=date.today() - timedelta(days=2),
+            submitter_first_name='Diana',
+            submitter_last_name='Davis',
+            submitted=True,
+            status='pending',
+        )
+        lot_list.append(lot2b)
+        self.stdout.write(self.style.SUCCESS(f'  ✓ {lot2b.lot_id}: PENDING (partner2b from GLOBEX)'))
         
         # Summary
         self.stdout.write('')
-        self.stdout.write(self.style.SUCCESS('=' * 50))
+        self.stdout.write(self.style.SUCCESS('=' * 70))
         self.stdout.write(self.style.SUCCESS('TEST DATA CREATED SUCCESSFULLY'))
-        self.stdout.write(self.style.SUCCESS('=' * 50))
+        self.stdout.write(self.style.SUCCESS('=' * 70))
         self.stdout.write(f'''
 Summary:
   FAs:  {FirstArticleInspection.objects.count()} total
-    - {fa1.fai_id}: APPROVED (both reviews passed)
-    - {fa2.fai_id}: PENDING_FINAL (awaiting final review)
-    - {fa3.fai_id}: PENDING (awaiting primary review)
+    COMPANY 1 (ACME):
+      - {fa1a.fai_id}: APPROVED (partner1a)
+      - {fa1b.fai_id}: PENDING_FINAL (partner1b)
+    COMPANY 2 (GLOBEX):
+      - {fa2a.fai_id}: APPROVED (partner2a)
+      - {fa2b.fai_id}: PENDING_FINAL (partner2b)
   
   Lots: {LotAcceptance.objects.count()} total
-    - {lot1.lot_id}: APPROVED
-    - {lot2.lot_id}: PENDING (awaiting review)
+    COMPANY 1 (ACME):
+      - {lot1a.lot_id}: PENDING (partner1a)
+      - {lot1b.lot_id}: PENDING (partner1b)
+    COMPANY 2 (GLOBEX):
+      - {lot2a.lot_id}: PENDING (partner2a)
+      - {lot2b.lot_id}: PENDING (partner2b)
 
 Test Users:
-  - partner / partner123
-  - primary_inspector / primary_inspector123
-  - final_inspector / final_inspector123
+  Company 1: partner1a / partner1a123,  partner1b / partner1b123
+  Company 2: partner2a / partner2a123,  partner2b / partner2b123
+  Inspectors: primary_inspector / primary_inspector123
+             final_inspector / final_inspector123
 ''')
 
     def get_or_create_user(self, username, role):
@@ -301,6 +322,23 @@ Test Users:
             from django.core.management import call_command
             call_command('setup_test_users')
             return UserProfile.objects.get(user__username=username)
+
+    def create_evaluation(self, fa, stage, inspector, camo_type, passing=True, days_ago=1):
+        """Create an FA evaluation with color evaluations"""
+        eval = FAEvaluation.objects.create(
+            fa=fa,
+            stage=stage,
+            attempt_number=1,
+            inspector=inspector,
+            pattern_execution='pass' if passing else 'fail',
+            scale='pass' if passing else 'fail',
+            spectral_reflectance='pass' if passing else 'fail',
+            comments=f'{"Passed" if passing else "Failed"} {stage} review.',
+            is_submitted=True,
+            submitted_at=timezone.now() - timedelta(days=days_ago),
+        )
+        self.create_color_evaluations(eval, camo_type, passing)
+        return eval
 
     def create_color_evaluations(self, evaluation, camo_type, passing=True):
         """Create color evaluations for all colors in the variant"""

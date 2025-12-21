@@ -79,24 +79,29 @@ If you ran setup with `--with-test-users`, use these credentials:
 
 | Username | Password | Role | Company |
 |----------|----------|------|---------|
-| partner | partner123 | Partner | TESTCO |
-| partner2 | partner2123 | Partner | TESTCO |
+| partner1a | partner1a123 | Partner | ACME |
+| partner1b | partner1b123 | Partner | ACME |
+| partner2a | partner2a123 | Partner | GLOBEX |
+| partner2b | partner2b123 | Partner | GLOBEX |
 | primary_inspector | primary_inspector123 | Primary Inspector | - |
 | final_inspector | final_inspector123 | Final Inspector | - |
 | staff | staff123 | Staff Executive | - |
 
-**Note:** `partner` and `partner2` both belong to the same company (TESTCO). FAs/Lots submitted by either are visible to both.
+**Note:** 
+- **ACME**: `partner1a` and `partner1b` belong to the same company. FAs/Lots submitted by either are visible to both.
+- **GLOBEX**: `partner2a` and `partner2b` belong to the same company. FAs/Lots submitted by either are visible to both.
 
 ### Test Data
 
 Run `python manage.py create_test_data` to create sample FAs and Lots for testing:
 
-| Item | Status | Description |
-|------|--------|-------------|
-| FA1 | Approved | Passed both primary and final review |
-| FA2 | Pending Final | Passed primary, awaiting final review |
-| FA3 | Pending | Awaiting primary review |
-| LOT1 | Approved | Linked to FA1, fully inspected |
+**Company 1 (ACME):**
+- FA: APPROVED (partner1a) + FA: PENDING_FINAL (partner1b)
+- 2 PENDING Lots (one from each partner)
+
+**Company 2 (GLOBEX):**
+- FA: APPROVED (partner2a) + FA: PENDING_FINAL (partner2b)
+- 2 PENDING Lots (one from each partner)
 
 Use `--clear` flag to wipe existing data before creating fresh test data.
 
