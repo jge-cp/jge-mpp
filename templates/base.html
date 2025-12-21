@@ -433,11 +433,8 @@
             <div class="flex justify-start items-center">
                 {% block sidebar_toggle %}{% endblock %}
                 
-                <a href="{% if user.is_authenticated and user.profile %}{% url user.profile.get_dashboard_url %}{% else %}{% url 'core:home' %}{% endif %}" class="flex items-center justify-between mr-4">
-                    <div class="w-8 h-8 bg-gradient-to-br from-multicam-olive to-multicam-green rounded-lg flex items-center justify-center border border-multicam-olive/50 mr-3">
-                        <span class="text-white font-bold text-sm">MC</span>
-                    </div>
-                    <span class="self-center text-xl font-semibold whitespace-nowrap">Multicam</span>
+                <a href="{% if user.is_authenticated and user.profile %}{% url user.profile.get_dashboard_url %}{% else %}{% url 'core:home' %}{% endif %}" class="flex items-center mr-4">
+                    <span class="text-lg font-bold tracking-wide whitespace-nowrap uppercase">Multicam Partner Portal</span>
                 </a>
             </div>
             
