@@ -1,0 +1,126 @@
+{# HTMX fragment: FA status + latest evaluation summary #}
+
+<div class="card p-6 mb-6">
+  <h2 class="text-xl font-bold mb-4 border-b border-theme pb-2">Submission Details</h2>
+  <dl class="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2 md:grid-cols-3">
+    <div>
+      <dt class="text-sm font-medium text-muted">Fabric Style</dt>
+      <dd class="mt-1 text-primary">{{ fa.fabric_style }}</dd>
+    </div>
+    <div>
+      <dt class="text-sm font-medium text-muted">Status</dt>
+      <dd class="mt-1">
+        {% if fa.status == 'approved' %}
+          <span class="badge-success">✓ Fully Approved</span>
+          <p class="text-xs text-green-600 mt-1">Passed Primary & Final Review</p>
+        {% elif fa.status == 'rejected' %}
+          <span class="badge-danger">✗ Rejected</span>
+          <p class="text-xs text-red-600 mt-1">
+            {% if fa.final_inspector %}
+              Rejected at Final Review by {{ fa.final_inspector.get_full_name|default:fa.final_inspector.username }}
+            {% elif fa.primary_inspector %}
+              Rejected at Primary Review by {{ fa.primary_inspector.get_full_name|default:fa.primary_inspector.username }}
+            {% else %}
+              Rejection details in evaluation history
+            {% endif %}
+          </p>
+        {% elif fa.status == 'pending_final' %}
+          <span class="badge-info">Awaiting Final Review</span>
+          <p class="text-xs text-blue-600 mt-1">✓ Passed Primary Review{% if fa.primary_inspector %} by {{ fa.primary_inspector.get_full_name|default:fa.primary_inspector.username }}{% endif %}</p>
+        {% else %}
+          <span class="badge-warning">Awaiting Primary Review</span>
+          <p class="text-xs text-yellow-600 mt-1">Submitted {{ fa.submission_date|timesince }} ago</p>
+        {% endif %}
+      </dd>
+    </div>
+    <div>
+      <dt class="text-sm font-medium text-muted">MultiCam Variant</dt>
+      <dd class="mt-1 text-primary">{{ fa.multicam_variant.camouflage_name }}</dd>
+    </div>
+    <div>
+      <dt class="text-sm font-medium text-muted">FA Lot Number</dt>
+      <dd class="mt-1 text-primary font-semibold">{{ fa.fa_lot_number }}</dd>
+    </div>
+    <div>
+      <dt class="text-sm font-medium text-muted">Shade Standard</dt>
+      <dd class="mt-1 text-primary">{{ fa.get_shade_standard_display }}</dd>
+    </div>
+    <div>
+      <dt class="text-sm font-medium text-muted">Spectral Reflectance Req.</dt>
+      <dd class="mt-1 text-primary">{{ fa.get_spectral_reflectance_requirement_display }}</dd>
+    </div>
+    <div>
+      <dt class="text-sm font-medium text-muted">Submission Date</dt>
+      <dd class="mt-1 text-primary">{{ fa.submission_date|date:"M d, Y H:i" }}</dd>
+    </div>
+    <div>
+      <dt class="text-sm font-medium text-muted">Date of Printing</dt>
+      <dd class="mt-1 text-primary">{{ fa.date_of_printing|date:"M d, Y" }}</dd>
+    </div>
+    <div>
+      <dt class="text-sm font-medium text-muted">Tracking Number</dt>
+      <dd class="mt-1 text-primary">{{ fa.tracking_number|default:"-" }}</dd>
+    </div>
+  </dl>
+</div>
+
+{% if evaluation_history %}
+<div class="card p-6 mb-6">
+  {% for attempt_num, stages in evaluation_history.items %}
+    {% if forloop.first %}
+    <h2 class="text-xl font-bold mb-4 border-b border-theme pb-2">
+      Latest Evaluation
+      <span class="ml-2 text-sm font-normal bg-purple-600 text-white px-2 py-1 rounded">Attempt #{{ attempt_num }}</span>
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="border border-theme rounded p-4">
+        <h3 class="font-bold mb-3">Primary Inspector</h3>
+        {% if stages.primary %}
+          <div class="space-y-2 text-sm">
+            <p><span class="text-muted">Inspector:</span> <span class="text-primary">{{ stages.primary.inspector.username|default:"N/A" }}</span></p>
+            <p><span class="text-muted">Date:</span> <span class="text-primary">{{ stages.primary.submitted_at|date:"M d, Y H:i"|default:stages.primary.evaluation_date|date:"M d, Y H:i" }}</span></p>
+            <p>
+              <span class="text-muted">Result:</span>
+              {% if stages.primary.is_submitted %}
+                {% if stages.primary.all_pass %}<span class="result-pass">Pass</span>{% else %}<span class="result-fail">Fail</span>{% endif %}
+              {% else %}
+                <span class="badge-warning">In Progress</span>
+              {% endif %}
+            </p>
+          </div>
+        {% else %}
+          <p class="text-muted">Awaiting primary review</p>
+        {% endif %}
+      </div>
+
+      <div class="border border-theme rounded p-4">
+        <h3 class="font-bold mb-3">Final Inspector</h3>
+        {% if stages.final %}
+          <div class="space-y-2 text-sm">
+            <p><span class="text-muted">Inspector:</span> <span class="text-primary">{{ stages.final.inspector.username|default:"N/A" }}</span></p>
+            <p><span class="text-muted">Date:</span> <span class="text-primary">{{ stages.final.submitted_at|date:"M d, Y H:i"|default:stages.final.evaluation_date|date:"M d, Y H:i" }}</span></p>
+            <p>
+              <span class="text-muted">Result:</span>
+              {% if stages.final.is_submitted %}
+                {% if stages.final.all_pass %}<span class="result-pass">Pass</span>{% else %}<span class="result-fail">Fail</span>{% endif %}
+              {% else %}
+                <span class="badge-warning">In Progress</span>
+              {% endif %}
+            </p>
+          </div>
+        {% else %}
+          <p class="text-muted">
+            {% if stages.primary and stages.primary.all_pass %}Awaiting final review{% else %}Not applicable (Primary review not passed){% endif %}
+          </p>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  {% empty %}
+    <h2 class="text-xl font-bold mb-4 border-b border-theme pb-2">Evaluation Status</h2>
+    <p class="text-muted">Awaiting primary review</p>
+  {% endfor %}
+</div>
+{% endif %}
+
+

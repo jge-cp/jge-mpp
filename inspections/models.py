@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction, IntegrityError
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 from django.utils import timezone
@@ -315,50 +315,89 @@ class FirstArticleInspection(models.Model):
     def can_resubmit(self):
         """Check if this FA can be resubmitted (only if rejected)"""
         return self.status == 'rejected'
+
+    def _reset_review_fields_for_new_attempt(self):
+        """
+        Clear denormalized review fields so a new attempt doesn't carry stale inspector/comments/criteria.
+        The attempt history remains in FAEvaluation/FAColorEvaluation.
+        """
+        self.primary_inspector = None
+        self.primary_review_date = None
+        self.primary_comments = ''
+        self.primary_pattern_execution = ''
+        self.primary_scale = ''
+        self.primary_spectral_reflectance = ''
+
+        self.final_inspector = None
+        self.final_review_date = None
+        self.final_comments = ''
+        self.final_pattern_execution = ''
+        self.final_scale = ''
+        self.final_spectral_reflectance = ''
     
     def resubmit(self):
         """
         Handle FA resubmission after rejection.
         Changes status back to 'pending' for a new evaluation round.
         """
-        if not self.can_resubmit():
-            raise ValueError("Only rejected FAs can be resubmitted")
-        
-        self.status = 'pending'
-        self.save()
-        return self.get_next_attempt_number()
+        if not self.pk:
+            raise ValueError("Cannot resubmit an unsaved First Article.")
+
+        with transaction.atomic():
+            fa = FirstArticleInspection.objects.select_for_update().get(pk=self.pk)
+            if fa.status != 'rejected':
+                raise ValueError("Only rejected FAs can be resubmitted")
+
+            fa.status = 'pending'
+            fa._reset_review_fields_for_new_attempt()
+            fa.save()
+
+            # Next attempt number is derived from existing evaluation history.
+            return fa.get_next_attempt_number()
     
     def save(self, *args, **kwargs):
         """Auto-generate fai_id and fsid if not set"""
-        if not self.fai_id:
-            # Generate fai_id: {company}-FA-{sequence}
-            company_prefix = re.sub(r'[^A-Z0-9]', '', self.vendor.company_name.upper())[:10]
-            last_fa = FirstArticleInspection.objects.filter(
-                vendor=self.vendor
-            ).order_by('-fai_id').first()
-            
-            if last_fa and last_fa.fai_id:
-                # Extract sequence number
-                match = re.search(r'-FA-(\d+)', last_fa.fai_id)
-                if match:
-                    sequence = int(match.group(1)) + 1
+        # Concurrency hardening:
+        # This ID is derived from "last record + 1" which can race under concurrent creates.
+        # We keep the same external format, but retry on integrity collisions.
+        max_attempts = 5
+        for attempt in range(max_attempts):
+            if not self.fai_id:
+                # Generate fai_id: {company}-FA-{sequence}
+                company_prefix = re.sub(r'[^A-Z0-9]', '', self.vendor.company_name.upper())[:10]
+                last_fa = FirstArticleInspection.objects.filter(
+                    vendor=self.vendor
+                ).order_by('-fai_id').first()
+                
+                if last_fa and last_fa.fai_id:
+                    match = re.search(r'-FA-(\d+)', last_fa.fai_id)
+                    sequence = int(match.group(1)) + 1 if match else 1
                 else:
                     sequence = 1
-            else:
-                sequence = 1
+                
+                self.fai_id = f"{company_prefix}-FA-{sequence:04d}"
             
-            self.fai_id = f"{company_prefix}-FA-{sequence:04d}"
-        
-        if not self.fsid:
-            # Generate unique fsid
-            import uuid
-            self.fsid = str(uuid.uuid4())[:8].upper()
-        
-        # Generate sheet name
-        if not self.sheet_name_generated:
-            self.sheet_name_generated = f"{self.fabric_style} - {self.multicam_variant.camouflage_name} - {self.fa_lot_number}"
-        
-        super().save(*args, **kwargs)
+            if not self.fsid:
+                # Generate unique fsid
+                import uuid
+                self.fsid = str(uuid.uuid4())[:8].upper()
+            
+            # Generate sheet name
+            if not self.sheet_name_generated:
+                self.sheet_name_generated = f"{self.fabric_style} - {self.multicam_variant.camouflage_name} - {self.fa_lot_number}"
+            
+            try:
+                super().save(*args, **kwargs)
+                break
+            except IntegrityError:
+                # Only retry on create; updates should not be regenerating primary keys.
+                if not self._state.adding:
+                    raise
+                if attempt >= max_attempts - 1:
+                    raise
+                # Clear and retry with a new sequence.
+                self.fai_id = ''
+                continue
 
 
 class LotAcceptance(models.Model):
@@ -521,60 +560,67 @@ class LotAcceptance(models.Model):
     
     def save(self, *args, **kwargs):
         """Auto-generate lot_id, fsid, sample count, and sample IDs if not set"""
-        if not self.lot_id:
-            # Generate lot_id: {company}-LOT-{sequence}
-            company_prefix = re.sub(r'[^A-Z0-9]', '', self.vendor.company_name.upper())[:10]
-            last_lot = LotAcceptance.objects.filter(
-                vendor=self.vendor
-            ).order_by('-lot_id').first()
-            
-            if last_lot and last_lot.lot_id:
-                # Extract sequence number
-                match = re.search(r'-LOT-(\d+)', last_lot.lot_id)
-                if match:
-                    sequence = int(match.group(1)) + 1
+        max_attempts = 5
+        for attempt in range(max_attempts):
+            if not self.lot_id:
+                # Generate lot_id: {company}-LOT-{sequence}
+                company_prefix = re.sub(r'[^A-Z0-9]', '', self.vendor.company_name.upper())[:10]
+                last_lot = LotAcceptance.objects.filter(
+                    vendor=self.vendor
+                ).order_by('-lot_id').first()
+                
+                if last_lot and last_lot.lot_id:
+                    match = re.search(r'-LOT-(\d+)', last_lot.lot_id)
+                    sequence = int(match.group(1)) + 1 if match else 1
                 else:
                     sequence = 1
-            else:
-                sequence = 1
+                
+                self.lot_id = f"{company_prefix}-LOT-{sequence:04d}"
             
-            self.lot_id = f"{company_prefix}-LOT-{sequence:04d}"
-        
-        if not self.fsid:
-            # Generate unique fsid
-            import uuid
-            self.fsid = str(uuid.uuid4())[:8].upper()
-        
-        # Auto-calculate sample count based on yards printed
-        # Formula: 0-800 yards = 2, 801-22000 = 3, 22001+ = 5
-        if self.number_of_yards_printed:
-            if self.number_of_yards_printed <= 800:
-                self.number_of_samples = 2
-            elif self.number_of_yards_printed <= 22000:
-                self.number_of_samples = 3
+            if not self.fsid:
+                # Generate unique fsid
+                import uuid
+                self.fsid = str(uuid.uuid4())[:8].upper()
+            
+            # Auto-calculate sample count based on yards printed
+            # Formula: 0-800 yards = 2, 801-22000 = 3, 22001+ = 5
+            if self.number_of_yards_printed:
+                if self.number_of_yards_printed <= 800:
+                    self.number_of_samples = 2
+                elif self.number_of_yards_printed <= 22000:
+                    self.number_of_samples = 3
+                else:
+                    self.number_of_samples = 5
+            
+            # Auto-generate individual sample numbers if not set
+            # Format: {lot_lot_number}-1, {lot_lot_number}-2, etc.
+            if not self.individual_sample_numbers and self.lot_lot_number:
+                sample_ids = [f"{self.lot_lot_number}-{i}" for i in range(1, self.number_of_samples + 1)]
+                self.individual_sample_numbers = ', '.join(sample_ids)
+            
+            # Determine evaluation type based on sample count
+            if self.number_of_samples <= 2:
+                self.evaluation_type = 'simple'
+            elif self.number_of_samples <= 3:
+                self.evaluation_type = 'standard'
             else:
-                self.number_of_samples = 5
-        
-        # Auto-generate individual sample numbers if not set
-        # Format: {lot_lot_number}-1, {lot_lot_number}-2, etc.
-        if not self.individual_sample_numbers and self.lot_lot_number:
-            sample_ids = [f"{self.lot_lot_number}-{i}" for i in range(1, self.number_of_samples + 1)]
-            self.individual_sample_numbers = ', '.join(sample_ids)
-        
-        # Determine evaluation type based on sample count
-        if self.number_of_samples <= 2:
-            self.evaluation_type = 'simple'
-        elif self.number_of_samples <= 3:
-            self.evaluation_type = 'standard'
-        else:
-            self.evaluation_type = 'complex'
-        
-        # Generate sheet name: {fabric_style} - {variant} - {lot_lot_number}
-        if not self.sheet_name_generated:
-            variant_name = self.original_fa.multicam_variant.camouflage_name if self.original_fa and self.original_fa.multicam_variant else 'Unknown'
-            self.sheet_name_generated = f"{self.fabric_style} - {variant_name} - {self.lot_lot_number}"
-        
-        super().save(*args, **kwargs)
+                self.evaluation_type = 'complex'
+            
+            # Generate sheet name: {fabric_style} - {variant} - {lot_lot_number}
+            if not self.sheet_name_generated:
+                variant_name = self.original_fa.multicam_variant.camouflage_name if self.original_fa and self.original_fa.multicam_variant else 'Unknown'
+                self.sheet_name_generated = f"{self.fabric_style} - {variant_name} - {self.lot_lot_number}"
+            
+            try:
+                super().save(*args, **kwargs)
+                break
+            except IntegrityError:
+                if not self._state.adding:
+                    raise
+                if attempt >= max_attempts - 1:
+                    raise
+                self.lot_id = ''
+                continue
 
 
 class MonthlyReport(models.Model):
@@ -823,37 +869,56 @@ class FAEvaluation(models.Model):
     def submit(self):
         """Mark evaluation as submitted and update FA status and inspector fields"""
         from django.utils import timezone
-        
-        self.is_submitted = True
-        self.submitted_at = timezone.now()
-        self.save()
-        
-        # Update FA inspector fields based on stage
-        if self.stage == 'primary':
-            self.fa.primary_inspector = self.inspector
-            self.fa.primary_review_date = timezone.now().date()
-            self.fa.primary_comments = self.comments
-            self.fa.primary_pattern_execution = self.pattern_execution
-            self.fa.primary_scale = self.scale
-            self.fa.primary_spectral_reflectance = self.spectral_reflectance
-        else:  # final stage
-            self.fa.final_inspector = self.inspector
-            self.fa.final_review_date = timezone.now().date()
-            self.fa.final_comments = self.comments
-            self.fa.final_pattern_execution = self.pattern_execution
-            self.fa.final_scale = self.scale
-            self.fa.final_spectral_reflectance = self.spectral_reflectance
-        
-        # Update FA status based on result
-        if self.all_pass:
+
+        if self.is_submitted:
+            raise ValueError("This evaluation has already been submitted.")
+        if not self.pk:
+            raise ValueError("Cannot submit an unsaved evaluation.")
+        if not self.inspector:
+            raise ValueError("Cannot submit an evaluation without an inspector.")
+        if not self.color_evaluations.exists():
+            raise ValueError("Cannot submit an evaluation without color ratings.")
+
+        # Atomic, state-checked transition. Prevents double-submit/back-button and tampering.
+        with transaction.atomic():
+            fa = FirstArticleInspection.objects.select_for_update().get(pk=self.fa.pk)
+
+            if fa.status in ['approved', 'rejected']:
+                raise ValueError("This First Article has already been completed and cannot be changed.")
+            if self.stage == 'primary' and fa.status != 'pending':
+                raise ValueError("Primary evaluation can only be submitted when FA is pending primary review.")
+            if self.stage == 'final' and fa.status != 'pending_final':
+                raise ValueError("Final evaluation can only be submitted when FA is pending final review.")
+
+            # Mark evaluation submitted (audit)
+            self.is_submitted = True
+            self.submitted_at = timezone.now()
+            self.save(update_fields=['is_submitted', 'submitted_at'])
+
+            # Update FA inspector fields based on stage
             if self.stage == 'primary':
-                self.fa.status = 'pending_final'
+                fa.primary_inspector = self.inspector
+                fa.primary_review_date = timezone.now().date()
+                fa.primary_comments = self.comments
+                fa.primary_pattern_execution = self.pattern_execution
+                fa.primary_scale = self.scale
+                fa.primary_spectral_reflectance = self.spectral_reflectance
             else:  # final stage
-                self.fa.status = 'approved'
-        else:
-            self.fa.status = 'rejected'
-        
-        self.fa.save()
+                fa.final_inspector = self.inspector
+                fa.final_review_date = timezone.now().date()
+                fa.final_comments = self.comments
+                fa.final_pattern_execution = self.pattern_execution
+                fa.final_scale = self.scale
+                fa.final_spectral_reflectance = self.spectral_reflectance
+
+            # Update FA status based on result
+            if self.all_pass:
+                fa.status = 'pending_final' if self.stage == 'primary' else 'approved'
+            else:
+                fa.status = 'rejected'
+
+            fa.save()
+            self.fa = fa
 
 
 class FAColorEvaluation(models.Model):
@@ -975,6 +1040,9 @@ class LotEvaluation(models.Model):
     submitted_at = models.DateTimeField(null=True, blank=True)
     
     class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['lot'], name='unique_lot_evaluation_per_lot'),
+        ]
         ordering = ['-evaluation_date']
         verbose_name = 'Lot Evaluation'
         verbose_name_plural = 'Lot Evaluations'
@@ -1003,19 +1071,28 @@ class LotEvaluation(models.Model):
     def submit(self):
         """Mark evaluation as submitted and update Lot status"""
         from django.utils import timezone
-        
-        self.is_submitted = True
-        self.submitted_at = timezone.now()
-        self.save()
-        
-        if self.all_pass:
-            self.lot.status = 'approved'
-        else:
-            self.lot.status = 'rejected'
-        
-        self.lot.inspector = self.inspector
-        self.lot.review_date = timezone.now().date()
-        self.lot.save()
+
+        if self.is_submitted:
+            raise ValueError("This lot evaluation has already been submitted.")
+        if not self.pk:
+            raise ValueError("Cannot submit an unsaved lot evaluation.")
+
+        with transaction.atomic():
+            lot = LotAcceptance.objects.select_for_update().get(pk=self.lot.pk)
+            if lot.status in ['approved', 'rejected']:
+                raise ValueError("This Lot has already been completed and cannot be changed.")
+            if lot.status != 'pending':
+                raise ValueError("Lot evaluation can only be submitted when Lot is pending review.")
+
+            self.is_submitted = True
+            self.submitted_at = timezone.now()
+            self.save(update_fields=['is_submitted', 'submitted_at'])
+
+            lot.status = 'approved' if self.all_pass else 'rejected'
+            lot.inspector = self.inspector
+            lot.review_date = timezone.now().date()
+            lot.save()
+            self.lot = lot
 
 
 class LotSampleEvaluation(models.Model):

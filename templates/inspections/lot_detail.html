@@ -16,31 +16,13 @@
         {% endif %}
     </div>
     
-    <!-- Status Banner -->
-    <div class="card p-4 mb-6 {% if lot.status == 'approved' %}bg-green-50 border-green-200{% elif lot.status == 'rejected' %}bg-red-50 border-red-200{% else %}bg-yellow-50 border-yellow-200{% endif %}">
-        <div class="flex items-center gap-4">
-            {% if lot.status == 'approved' %}
-                <span class="badge-success text-lg">✓ Approved</span>
-                <span class="text-green-700">
-                    Ready for Production
-                    {% if lot.inspector %}
-                        - Reviewed by {{ lot.inspector.get_full_name|default:lot.inspector.username }}
-                        {% if lot.review_date %}on {{ lot.review_date|date:"M d, Y" }}{% endif %}
-                    {% endif %}
-                </span>
-            {% elif lot.status == 'rejected' %}
-                <span class="badge-danger text-lg">✗ Rejected</span>
-                <span class="text-red-700">
-                    {% if lot.inspector %}
-                        Rejected by {{ lot.inspector.get_full_name|default:lot.inspector.username }}
-                        {% if lot.review_date %}on {{ lot.review_date|date:"M d, Y" }}{% endif %}
-                    {% endif %}
-                </span>
-            {% else %}
-                <span class="badge-warning text-lg">Awaiting Review</span>
-                <span class="text-yellow-700">Submitted {{ lot.submission_date|timesince }} ago</span>
-            {% endif %}
-        </div>
+    <div
+        id="lot-detail-live"
+        hx-get="{% url 'inspections:lot_detail' lot.lot_id %}"
+        hx-trigger="load, every 10s"
+        hx-swap="innerHTML"
+    >
+        {% include 'inspections/_lot_detail_status_and_summary.html' %}
     </div>
     
     <!-- Lot Details -->

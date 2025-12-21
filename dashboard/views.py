@@ -70,6 +70,8 @@ def partner_dashboard(request):
         'recent_lots': recent_lots,
     }
     
+    if getattr(request, "htmx", False):
+        return render(request, 'dashboard/_partner_dashboard_live.html', context)
     return render(request, 'dashboard/partner_dashboard.html', context)
 
 
@@ -233,6 +235,8 @@ def inspector_dashboard(request):
         'alerts': alerts,
     }
     
+    if getattr(request, "htmx", False):
+        return render(request, 'dashboard/_inspector_dashboard_live.html', context)
     return render(request, 'dashboard/inspector_dashboard.html', context)
 
 
@@ -387,6 +391,8 @@ def staff_dashboard(request):
         'all_partners': all_partners,
     }
     
+    if getattr(request, "htmx", False):
+        return render(request, 'dashboard/_staff_dashboard_live.html', context)
     return render(request, 'dashboard/staff_dashboard.html', context)
 
 

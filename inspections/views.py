@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db import IntegrityError, transaction
 from django.utils import timezone
 from django.http import JsonResponse
 from .models import (
@@ -109,6 +110,8 @@ def fa_detail(request, fai_id):
         'evaluation_history': evaluation_history,
         'can_resubmit': fa.can_resubmit() and profile.is_partner() and fa.vendor == profile,
     }
+    if request.headers.get('HX-Request'):
+        return render(request, 'inspections/_fa_detail_status_and_summary.html', context)
     return render(request, 'inspections/fa_detail.html', context)
 
 
@@ -128,7 +131,11 @@ def fa_resubmit(request, fai_id):
     
     if request.method == 'POST':
         # Resubmit the FA
-        new_attempt = fa.resubmit()
+        try:
+            new_attempt = fa.resubmit()
+        except ValueError as e:
+            messages.error(request, str(e))
+            return redirect('inspections:fa_detail', fai_id=fai_id)
         
         # Send notification email to Primary Inspector
         from .emails import send_fa_submitted_email
@@ -342,6 +349,8 @@ def lot_detail(request, lot_id):
         'sample_evaluations': sample_evaluations,
         'can_review': can_review,
     }
+    if request.headers.get('HX-Request'):
+        return render(request, 'inspections/_lot_detail_status_and_summary.html', context)
     return render(request, 'inspections/lot_detail.html', context)
 
 
@@ -377,6 +386,8 @@ def fa_review_queue_primary(request):
         'queue_type': 'primary',
         'queue_title': 'Primary Review Queue',
     }
+    if request.headers.get('HX-Request'):
+        return render(request, 'inspections/_fa_review_queue_list.html', context)
     return render(request, 'inspections/fa_review_queue.html', context)
 
 
@@ -398,6 +409,8 @@ def fa_review_queue_final(request):
         'queue_type': 'final',
         'queue_title': 'Final Review Queue',
     }
+    if request.headers.get('HX-Request'):
+        return render(request, 'inspections/_fa_review_queue_list.html', context)
     return render(request, 'inspections/fa_review_queue.html', context)
 
 
@@ -440,8 +453,15 @@ def fa_review(request, fai_id):
     final_has_started = False
     
     if is_primary_viewing_pending_final:
-        # Check if final inspector has started their review
-        final_eval = fa.get_latest_evaluation('final')
+        # Check if final inspector has started their review.
+        # IMPORTANT: "started" should be driven by persisted final evaluation records,
+        # not by simply visiting the page. We avoid creating final evals on GET below,
+        # so existence here means the final inspector has actually POSTed (save/submit).
+        latest_submitted_primary = fa.evaluations.filter(
+            stage='primary', is_submitted=True
+        ).order_by('-attempt_number').first()
+        attempt_for_lock = latest_submitted_primary.attempt_number if latest_submitted_primary else fa.get_current_attempt_number()
+        final_eval = fa.evaluations.filter(stage='final', attempt_number=attempt_for_lock).first()
         final_has_started = final_eval is not None
         is_read_only = final_has_started  # Read-only if final has started
     
@@ -504,31 +524,65 @@ def fa_review(request, fai_id):
         if need_new_attempt:
             current_attempt = fa.get_next_attempt_number()
         
-        # Check if there's an existing evaluation for this attempt
-        try:
-            evaluation = FAEvaluation.objects.get(
-                fa=fa, stage=stage, attempt_number=current_attempt
-            )
-            created = False
-        except FAEvaluation.DoesNotExist:
-            evaluation = FAEvaluation.objects.create(
-                fa=fa, stage=stage, attempt_number=current_attempt, inspector=request.user
-            )
-            created = True
+        # Check if there's an existing evaluation for this attempt (idempotent under concurrency)
+        with transaction.atomic():
+            try:
+                evaluation = FAEvaluation.objects.get(
+                    fa=fa, stage=stage, attempt_number=current_attempt
+                )
+                created = False
+            except FAEvaluation.DoesNotExist:
+                try:
+                    evaluation = FAEvaluation.objects.create(
+                        fa=fa, stage=stage, attempt_number=current_attempt, inspector=request.user
+                    )
+                    created = True
+                except IntegrityError:
+                    # Another request created it first.
+                    evaluation = FAEvaluation.objects.get(
+                        fa=fa, stage=stage, attempt_number=current_attempt
+                    )
+                    created = False
     else:
-        # Final review - use the attempt number from the LATEST SUBMITTED PRIMARY
+        # Final review:
+        # - Use the attempt number from the latest submitted primary evaluation.
+        # - Do NOT create DB rows on GET (prevents locking primary just by visiting).
         latest_submitted_primary = fa.evaluations.filter(
             stage='primary', is_submitted=True
         ).order_by('-attempt_number').first()
-        
         if latest_submitted_primary:
             current_attempt = latest_submitted_primary.attempt_number
-        
-        evaluation, created = FAEvaluation.objects.get_or_create(
+
+        evaluation = FAEvaluation.objects.filter(
+            fa=fa,
+            stage=stage,
+            attempt_number=current_attempt,
+        ).first()
+        created = False
+
+        if not evaluation and request.method == 'POST' and not is_read_only:
+            try:
+                evaluation = FAEvaluation.objects.create(
+                    fa=fa,
+                    stage=stage,
+                    attempt_number=current_attempt,
+                    inspector=request.user,
+                )
+                created = True
+            except IntegrityError:
+                evaluation = FAEvaluation.objects.get(
+                    fa=fa,
+                    stage=stage,
+                    attempt_number=current_attempt,
+                )
+                created = False
+        elif not evaluation:
+            # Unsaved in-memory evaluation for display (pre-filled from primary).
+            evaluation = FAEvaluation(
                 fa=fa,
                 stage=stage,
                 attempt_number=current_attempt,
-                defaults={'inspector': request.user}
+                inspector=request.user,
             )
     
     # Get primary evaluation for reference - use the one from the SAME attempt as current evaluation
@@ -543,13 +597,15 @@ def fa_review(request, fai_id):
         if primary_evaluation and not primary_evaluation.is_submitted:
             primary_evaluation = None
     
-    # For final review, pre-load primary inspector's ratings if evaluation is new
-    if is_final_review and created and primary_evaluation:
-        # Copy overall criteria from primary
+    # For final review, pre-load primary inspector's ratings for display.
+    # If the final evaluation was just created via POST (save/submit), persist the prefill.
+    # If we're rendering an unsaved in-memory evaluation (GET), do not persist.
+    if is_final_review and primary_evaluation:
         evaluation.pattern_execution = primary_evaluation.pattern_execution
         evaluation.scale = primary_evaluation.scale
         evaluation.spectral_reflectance = primary_evaluation.spectral_reflectance
-        evaluation.save()
+        if created:
+            evaluation.save()
     
     # Get variant colors for this FA
     variant_colors = fa.multicam_variant.colors.all().order_by('position')
@@ -559,6 +615,16 @@ def fa_review(request, fai_id):
         eval_form = FAEvaluationForm(request.POST, instance=evaluation, fa=fa)
         
         if eval_form.is_valid():
+            # Guardrail: variant must have at least one color configured.
+            # Without colors, the evaluation model will compute all_pass=False and incorrectly reject.
+            if not variant_colors.exists():
+                messages.error(
+                    request,
+                    'This MultiCam Variant has no colors configured, so it cannot be evaluated. '
+                    'Please run the variant color setup (TEMP COLOR) and try again.'
+                )
+                return redirect('inspections:fa_review', fai_id=fa.fai_id)
+
             evaluation = eval_form.save(commit=False)
             evaluation.inspector = request.user
             evaluation.save()
@@ -586,8 +652,12 @@ def fa_review(request, fai_id):
                 elif not evaluation.pattern_execution or not evaluation.scale:
                     messages.error(request, 'Please evaluate Pattern Execution and Scale.')
                 else:
-                    # Submit the evaluation
-                    evaluation.submit()
+                    # Submit the evaluation (state-checked, atomic)
+                    try:
+                        evaluation.submit()
+                    except ValueError as e:
+                        messages.error(request, str(e))
+                        return redirect('inspections:fa_review', fai_id=fa.fai_id)
                     
                     # Send appropriate emails
                     if evaluation.all_pass:
@@ -618,21 +688,20 @@ def fa_review(request, fai_id):
     color_forms = []
     for color in variant_colors:
         try:
-            color_eval = evaluation.color_evaluations.get(color=color)
+            color_eval = evaluation.color_evaluations.get(color=color) if getattr(evaluation, 'pk', None) else None
         except FAColorEvaluation.DoesNotExist:
             color_eval = None
         
-        # For final review, pre-load from primary if no existing evaluation
-        # Also save them to DB so they persist
-        if is_final_review and created and not color_eval and primary_evaluation:
+        # For final review, pre-load from primary if no existing final evaluation.
+        # IMPORTANT: do not persist this on GET; only persist on POST when the final saves/submits.
+        if is_final_review and not color_eval and primary_evaluation:
             try:
                 primary_color_eval = primary_evaluation.color_evaluations.get(color=color)
-                # Create the color evaluation with pre-loaded values
-                color_eval = FAColorEvaluation.objects.create(
+                color_eval = FAColorEvaluation(
                     evaluation=evaluation,
                     color=color,
                     rating=primary_color_eval.rating,
-                    comment=primary_color_eval.comment
+                    comment=primary_color_eval.comment,
                 )
             except FAColorEvaluation.DoesNotExist:
                 pass
@@ -644,7 +713,7 @@ def fa_review(request, fai_id):
         color_forms.append((color, form, color_eval))
     
     # Handle inspection document uploads
-    if request.method == 'POST' and 'inspection_documents' in request.FILES:
+    if request.method == 'POST' and 'inspection_documents' in request.FILES and not is_read_only:
         from core.models import FileUpload
         for file in request.FILES.getlist('inspection_documents'):
             file_upload = FileUpload.objects.create(
@@ -695,7 +764,10 @@ def lot_review_queue(request):
         return redirect('dashboard:partner_dashboard')
     
     pending_lots = LotAcceptance.objects.filter(status='pending').order_by('submission_date')
-    return render(request, 'inspections/lot_review_queue.html', {'pending_lots': pending_lots})
+    context = {'pending_lots': pending_lots}
+    if request.headers.get('HX-Request'):
+        return render(request, 'inspections/_lot_review_queue_list.html', context)
+    return render(request, 'inspections/lot_review_queue.html', context)
 
 
 @login_required
@@ -720,11 +792,15 @@ def lot_review(request, lot_id):
         messages.warning(request, f'Lot {lot.display_name} has already been reviewed.')
         return redirect('inspections:lot_detail', lot_id=lot_id)
     
-    # Get or create evaluation
-    evaluation, created = LotEvaluation.objects.get_or_create(
-        lot=lot,
-        defaults={'inspector': request.user}
-    )
+    # Get or create evaluation (idempotent under concurrency)
+    try:
+        evaluation, created = LotEvaluation.objects.get_or_create(
+            lot=lot,
+            defaults={'inspector': request.user}
+        )
+    except IntegrityError:
+        evaluation = LotEvaluation.objects.get(lot=lot)
+        created = False
     
     # Get variant colors for this lot's FA
     variant = lot.original_fa.multicam_variant
@@ -737,17 +813,33 @@ def lot_review(request, lot_id):
     # Ensure sample evaluations exist for each sample
     sample_evaluations = []
     for i, sample_id in enumerate(sample_ids, start=1):
-        sample_eval, _ = LotSampleEvaluation.objects.get_or_create(
-            lot_evaluation=evaluation,
-            sample_number=i,
-            defaults={'sample_id': sample_id}
-        )
+        try:
+            sample_eval, _ = LotSampleEvaluation.objects.get_or_create(
+                lot_evaluation=evaluation,
+                sample_number=i,
+                defaults={'sample_id': sample_id}
+            )
+        except IntegrityError:
+            sample_eval = LotSampleEvaluation.objects.get(
+                lot_evaluation=evaluation,
+                sample_number=i,
+            )
         if not sample_eval.sample_id:
             sample_eval.sample_id = sample_id
             sample_eval.save()
         sample_evaluations.append(sample_eval)
     
     if request.method == 'POST':
+        # Guardrail: variant must have at least one color configured.
+        # Without colors, the evaluation model will compute all_pass=False and incorrectly reject.
+        if not variant_colors.exists():
+            messages.error(
+                request,
+                'This MultiCam Variant has no colors configured, so it cannot be evaluated. '
+                'Please run the variant color setup (TEMP COLOR) and try again.'
+            )
+            return redirect('inspections:lot_review', lot_id=lot.lot_id)
+
         eval_form = LotEvaluationForm(request.POST, instance=evaluation)
         
         if eval_form.is_valid():
@@ -792,8 +884,12 @@ def lot_review(request, lot_id):
                 if not all_samples_complete:
                     messages.error(request, 'Please complete all sample evaluations before submitting.')
                 else:
-                    # Submit the evaluation
-                    evaluation.submit()
+                    # Submit the evaluation (state-checked, atomic)
+                    try:
+                        evaluation.submit()
+                    except ValueError as e:
+                        messages.error(request, str(e))
+                        return redirect('inspections:lot_review', lot_id=lot.lot_id)
                     
                     # Send appropriate emails
                     if evaluation.all_pass:

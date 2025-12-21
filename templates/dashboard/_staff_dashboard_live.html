@@ -1,0 +1,244 @@
+{# HTMX fragment: staff dashboard dynamic content #}
+
+<!-- High-Level Summary Stats Cards -->
+<div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+    <div class="bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl shadow-lg p-5 text-white">
+        <p class="text-3xl font-bold">{{ summary.active_partners }}</p>
+        <p class="text-sm opacity-80 mt-1">Active Partners</p>
+    </div>
+    <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-5 text-white">
+        <p class="text-3xl font-bold">{{ fa_stats.approved }}</p>
+        <p class="text-sm opacity-80 mt-1">Approved FAs</p>
+    </div>
+    <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-5 text-white">
+        <p class="text-3xl font-bold">{{ lot_stats.approved }}</p>
+        <p class="text-sm opacity-80 mt-1">Approved Lots</p>
+    </div>
+    <div class="bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl shadow-lg p-5 text-white">
+        <p class="text-3xl font-bold">{{ total_yardage|floatformat:0 }}</p>
+        <p class="text-sm opacity-80 mt-1">Total Yardage</p>
+    </div>
+    <div class="bg-gradient-to-br from-teal-500 to-cyan-500 rounded-xl shadow-lg p-5 text-white">
+        <p class="text-3xl font-bold">{{ fa_stats.approval_rate }}%</p>
+        <p class="text-sm opacity-80 mt-1">FA Approval Rate</p>
+    </div>
+</div>
+
+<!-- Recent Activity - At the Top -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <!-- Recent First Article Submissions -->
+    <div class="card p-5">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold">Recent First Articles</h2>
+            <a href="{% url 'inspections:fa_list' %}" class="text-sm text-primary-600 hover:text-primary-700">View all →</a>
+        </div>
+        <div class="space-y-3">
+            {% for fa in recent_fas %}
+                <div class="flex items-center justify-between p-3 rounded-lg" style="background-color: var(--color-bg-elevated);">
+                    <div class="min-w-0 flex-1 mr-2">
+                        <p class="font-medium truncate">{{ fa.display_name }}</p>
+                        <p class="text-sm text-muted">{{ fa.vendor.company_name }}</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="badge
+                            {% if fa.status == 'approved' %}badge-approved
+                            {% elif fa.status == 'rejected' %}badge-rejected
+                            {% elif fa.status == 'pending_final' %}badge-pending-final
+                            {% else %}badge-pending{% endif %}">
+                            {{ fa.get_status_display }}
+                        </span>
+                        <p class="text-xs text-muted mt-1">{{ fa.submission_date|date:"M d" }}</p>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-muted text-center py-4">No recent activity</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Top Partners -->
+    <div class="card p-5">
+        <h2 class="text-lg font-bold mb-4">Top Partners by Volume</h2>
+        <div class="space-y-3">
+            {% for partner in top_partners %}
+                <div class="flex items-center justify-between p-3 rounded-lg" style="background-color: var(--color-bg-elevated);">
+                    <div>
+                        <p class="font-medium">{{ partner.company_name }}</p>
+                        <p class="text-sm text-muted">{{ partner.approved_fas }} approved FAs</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-lg font-bold text-primary-600">{{ partner.lot_count }}</p>
+                        <p class="text-xs text-muted">total lots</p>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-muted text-center py-4">No partners yet</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Stats Row -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <!-- First Article Statistics -->
+    <div class="card p-5">
+        <h2 class="text-lg font-bold mb-4">First Article Statistics</h2>
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="stat-card">
+                <div class="stat-number">{{ fa_stats.total }}</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number text-yellow-500">{{ fa_stats.pending }}</div>
+                <div class="stat-label">Pending Primary</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number text-blue-500">{{ fa_stats.pending_final }}</div>
+                <div class="stat-label">Pending Final</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number text-green-500">{{ fa_stats.approved }}</div>
+                <div class="stat-label">Approved</div>
+            </div>
+        </div>
+        <div class="pt-4 border-t space-y-2" style="border-color: var(--color-border);">
+            <div class="flex justify-between text-sm">
+                <span class="text-muted">This Month:</span>
+                <span class="font-medium">{{ fa_stats.this_month }} submitted</span>
+            </div>
+            <div class="flex justify-between text-sm">
+                <span class="text-muted">This Quarter:</span>
+                <span class="font-medium">{{ fa_stats.this_quarter }} submitted</span>
+            </div>
+            <div class="flex justify-between text-sm">
+                <span class="text-muted">This Year:</span>
+                <span class="font-medium">{{ fa_stats.this_year }} submitted</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lot Statistics -->
+    <div class="card p-5">
+        <h2 class="text-lg font-bold mb-4">Lot Statistics</h2>
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="stat-card">
+                <div class="stat-number">{{ lot_stats.total }}</div>
+                <div class="stat-label">Total Lots</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number text-yellow-500">{{ lot_stats.pending }}</div>
+                <div class="stat-label">Pending Review</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number text-green-500">{{ lot_stats.approved }}</div>
+                <div class="stat-label">Approved</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number text-red-500">{{ lot_stats.rejected }}</div>
+                <div class="stat-label">Rejected</div>
+            </div>
+        </div>
+        <div class="pt-4 border-t space-y-2" style="border-color: var(--color-border);">
+            <div class="flex justify-between text-sm">
+                <span class="text-muted">This Month:</span>
+                <span class="font-medium">{{ lot_stats.this_month }} submitted</span>
+            </div>
+            <div class="flex justify-between text-sm">
+                <span class="text-muted">Approval Rate:</span>
+                <span class="font-medium">{{ lot_stats.approval_rate }}%</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Production Volume -->
+<div class="card p-5 mb-6">
+    <h2 class="text-lg font-bold mb-4">Production Volume</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="text-center p-5 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-xl">
+            <p class="text-3xl font-bold text-indigo-600 dark:text-indigo-400">{{ total_yardage|floatformat:0 }}</p>
+            <p class="text-sm text-muted mt-1">Total Yardage (All Time)</p>
+        </div>
+        <div class="text-center p-5 bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-900/30 dark:to-teal-900/30 rounded-xl">
+            <p class="text-3xl font-bold text-green-600 dark:text-green-400">{{ yardage_this_month|floatformat:0 }}</p>
+            <p class="text-sm text-muted mt-1">This Month</p>
+        </div>
+        <div class="text-center p-5 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/30 dark:to-cyan-900/30 rounded-xl">
+            <p class="text-3xl font-bold text-blue-600 dark:text-blue-400">{{ yardage_this_year|floatformat:0 }}</p>
+            <p class="text-sm text-muted mt-1">This Year</p>
+        </div>
+    </div>
+</div>
+
+<!-- Monthly Trends -->
+<div class="card p-5 mb-6">
+    <h2 class="text-lg font-bold mb-4">Monthly Trends (Last 6 Months)</h2>
+    <div class="overflow-x-auto">
+        <table class="min-w-full">
+            <thead>
+                <tr>
+                    <th class="text-left py-3 px-4">Month</th>
+                    <th class="text-center py-3 px-4">FAs Submitted</th>
+                    <th class="text-center py-3 px-4">Lots Submitted</th>
+                    <th class="text-center py-3 px-4">FAs Approved</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for trend in monthly_trends %}
+                    <tr>
+                        <td class="py-3 px-4 font-medium">{{ trend.month }}</td>
+                        <td class="text-center py-3 px-4">{{ trend.fa_submitted }}</td>
+                        <td class="text-center py-3 px-4">{{ trend.lots_submitted }}</td>
+                        <td class="text-center py-3 px-4">{{ trend.fa_approved }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-8 text-muted">No data available</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- All Partners List -->
+<div class="card p-5">
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-bold">All Partners</h2>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="min-w-full">
+            <thead>
+                <tr>
+                    <th class="text-left py-3 px-4">Company</th>
+                    <th class="text-center py-3 px-4">Status</th>
+                    <th class="text-center py-3 px-4">First Articles</th>
+                    <th class="text-center py-3 px-4">Lots</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for partner in all_partners %}
+                    <tr>
+                        <td class="py-3 px-4">
+                            <p class="font-medium">{{ partner.company_name }}</p>
+                            <p class="text-sm text-muted">{{ partner.technical_email }}</p>
+                        </td>
+                        <td class="text-center py-3 px-4">
+                            <span class="badge {% if partner.status == 'active' %}badge-approved{% else %}badge-pending{% endif %}">
+                                {{ partner.get_status_display }}
+                            </span>
+                        </td>
+                        <td class="text-center py-3 px-4">{{ partner.fa_count }}</td>
+                        <td class="text-center py-3 px-4">{{ partner.lot_count }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-8 text-muted">No partners yet</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+

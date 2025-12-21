@@ -87,11 +87,44 @@ If you want to customize settings, create `.env` file (see `.env.example` for re
 
 ```bash
 # Dry-run first to see what would be imported
-python manage.py import_printers printers_import.csv --dry-run
+python manage.py import_printers partners_import.csv --dry-run
 
 # Actually import
-python manage.py import_printers printers_import.csv
+python manage.py import_printers partners_import.csv
 ```
+
+> Note: the management command is named `import_printers` for legacy reasons, but it imports **Partners**.
+
+---
+
+## Real-Time UI & Caching (HTMX Conventions)
+
+This project uses **HTMX** for “real-time-ish” updates via fragment polling and event triggers.
+
+### Fragment Pattern
+
+- **Views**: return a fragment template when `request.htmx` is true.
+- **Templates**: wrap the dynamic area with `hx-get` + `hx-trigger="every Ns"` and `hx-swap`.
+
+Examples currently implemented:
+- **Dashboards**: partner/inspector/staff dashboards poll their “live” fragment.
+- **Inspector queues**: FA/Lot queues poll list fragments.
+- **FA/Lot detail**: status + summary block polls a fragment.
+- **Notifications**:
+  - bell badge polls a fragment and refreshes on `notifications-changed`
+  - dropdown loads via HTMX and polls **only while open** (Alpine toggles `hx-disable`)
+
+### Back Button / Stale HTML Mitigation
+
+Authenticated HTML responses (including HTMX fragments) are served with:
+- `Cache-Control: no-store, no-cache, must-revalidate, max-age=0`
+
+This is implemented in:
+- `core.middleware.NoStoreAuthenticatedHtmlMiddleware`
+
+### HTMX + Django CSRF
+
+`templates/base.html` attaches the `csrftoken` cookie as `X-CSRFToken` for all HTMX requests using the `htmx:configRequest` event.
 
 ---
 
@@ -112,7 +145,7 @@ python manage.py test inspections.tests_workflow --verbosity=2
 coverage run manage.py test && coverage report
 ```
 
-**78 tests** cover:
+The automated test suite covers:
 - FA model and workflow tests
 - Two-stage review workflow
 - Lot submission and review
@@ -285,7 +318,10 @@ python manage.py collectstatic
 |---------|-------------|
 | `python manage.py setup_test_users` | Create test users (partner, primary_inspector, final_inspector, staff) |
 | `python manage.py load_initial_data` | Load camouflage types and variant colors |
-| `python manage.py import_printers <csv>` | Import partners from CSV |
+| `python manage.py load_variant_colors` | Load/refresh variant colors (if needed) |
+| `python manage.py backfill_variant_temp_colors` | Backfill “TEMP COLOR” for any variants missing colors |
+| `python manage.py create_test_data` | Create sample FAs/Lots for local testing |
+| `python manage.py import_printers <csv>` | Import partners from CSV (legacy command name) |
 | `python manage.py import_historical_fas <csv>` | Import historical FA data |
 | `python manage.py import_historical_lots <csv>` | Import historical Lot data |
 | `python manage.py verify_migration` | Verify data migration |

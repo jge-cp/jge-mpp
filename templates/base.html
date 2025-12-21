@@ -56,6 +56,25 @@
     
     <!-- HTMX -->
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
+    <!-- HTMX + Django CSRF -->
+    <script>
+        (function () {
+            function getCookie(name) {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
+                return null;
+            }
+
+            document.addEventListener('htmx:configRequest', function (event) {
+                const token = getCookie('csrftoken');
+                if (token) {
+                    event.detail.headers['X-CSRFToken'] = token;
+                }
+            });
+        })();
+    </script>
     
     <!-- Global Theme Styles -->
     <style>
@@ -437,43 +456,37 @@
                 {% if user.is_authenticated %}
                     <!-- Notification Bell -->
                     <div x-data="{ notifOpen: false }" class="relative">
-                        <button @click="notifOpen = !notifOpen" type="button"
+                        <button @click="notifOpen = !notifOpen; if (notifOpen) { $nextTick(() => htmx.trigger($refs.notifDropdownContent, 'refresh')) }" type="button"
                                 class="relative p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
                                 title="Notifications">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                             </svg>
-                            {% if unread_notification_count %}
-                            <span class="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
-                                {{ unread_notification_count|default:0 }}
+                            <span
+                                id="notification-badge"
+                                hx-get="{% url 'notifications:badge' %}"
+                                hx-trigger="load, every 10s, notifications-changed from:body"
+                                hx-swap="outerHTML"
+                            >
+                                {% include 'notifications/badge.html' with unread_notification_count=unread_notification_count %}
                             </span>
-                            {% endif %}
                         </button>
                         
                         <!-- Notification Dropdown -->
                         <div x-show="notifOpen" x-cloak @click.outside="notifOpen = false" x-transition
                              class="absolute right-0 mt-2 w-80 rounded-xl shadow-lg z-50 max-h-96 overflow-hidden"
                              style="background-color: var(--color-bg-card); border: 1px solid var(--color-border);">
-                            <div class="py-3 px-4 border-b flex justify-between items-center" style="border-color: var(--color-border);">
-                                <span class="font-semibold">Notifications</span>
-                                {% if unread_notification_count %}
-                                <a href="{% url 'notifications:mark_all_read' %}" 
-                                   hx-post="{% url 'notifications:mark_all_read' %}"
-                                   hx-swap="none"
-                                   hx-on::after-request="window.location.reload()"
-                                   class="text-xs text-primary-600 hover:text-primary-700">Mark all read</a>
-                                {% endif %}
-                            </div>
-                            <div class="overflow-y-auto max-h-72"
-                                 hx-get="{% url 'notifications:dropdown' %}"
-                                 hx-trigger="revealed"
-                                 hx-swap="innerHTML">
+                            <div
+                                x-ref="notifDropdownContent"
+                                data-notif-dropdown-content="1"
+                                hx-get="{% url 'notifications:dropdown' %}"
+                                hx-trigger="refresh, every 10s, notifications-changed from:body"
+                                :hx-disable="!notifOpen"
+                                hx-swap="innerHTML"
+                            >
                                 <div class="p-4 text-center text-muted text-sm">
                                     Loading...
                                 </div>
-                            </div>
-                            <div class="py-2 px-4 border-t text-center" style="border-color: var(--color-border);">
-                                <a href="{% url 'notifications:list' %}" class="text-sm text-primary-600 hover:text-primary-700">View all notifications</a>
                             </div>
                         </div>
                     </div>

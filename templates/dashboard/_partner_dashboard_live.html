@@ -1,0 +1,113 @@
+<!-- Prominent Action Buttons -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+    <a href="{% url 'inspections:fa_submit' %}"
+       class="card p-6 hover:border-primary-500 transition-all group border-2 hover:shadow-lg">
+        <div class="flex items-center space-x-4">
+            <div class="flex-shrink-0 w-14 h-14 bg-primary-100 dark:bg-primary-900/30 rounded-xl flex items-center justify-center border border-primary-200 dark:border-primary-700">
+                <svg class="w-7 h-7 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <h3 class="text-lg font-bold group-hover:text-primary-600">Submit First Article</h3>
+                <p class="text-sm text-muted">Submit a new First Article for inspection</p>
+            </div>
+            <svg class="w-6 h-6 text-muted group-hover:text-primary-600 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </div>
+    </a>
+
+    <a href="{% url 'inspections:lot_submit' %}"
+       class="card p-6 hover:border-green-500 transition-all group border-2 hover:shadow-lg {% if not fa_stats.approved %}opacity-50 pointer-events-none{% endif %}">
+        <div class="flex items-center space-x-4">
+            <div class="flex-shrink-0 w-14 h-14 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center border border-green-200 dark:border-green-700">
+                <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+            </div>
+            <div class="flex-1">
+                <h3 class="text-lg font-bold group-hover:text-green-600">Submit Lot</h3>
+                <p class="text-sm text-muted">
+                    {% if fa_stats.approved %}Submit production lots for approval{% else %}Requires approved First Article{% endif %}
+                </p>
+            </div>
+            <svg class="w-6 h-6 text-muted group-hover:text-green-600 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </div>
+    </a>
+</div>
+
+<!-- Recent Activity -->
+<div class="card p-6">
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold">Recent Activity</h2>
+        <a href="{% url 'inspections:fa_list' %}" class="text-sm text-primary-600 hover:text-primary-700">
+            View all →
+        </a>
+    </div>
+
+    <div class="space-y-3">
+        {% for fa in recent_fas %}
+            <div class="flex items-center justify-between p-3 rounded-lg border" style="background-color: var(--color-bg-elevated); border-color: var(--color-border);">
+                <div class="flex items-center space-x-3">
+                    <div class="icon-container w-10 h-10 bg-primary-100 dark:bg-primary-900/30 border-primary-200 dark:border-primary-700">
+                        <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <a href="{% url 'inspections:fa_detail' fa.fai_id %}" class="font-medium hover:text-primary-600">
+                            {{ fa.display_name }}
+                        </a>
+                        <p class="text-sm text-muted">FA Lot #: {{ fa.fa_lot_number }}</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <span class="badge {% if fa.status == 'approved' %}badge-approved{% elif fa.status == 'rejected' %}badge-rejected{% elif fa.status == 'pending_final' %}badge-pending-final{% else %}badge-pending{% endif %}">
+                        {% if fa.status == 'approved' %}✓ Approved{% elif fa.status == 'rejected' %}✗ Rejected{% elif fa.status == 'pending_final' %}Awaiting Final{% else %}Awaiting Primary{% endif %}
+                    </span>
+                    <p class="text-xs {% if fa.status == 'approved' %}text-green-600{% elif fa.status == 'rejected' %}text-red-600{% elif fa.status == 'pending_final' %}text-blue-600{% else %}text-yellow-600{% endif %} mt-1">
+                        {% if fa.status == 'approved' %}Passed Both Reviews{% elif fa.status == 'rejected' %}{% if fa.final_inspector %}Failed Final{% else %}Failed Primary{% endif %}{% elif fa.status == 'pending_final' %}✓ Passed Primary{% else %}{{ fa.submission_date|timesince }} ago{% endif %}
+                    </p>
+                </div>
+            </div>
+        {% empty %}
+            <div class="text-center py-8">
+                <svg class="w-12 h-12 mx-auto text-muted mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <p class="text-muted">No submissions yet. Get started by submitting a First Article!</p>
+            </div>
+        {% endfor %}
+
+        {% for lot in recent_lots %}
+            <div class="flex items-center justify-between p-3 rounded-lg border" style="background-color: var(--color-bg-elevated); border-color: var(--color-border);">
+                <div class="flex items-center space-x-3">
+                    <div class="icon-container w-10 h-10 bg-green-100 dark:bg-green-900/30 border-green-200 dark:border-green-700">
+                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <a href="{% url 'inspections:lot_detail' lot.lot_id %}" class="font-medium hover:text-green-600">
+                            {{ lot.display_name }}
+                        </a>
+                        <p class="text-sm text-muted">Lot #: {{ lot.lot_lot_number }} - {{ lot.number_of_yards_printed }} yards</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <span class="badge {% if lot.status == 'approved' %}badge-approved{% elif lot.status == 'rejected' %}badge-rejected{% else %}badge-pending{% endif %}">
+                        {% if lot.status == 'approved' %}✓ Approved{% elif lot.status == 'rejected' %}✗ Rejected{% else %}Awaiting Review{% endif %}
+                    </span>
+                    <p class="text-xs {% if lot.status == 'approved' %}text-green-600{% elif lot.status == 'rejected' %}text-red-600{% else %}text-yellow-600{% endif %} mt-1">
+                        {% if lot.status == 'approved' %}Ready for Production{% elif lot.status == 'rejected' %}See Review Comments{% else %}{{ lot.submission_date|timesince }} ago{% endif %}
+                    </p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+

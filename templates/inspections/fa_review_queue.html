@@ -7,45 +7,14 @@
     <h1 class="text-3xl font-bold mb-6">First Article Review Queue</h1>
     
     <div class="card overflow-hidden">
-        <ul class="divide-y border-theme">
-            {% for fa in pending_fas %}
-                <li>
-                    <a href="{% url 'inspections:fa_review' fa.fai_id %}" class="block hover:bg-elevated p-4">
-                        <div class="flex items-center justify-between">
-                            <p class="text-sm font-medium text-blue-600 truncate">
-                                {{ fa.display_name }}
-                            </p>
-                            <div class="ml-2 flex-shrink-0 flex flex-col items-end">
-                                {% if fa.status == 'pending_final' %}
-                                    <span class="badge-info">Ready for Final Review</span>
-                                    <span class="text-xs text-blue-600 mt-1">✓ Passed Primary Review{% if fa.primary_inspector %} by {{ fa.primary_inspector.get_full_name|default:fa.primary_inspector.username }}{% endif %}</span>
-                                {% else %}
-                                    <span class="badge-warning">Ready for Primary Review</span>
-                                    <span class="text-xs text-yellow-600 mt-1">Waiting {{ fa.submission_date|timesince }}</span>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="mt-2 sm:flex sm:justify-between">
-                            <div class="sm:flex">
-                                <p class="flex items-center text-sm text-muted">
-                                    <span class="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-xs px-2 py-0.5 rounded mr-2">Attempt #{{ fa.current_attempt }}</span>
-                                    <span class="font-medium">{{ fa.vendor.company_name }}</span> | FA Lot #: {{ fa.fa_lot_number }} | {{ fa.multicam_variant.camouflage_name }}
-                                </p>
-                            </div>
-                            <div class="mt-2 flex items-center text-sm text-muted sm:mt-0">
-                                <p>
-                                    {{ fa.submission_date|date:"M d, Y" }}
-                                </p>
-                            </div>
-                        </div>
-                    </a>
-                </li>
-            {% empty %}
-                <li class="px-4 py-4">
-                    <p class="text-muted">No pending First Article submissions.</p>
-                </li>
-            {% endfor %}
-        </ul>
+        <div
+            id="fa-queue-list"
+            hx-get="{% if queue_type == 'final' %}{% url 'inspections:fa_review_queue_final' %}{% else %}{% url 'inspections:fa_review_queue_primary' %}{% endif %}"
+            hx-trigger="load, every 10s"
+            hx-swap="innerHTML"
+        >
+            {% include 'inspections/_fa_review_queue_list.html' %}
+        </div>
     </div>
 </div>
 {% endblock %}

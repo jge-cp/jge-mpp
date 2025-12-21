@@ -201,7 +201,8 @@ class FullWorkflowWithNotificationsTest(TestCase):
             spectral_reflectance_requirement='full',
             fa_lot_number='LOT-2024-001',
             date_of_printing=date.today(),
-            name_of_printer_representative='John Doe',
+            submitter_first_name='John',
+            submitter_last_name='Doe',
             status='pending'
         )
         
@@ -236,6 +237,37 @@ class FullWorkflowWithNotificationsTest(TestCase):
         )
         self.assertEqual(notifications.count(), 1)
         self.assertIn('New First Article', notifications.first().title)
+
+    def test_partner_can_submit_fa_via_view_and_status_stays_pending(self):
+        """
+        Regression: cover actual POST submit path (not just model create).
+        Ensures FA lands in pending and does not incorrectly show as failed.
+        """
+        self.client.login(username='partner', password='partner123')
+
+        payload = {
+            'fabric_style': 'Submit View Fabric',
+            'multicam_variant': self.camo.id,
+            'shade_standard': 'alpha',
+            'shade_standard_number': '',
+            'spectral_reflectance_requirement': 'alpha',
+            'fa_lot_number': 'LOT-SUBMIT-001',
+            'date_of_printing': date.today().isoformat(),
+            'first_article_ship_date': '',
+            'tracking_number': '',
+            'submitter_first_name': 'Pat',
+            'submitter_last_name': 'Ner',
+        }
+
+        response = self.client.post(reverse('inspections:fa_submit'), payload, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        fa = FirstArticleInspection.objects.get(
+            vendor=self.partner.profile,
+            fa_lot_number='LOT-SUBMIT-001',
+        )
+        self.assertEqual(fa.status, 'pending')
+        self.assertTrue(fa.submitted)
     
     def test_step2_primary_inspector_approves_fa(self):
         """Step 2: Primary Inspector approves FA - triggers email to Final Inspector"""
@@ -248,7 +280,8 @@ class FullWorkflowWithNotificationsTest(TestCase):
             spectral_reflectance_requirement='full',
             fa_lot_number='LOT-STEP2-001',
             date_of_printing=date.today(),
-            name_of_printer_representative='John Doe',
+            submitter_first_name='John',
+            submitter_last_name='Doe',
             status='pending'
         )
         
@@ -295,7 +328,8 @@ class FullWorkflowWithNotificationsTest(TestCase):
             spectral_reflectance_requirement='full',
             fa_lot_number='LOT-REJECT-001',
             date_of_printing=date.today(),
-            name_of_printer_representative='John Doe',
+            submitter_first_name='John',
+            submitter_last_name='Doe',
             status='pending'
         )
         
@@ -342,7 +376,8 @@ class FullWorkflowWithNotificationsTest(TestCase):
             spectral_reflectance_requirement='full',
             fa_lot_number='LOT-FINAL-001',
             date_of_printing=date.today(),
-            name_of_printer_representative='John Doe',
+            submitter_first_name='John',
+            submitter_last_name='Doe',
             status='pending_final',
             primary_inspector=self.primary_inspector
         )
@@ -407,7 +442,8 @@ class FullWorkflowWithNotificationsTest(TestCase):
             spectral_reflectance_requirement='full',
             fa_lot_number='LOT-FINAL-REJ-001',
             date_of_printing=date.today(),
-            name_of_printer_representative='John Doe',
+            submitter_first_name='John',
+            submitter_last_name='Doe',
             status='pending_final',
             primary_inspector=self.primary_inspector
         )
@@ -489,7 +525,8 @@ class FullWorkflowWithNotificationsTest(TestCase):
             spectral_reflectance_requirement='full',
             fa_lot_number='FA-APPROVED-001',
             date_of_printing=date.today(),
-            name_of_printer_representative='John Doe',
+            submitter_first_name='John',
+            submitter_last_name='Doe',
             status='approved'
         )
         
@@ -509,7 +546,8 @@ class FullWorkflowWithNotificationsTest(TestCase):
             number_of_samples=3,
             individual_sample_numbers='LOT-PROD-001-1, LOT-PROD-001-2, LOT-PROD-001-3',
             date_of_printing=date.today(),
-            name_of_submitter='John Doe',
+            submitter_first_name='John',
+            submitter_last_name='Doe',
             original_fa=fa,
             status='pending'
         )
@@ -538,6 +576,87 @@ class FullWorkflowWithNotificationsTest(TestCase):
             channel='in_app'
         )
         self.assertEqual(notifications.count(), 1)
+
+    def test_partner_can_submit_lot_via_view_requires_approved_fa(self):
+        """
+        Covers actual POST submit path for lots.
+        """
+        # Approved FA owned by partner
+        fa = FirstArticleInspection.objects.create(
+            vendor=self.partner.profile,
+            fabric_style='Approved Fabric For Lot Submit',
+            multicam_variant=self.camo,
+            shade_standard='alpha',
+            spectral_reflectance_requirement='alpha',
+            fa_lot_number='FA-FOR-LOT-SUBMIT',
+            date_of_printing=date.today(),
+            status='approved',
+        )
+
+        self.client.login(username='partner', password='partner123')
+
+        payload = {
+            'original_fa': fa.fai_id,  # ModelForm Select uses PK; here PK is fai_id
+            'lot_lot_number': 'LOT-SUBMIT-001',
+            'number_of_yards_printed': '1000',
+            'date_of_printing': date.today().isoformat(),
+            'date_shipped': '',
+            'tracking_number': '',
+            'submitter_first_name': 'Pat',
+            'submitter_last_name': 'Ner',
+            # Hidden fields expected by view:
+            'individual_sample_numbers': 'LOT-SUBMIT-001-1, LOT-SUBMIT-001-2, LOT-SUBMIT-001-3',
+            'number_of_samples': '3',
+        }
+
+        response = self.client.post(reverse('inspections:lot_submit'), payload, follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        lot = LotAcceptance.objects.get(
+            vendor=self.partner.profile,
+            lot_lot_number='LOT-SUBMIT-001',
+        )
+        self.assertEqual(lot.status, 'pending')
+        self.assertTrue(lot.submitted)
+
+    def test_fa_evaluation_submit_blocked_when_variant_has_no_colors(self):
+        """
+        Regression for the reported issue: without VariantColor rows, an intended PASS
+        could be computed as FAIL and flip the FA to rejected. We block submission instead.
+        """
+        # Create a camo variant with no colors
+        camo_no_colors = CamouflageType.objects.create(
+            camouflage_name='No Colors Variant',
+            status='active',
+        )
+
+        fa = FirstArticleInspection.objects.create(
+            vendor=self.partner.profile,
+            fabric_style='No Colors Fabric',
+            multicam_variant=camo_no_colors,
+            shade_standard='alpha',
+            spectral_reflectance_requirement='alpha',
+            fa_lot_number='LOT-NOCOLORS-FA',
+            date_of_printing=date.today(),
+            status='pending',
+        )
+
+        self.client.login(username='primary_inspector', password='primary123')
+        response = self.client.post(
+            reverse('inspections:fa_review', args=[fa.fai_id]),
+            {
+                'pattern_execution': 'pass',
+                'scale': 'pass',
+                'spectral_reflectance': 'pass',
+                'comments': 'Should not be allowed without colors',
+                'submit_evaluation': 'Submit Evaluation',
+            },
+            follow=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        fa.refresh_from_db()
+        self.assertEqual(fa.status, 'pending')
     
     def test_step7_primary_inspector_approves_lot(self):
         """Step 5: Primary Inspector approves Lot - email to Partner"""
@@ -550,7 +669,8 @@ class FullWorkflowWithNotificationsTest(TestCase):
             spectral_reflectance_requirement='full',
             fa_lot_number='FA-LOT-001',
             date_of_printing=date.today(),
-            name_of_printer_representative='John Doe',
+            submitter_first_name='John',
+            submitter_last_name='Doe',
             status='approved'
         )
         
@@ -565,7 +685,8 @@ class FullWorkflowWithNotificationsTest(TestCase):
             number_of_samples=3,
             individual_sample_numbers='LOT-APPROVE-001-1, LOT-APPROVE-001-2, LOT-APPROVE-001-3',
             date_of_printing=date.today(),
-            name_of_submitter='John Doe',
+            submitter_first_name='John',
+            submitter_last_name='Doe',
             original_fa=fa,
             status='pending'
         )
@@ -635,7 +756,8 @@ class FullWorkflowWithNotificationsTest(TestCase):
             spectral_reflectance_requirement='full',
             fa_lot_number='FA-LOT-REJ-001',
             date_of_printing=date.today(),
-            name_of_printer_representative='John Doe',
+            submitter_first_name='John',
+            submitter_last_name='Doe',
             status='approved'
         )
         
@@ -650,7 +772,8 @@ class FullWorkflowWithNotificationsTest(TestCase):
             number_of_samples=3,
             individual_sample_numbers='LOT-REJECT-001-1, LOT-REJECT-001-2, LOT-REJECT-001-3',
             date_of_printing=date.today(),
-            name_of_submitter='John Doe',
+            submitter_first_name='John',
+            submitter_last_name='Doe',
             original_fa=fa,
             status='pending'
         )
@@ -720,7 +843,8 @@ class FullWorkflowWithNotificationsTest(TestCase):
             spectral_reflectance_requirement='full',
             fa_lot_number='STAFF-FA-001',
             date_of_printing=date.today(),
-            name_of_printer_representative='John Doe',
+            submitter_first_name='John',
+            submitter_last_name='Doe',
             status='approved'
         )
         
@@ -776,7 +900,8 @@ class NotificationContentTest(TestCase):
             spectral_reflectance_requirement='full',
             fa_lot_number='2024-BATCH-42',
             date_of_printing=date.today(),
-            name_of_printer_representative='Jane Smith',
+            submitter_first_name='Jane',
+            submitter_last_name='Smith',
             status='pending'
         )
         
@@ -823,7 +948,8 @@ class NotificationContentTest(TestCase):
             spectral_reflectance_requirement='full',
             fa_lot_number='URL-TEST-001',
             date_of_printing=date.today(),
-            name_of_printer_representative='Test User',
+            submitter_first_name='Test',
+            submitter_last_name='User',
             status='pending'
         )
         

@@ -122,6 +122,16 @@ APPROVE│             │REJECT   │
 - `approved` - Fully approved by both inspectors
 - `rejected` - Rejected by either inspector
 
+### Workflow Integrity (Invariants)
+
+The system is designed to be robust against “back button / double-submit / refresh” behavior:
+
+- **No GET side-effects**: simply viewing pages must not create or mutate evaluation records.
+- **Atomic submissions**: evaluation submit paths run inside DB transactions and use row locking to avoid race conditions.
+- **Idempotent create**: concurrent submits that try to create the same evaluation should not 500; existing rows are reused.
+- **Final states stay final**: `approved` / `rejected` are treated as terminal outcomes.
+- **Variant must have colors**: Multicam variants are expected to have at least one `VariantColor`. If a variant is missing colors, it’s considered data corruption and should be backfilled (see management command below).
+
 ### Single-Stage Lot Workflow
 
 ```
@@ -163,6 +173,16 @@ APPROVE│             │REJECT   │
 - Partner must have at least one **approved** FA before submitting Lots
 - Lot dropdown only shows approved FAs belonging to that partner
 - Primary Inspector handles all Lot reviews (Final Inspector has no Lot responsibilities)
+
+---
+
+## Authorization Summary (Role × Visibility)
+
+- **Partner**
+  - Can submit and view **only their own** FAs and Lots.
+- **Primary Inspector / Final Inspector / Staff / Full Admin**
+  - Can view **all** FAs and Lots (this is required for their job functions).
+  - Only **Primary Inspector** reviews Lots; Final Inspector does not review Lots.
 
 ---
 
@@ -222,6 +242,20 @@ TRIGGER EVENTS                    PROCESSING                     DELIVERY
 | Lot Submitted | Primary Inspector | Email + In-App |
 | Lot Approved | Partner | Email + In-App |
 | Lot Rejected | Partner | Email + In-App |
+
+---
+
+## Real-Time UI (HTMX + Alpine.js)
+
+Key parts of the UI update without manual refresh:
+
+- **Notification bell badge**: polls an HTMX fragment and also refreshes immediately on a `notifications-changed` event.
+- **Notification dropdown**: loads via HTMX and polls **only while open** (to avoid background polling).
+- **Inspector queues**: queue pages poll fragment lists for near-real-time updates.
+- **FA/Lot detail pages**: status + summary areas poll fragments for near-real-time consistency.
+- **Dashboards**: partner/inspector/staff dashboards poll their “live” fragment content.
+
+To reduce stale back-button HTML, authenticated HTML responses are served with **`Cache-Control: no-store`** (see `core.middleware.NoStoreAuthenticatedHtmlMiddleware`).
 
 ### Email Flow Detail (Sequence)
 
@@ -512,7 +546,10 @@ The `is_historic` field on FirstArticleInspection is for **legacy data imports**
 |---------|-------------|
 | `python manage.py setup_test_users` | Create test users for development |
 | `python manage.py load_initial_data` | Load camouflage types and variant colors |
-| `python manage.py import_printers <csv>` | Import partners from CSV |
+| `python manage.py load_variant_colors` | Load/refresh variant colors (if needed) |
+| `python manage.py backfill_variant_temp_colors` | Backfill “TEMP COLOR” for any variants missing colors |
+| `python manage.py create_test_data` | Create sample FAs/Lots for local testing |
+| `python manage.py import_printers <csv>` | Import partners from CSV (legacy command name) |
 | `python manage.py import_historical_fas <csv>` | Import historical FA data |
 | `python manage.py import_historical_lots <csv>` | Import historical Lot data |
 | `python manage.py verify_migration` | Verify data migration |

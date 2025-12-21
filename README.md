@@ -116,6 +116,16 @@ Partner submits FA → Primary Inspector → Final Inspector → Approved
                      Partner notified    Partner notified
 ```
 
+## Real-Time Updates (HTMX)
+
+The UI is designed so users generally **do not need to manually refresh**:
+
+- **Notification bell badge** updates via HTMX polling and `notifications-changed` events.
+- **Notification dropdown** loads via HTMX and polls **only while open**.
+- **Dashboards / queues / detail pages** poll “live” fragments to keep state consistent for all users.
+
+To reduce stale back-button behavior, authenticated HTML responses are served with **`Cache-Control: no-store`**.
+
 ## Documentation
 
 | File | Description |
@@ -160,3 +170,13 @@ multicam-partner-portal/
 ## License
 
 Proprietary - Multicam Partner Program
+
+## Useful Commands
+
+```bash
+# Backfill TEMP COLOR for any Multicam variants missing colors
+python manage.py backfill_variant_temp_colors
+
+# Run workflow + notifications tests (covers FA/Lot routing + notifications)
+python manage.py test inspections.tests_workflow notifications.tests --verbosity=2
+```

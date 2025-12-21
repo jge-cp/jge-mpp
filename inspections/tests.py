@@ -2,6 +2,12 @@
 Tests for the inspections app.
 Tests FA submission, two-stage FA review, Lot workflows, and evaluation system.
 """
+
+# Pyright does not understand Django's dynamic model managers / response objects in this repo.
+# These tests are executed by Django's test runner; type-checking noise is not actionable here.
+# pyright: reportAttributeAccessIssue=false
+# pyright: reportGeneralTypeIssues=false
+# pyright: reportOptionalMemberAccess=false
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from django.urls import reverse
@@ -45,7 +51,8 @@ class FirstArticleModelTests(TestCase):
             spectral_reflectance_requirement='alpha',
             fa_lot_number='LOT-001',
             date_of_printing=date.today(),
-            name_of_printer_representative='John Doe'
+            submitter_first_name='John',
+            submitter_last_name='Doe',
         )
         self.assertIn('-FA-', fa.fai_id)
         self.assertRegex(fa.fai_id, r'-FA-\d{4}$')
@@ -60,7 +67,8 @@ class FirstArticleModelTests(TestCase):
             spectral_reflectance_requirement='alpha',
             fa_lot_number='LOT-001',
             date_of_printing=date.today(),
-            name_of_printer_representative='John Doe'
+            submitter_first_name='John',
+            submitter_last_name='Doe',
         )
         self.assertEqual(fa.status, 'pending')
     
@@ -74,7 +82,8 @@ class FirstArticleModelTests(TestCase):
             spectral_reflectance_requirement='alpha',
             fa_lot_number='LOT-001',
             date_of_printing=date.today(),
-            name_of_printer_representative='John Doe'
+            submitter_first_name='John',
+            submitter_last_name='Doe',
         )
         
         # Test all status transitions
@@ -141,7 +150,8 @@ class TwoStageReviewWorkflowTests(TestCase):
             spectral_reflectance_requirement='alpha',
             fa_lot_number='LOT-001',
             date_of_printing=date.today(),
-            name_of_printer_representative='John Doe'
+            submitter_first_name='John',
+            submitter_last_name='Doe',
         )
     
     def _get_passing_eval_data(self):
@@ -183,6 +193,14 @@ class TwoStageReviewWorkflowTests(TestCase):
         response = self.client.get(reverse('inspections:fa_review_queue_primary'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.fa.fai_id)
+
+        # HTMX fragment request should also work
+        response_htmx = self.client.get(
+            reverse('inspections:fa_review_queue_primary'),
+            HTTP_HX_REQUEST='true'
+        )
+        self.assertEqual(response_htmx.status_code, 200)
+        self.assertContains(response_htmx, self.fa.fai_id)
     
     def test_final_queue_shows_pending_final_fas(self):
         """Final queue should show only 'pending_final' FAs"""
@@ -203,14 +221,15 @@ class TwoStageReviewWorkflowTests(TestCase):
         self.assertEqual(response.status_code, 302)
     
     def test_primary_inspector_cannot_review_pending_final(self):
-        """Primary Inspector cannot review FA in pending_final status"""
+        """Primary Inspector can view their own submitted evaluation during pending_final (read-only unless final has started)."""
         self.fa.status = 'pending_final'
         self.fa.save()
         
         self.client.login(username='primary', password='testpass123')
         response = self.client.get(reverse('inspections:fa_review', args=[self.fa.fai_id]))
-        # Should redirect with error
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
+        # Primary viewing pending_final should not be in final review stage
+        self.assertTrue(response.context['is_primary_viewing_pending_final'])
     
     def test_final_inspector_cannot_review_pending(self):
         """Final Inspector cannot review FA in pending status"""
@@ -218,6 +237,135 @@ class TwoStageReviewWorkflowTests(TestCase):
         response = self.client.get(reverse('inspections:fa_review', args=[self.fa.fai_id]))
         # Should redirect with error
         self.assertEqual(response.status_code, 302)
+
+    def test_final_get_does_not_create_eval_or_lock_primary(self):
+        """
+        Regression: final inspector viewing the review page (GET) must not create DB rows
+        that lock the primary inspector out of edits.
+        """
+        # Move FA to pending_final by creating a submitted primary evaluation
+        self.fa.status = 'pending_final'
+        self.fa.save()
+
+        primary_eval = FAEvaluation.objects.create(
+            fa=self.fa,
+            stage='primary',
+            attempt_number=1,
+            inspector=self.primary_inspector,
+            pattern_execution='pass',
+            scale='pass',
+            spectral_reflectance='pass',
+            comments='Primary ok',
+            is_submitted=True,
+            submitted_at=timezone.now(),
+        )
+        for color in self.colors:
+            FAColorEvaluation.objects.create(
+                evaluation=primary_eval,
+                color=color,
+                rating='4',
+                comment='',
+            )
+
+        # Final inspector GET should not create a final evaluation row
+        self.client.login(username='final', password='testpass123')
+        resp_final = self.client.get(reverse('inspections:fa_review', args=[self.fa.fai_id]))
+        self.assertEqual(resp_final.status_code, 200)
+        self.assertEqual(
+            self.fa.evaluations.filter(stage='final', attempt_number=1).count(),
+            0,
+            "Final GET should not create a final evaluation row",
+        )
+
+        # Primary viewing pending_final should not be read-only yet
+        self.client.logout()
+        self.client.login(username='primary', password='testpass123')
+        resp_primary = self.client.get(reverse('inspections:fa_review', args=[self.fa.fai_id]))
+        self.assertEqual(resp_primary.status_code, 200)
+        self.assertFalse(resp_primary.context['final_has_started'])
+        self.assertFalse(resp_primary.context['is_read_only'])
+
+    def test_resubmit_is_atomic_and_resets_denormalized_review_fields(self):
+        """Resubmitting a rejected FA should clear primary/final review fields and return to pending."""
+        # Mark FA rejected with some denormalized fields filled
+        self.fa.status = 'rejected'
+        self.fa.primary_comments = 'Old comment'
+        self.fa.primary_pattern_execution = 'fail'
+        self.fa.primary_scale = 'pass'
+        self.fa.primary_spectral_reflectance = 'pass'
+        self.fa.final_comments = 'Old final comment'
+        self.fa.final_pattern_execution = 'fail'
+        self.fa.final_scale = 'pass'
+        self.fa.final_spectral_reflectance = 'pass'
+        self.fa.save()
+
+        next_attempt = self.fa.resubmit()
+        self.fa.refresh_from_db()
+
+        self.assertEqual(self.fa.status, 'pending')
+        self.assertEqual(self.fa.primary_comments, '')
+        self.assertEqual(self.fa.primary_pattern_execution, '')
+        self.assertEqual(self.fa.primary_scale, '')
+        self.assertEqual(self.fa.primary_spectral_reflectance, '')
+        self.assertEqual(self.fa.final_comments, '')
+        self.assertEqual(self.fa.final_pattern_execution, '')
+        self.assertEqual(self.fa.final_scale, '')
+        self.assertEqual(self.fa.final_spectral_reflectance, '')
+        self.assertEqual(next_attempt, self.fa.get_next_attempt_number())
+
+    def test_double_submit_post_is_gracefully_rejected(self):
+        """
+        Regression: a back-button / double-click submit should not 500 and should not mutate status twice.
+        """
+        self.client.login(username='primary', password='testpass123')
+
+        # First submit (pending -> pending_final)
+        resp1 = self.client.post(
+            reverse('inspections:fa_review', args=[self.fa.fai_id]),
+            self._get_passing_eval_data(),
+            follow=True,
+        )
+        self.assertEqual(resp1.status_code, 200)
+        self.fa.refresh_from_db()
+        self.assertEqual(self.fa.status, 'pending_final')
+
+    def test_double_submit_final_is_gracefully_handled(self):
+        """
+        Regression: final submit double-click/back-button should not 500 and should not mutate state twice.
+        """
+        # Move FA to pending_final by submitting a passing primary evaluation first
+        self.client.login(username='primary', password='testpass123')
+        resp_primary = self.client.post(
+            reverse('inspections:fa_review', args=[self.fa.fai_id]),
+            self._get_passing_eval_data(),
+            follow=True,
+        )
+        self.assertEqual(resp_primary.status_code, 200)
+        self.fa.refresh_from_db()
+        self.assertEqual(self.fa.status, 'pending_final')
+
+        # Final submit (pending_final -> approved)
+        self.client.logout()
+        self.client.login(username='final', password='testpass123')
+
+        resp_final_1 = self.client.post(
+            reverse('inspections:fa_review', args=[self.fa.fai_id]),
+            self._get_passing_eval_data(),
+            follow=True,
+        )
+        self.assertEqual(resp_final_1.status_code, 200)
+        self.fa.refresh_from_db()
+        self.assertEqual(self.fa.status, 'approved')
+
+        # Second POST should not 500 and should remain approved
+        resp_final_2 = self.client.post(
+            reverse('inspections:fa_review', args=[self.fa.fai_id]),
+            self._get_passing_eval_data(),
+            follow=True,
+        )
+        self.assertEqual(resp_final_2.status_code, 200)
+        self.fa.refresh_from_db()
+        self.assertEqual(self.fa.status, 'approved')
     
     def test_primary_approval_moves_to_pending_final(self):
         """Primary approval should move FA to pending_final status"""
@@ -328,6 +476,112 @@ class TwoStageReviewWorkflowTests(TestCase):
         self.assertFalse(evaluation.all_pass)
 
 
+class LotReviewDoubleSubmitTests(TestCase):
+    """Back-button / double-submit regressions for lot review view."""
+
+    def setUp(self):
+        self.client = Client()
+
+        # Partner
+        self.partner = User.objects.create_user(
+            username='partner', email='partner@test.com', password='testpass123'
+        )
+        self.partner.profile.user_functionality = 'partner'
+        self.partner.profile.company_name = 'TestPartner'
+        self.partner.profile.save()
+
+        # Primary inspector
+        self.primary = User.objects.create_user(
+            username='primary', email='primary@test.com', password='testpass123', is_staff=True
+        )
+        self.primary.profile.user_functionality = 'admin'
+        self.primary.profile.admin_role = 'primary_inspector'
+        self.primary.profile.save()
+
+        self.camo = CamouflageType.objects.create(
+            camouflage_name='Lot Double Submit Variant',
+            status='active'
+        )
+        self.colors = []
+        for i, name in enumerate(['Color 1', 'Color 2', 'Color 3'], 1):
+            self.colors.append(VariantColor.objects.create(
+                camouflage_type=self.camo,
+                position=i,
+                color_name=name
+            ))
+
+        self.fa = FirstArticleInspection.objects.create(
+            vendor=self.partner.profile,
+            fabric_style='Lot Double Submit Fabric',
+            multicam_variant=self.camo,
+            shade_standard='alpha',
+            spectral_reflectance_requirement='alpha',
+            fa_lot_number='FA-LOT-DBL-001',
+            date_of_printing=date.today(),
+            submitter_first_name='Pat',
+            submitter_last_name='Ner',
+            status='approved'
+        )
+
+        self.lot = LotAcceptance.objects.create(
+            vendor=self.partner.profile,
+            original_fa=self.fa,
+            fabric_style=self.fa.fabric_style,
+            shade_standard=self.fa.shade_standard,
+            shade_standard_number='',
+            spectral_reflectance_requirement=self.fa.spectral_reflectance_requirement,
+            original_fa_lot_number=self.fa.fa_lot_number,
+            lot_lot_number='LOT-DBL-001',
+            number_of_yards_printed=1000,
+            number_of_samples=3,
+            individual_sample_numbers='LOT-DBL-001-1, LOT-DBL-001-2, LOT-DBL-001-3',
+            date_of_printing=date.today(),
+            submitter_first_name='Pat',
+            submitter_last_name='Ner',
+            submitted=True,
+            status='pending',
+        )
+
+    def _lot_passing_payload(self):
+        payload = {
+            'comments': 'All good',
+            'submit_evaluation': 'Submit Evaluation',
+        }
+        # 3 samples * colors
+        for sample_num in [1, 2, 3]:
+            payload[f'sample_{sample_num}_pattern'] = 'pass'
+            payload[f'sample_{sample_num}_scale'] = 'pass'
+            payload[f'sample_{sample_num}_spectral'] = 'pass'
+            payload[f'sample_{sample_num}_comments'] = ''
+            for color in self.colors:
+                payload[f'sample_{sample_num}_color_{color.id}-rating'] = '4'
+                payload[f'sample_{sample_num}_color_{color.id}-comment'] = ''
+        return payload
+
+    def test_double_submit_lot_is_gracefully_handled(self):
+        self.client.login(username='primary', password='testpass123')
+
+        resp1 = self.client.post(
+            reverse('inspections:lot_review', args=[self.lot.lot_id]),
+            self._lot_passing_payload(),
+            follow=True,
+        )
+        self.assertEqual(resp1.status_code, 200)
+        self.lot.refresh_from_db()
+        self.assertIn(self.lot.status, ['approved', 'rejected'])
+        final_status = self.lot.status
+
+        # Second POST should not 500; lot status should remain unchanged
+        resp2 = self.client.post(
+            reverse('inspections:lot_review', args=[self.lot.lot_id]),
+            self._lot_passing_payload(),
+            follow=True,
+        )
+        self.assertEqual(resp2.status_code, 200)
+        self.lot.refresh_from_db()
+        self.assertEqual(self.lot.status, final_status)
+
+
 class LotAcceptanceTests(TestCase):
     """Test Lot submission and review (single-stage, Primary Inspector only)"""
     
@@ -374,7 +628,8 @@ class LotAcceptanceTests(TestCase):
             spectral_reflectance_requirement='alpha',
             fa_lot_number='FA-LOT-001',
             date_of_printing=date.today(),
-            name_of_printer_representative='John Doe',
+            submitter_first_name='John',
+            submitter_last_name='Doe',
             status='approved'
         )
     
@@ -391,7 +646,8 @@ class LotAcceptanceTests(TestCase):
             number_of_samples=3,
             individual_sample_numbers='S1, S2, S3',
             date_of_printing=date.today(),
-            name_of_submitter='John Doe',
+            submitter_first_name='John',
+            submitter_last_name='Doe',
             original_fa=self.fa
         )
         self.assertEqual(lot.original_fa, self.fa)
@@ -401,6 +657,12 @@ class LotAcceptanceTests(TestCase):
         self.client.login(username='primary', password='testpass123')
         response = self.client.get(reverse('inspections:lot_review_queue'))
         self.assertEqual(response.status_code, 200)
+
+        response_htmx = self.client.get(
+            reverse('inspections:lot_review_queue'),
+            HTTP_HX_REQUEST='true'
+        )
+        self.assertEqual(response_htmx.status_code, 200)
     
     def test_final_inspector_cannot_review_lots(self):
         """Final Inspector should NOT be able to access lot review queue"""
@@ -415,6 +677,31 @@ class LotAcceptanceTests(TestCase):
         response = self.client.get(reverse('inspections:lot_review_queue'))
         # Should redirect with error
         self.assertEqual(response.status_code, 302)
+
+    def test_lot_detail_htmx_fragment_renders(self):
+        lot = LotAcceptance.objects.create(
+            vendor=self.partner.profile,
+            fabric_style='Test Fabric',
+            shade_standard='alpha',
+            spectral_reflectance_requirement='alpha',
+            original_fa_lot_number='FA-LOT-001',
+            lot_lot_number='LOT-HTMX-001',
+            number_of_yards_printed=1000,
+            number_of_samples=3,
+            individual_sample_numbers='S1, S2, S3',
+            date_of_printing=date.today(),
+            submitter_first_name='John',
+            submitter_last_name='Doe',
+            original_fa=self.fa
+        )
+
+        self.client.login(username='partner', password='testpass123')
+        response = self.client.get(
+            reverse('inspections:lot_detail', args=[lot.lot_id]),
+            HTTP_HX_REQUEST='true'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'badge-warning')
 
 
 class FASubmissionViewTests(TestCase):
@@ -456,10 +743,14 @@ class FASubmissionViewTests(TestCase):
             'fabric_style': 'Test Fabric 90200',
             'multicam_variant': self.camo.pk,
             'shade_standard': 'alpha',
+            'shade_standard_number': '',
             'spectral_reflectance_requirement': 'alpha',
             'fa_lot_number': 'LOT-TEST-001',
             'date_of_printing': date.today().isoformat(),
-            'name_of_printer_representative': 'John Doe',
+            'first_article_ship_date': '',
+            'tracking_number': '',
+            'submitter_first_name': 'John',
+            'submitter_last_name': 'Doe',
         })
         
         self.assertEqual(FirstArticleInspection.objects.count(), initial_count + 1)
@@ -474,12 +765,35 @@ class FASubmissionViewTests(TestCase):
             spectral_reflectance_requirement='alpha',
             fa_lot_number='LOT-001',
             date_of_printing=date.today(),
-            name_of_printer_representative='John Doe'
+            submitter_first_name='John',
+            submitter_last_name='Doe',
         )
         
         response = self.client.get(reverse('inspections:fa_list'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'My Fabric')
+
+    def test_fa_detail_htmx_fragment_renders(self):
+        fa = FirstArticleInspection.objects.create(
+            vendor=self.user.profile,
+            fabric_style='My Fabric',
+            multicam_variant=self.camo,
+            shade_standard='alpha',
+            spectral_reflectance_requirement='alpha',
+            fa_lot_number='LOT-HTMX-FA-001',
+            date_of_printing=date.today(),
+            submitter_first_name='John',
+            submitter_last_name='Doe',
+            status='pending',
+        )
+        response = self.client.get(
+            reverse('inspections:fa_detail', args=[fa.fai_id]),
+            HTTP_HX_REQUEST='true'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Submission Details')
+        # Should be no-store for authenticated HTML
+        self.assertIn('no-store', response.get('Cache-Control', ''))
 
 
 class DashboardAccessTests(TestCase):
@@ -521,18 +835,42 @@ class DashboardAccessTests(TestCase):
         self.client.login(username='partner', password='testpass123')
         response = self.client.get(reverse('dashboard:partner_dashboard'))
         self.assertEqual(response.status_code, 200)
+
+    def test_partner_dashboard_htmx_fragment_renders(self):
+        """Partner dashboard should render a valid HTMX fragment (for polling)."""
+        self.client.login(username='partner', password='testpass123')
+        response = self.client.get(reverse('dashboard:partner_dashboard'), HTTP_HX_REQUEST='true')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Submit First Article')
+        self.assertIn('no-store', response.get('Cache-Control', ''))
     
     def test_inspector_dashboard_access(self):
         """Inspectors should access inspector dashboard"""
         self.client.login(username='primary', password='testpass123')
         response = self.client.get(reverse('dashboard:inspector_dashboard'))
         self.assertEqual(response.status_code, 200)
+
+    def test_inspector_dashboard_htmx_fragment_renders(self):
+        """Inspector dashboard should render a valid HTMX fragment (for polling)."""
+        self.client.login(username='primary', password='testpass123')
+        response = self.client.get(reverse('dashboard:inspector_dashboard'), HTTP_HX_REQUEST='true')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'First Article Queue')
+        self.assertIn('no-store', response.get('Cache-Control', ''))
     
     def test_staff_dashboard_access(self):
         """Staff should access staff dashboard"""
         self.client.login(username='staff', password='testpass123')
         response = self.client.get(reverse('dashboard:staff_dashboard'))
         self.assertEqual(response.status_code, 200)
+
+    def test_staff_dashboard_htmx_fragment_renders(self):
+        """Staff dashboard should render a valid HTMX fragment (for polling)."""
+        self.client.login(username='staff', password='testpass123')
+        response = self.client.get(reverse('dashboard:staff_dashboard'), HTTP_HX_REQUEST='true')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Active Partners')
+        self.assertIn('no-store', response.get('Cache-Control', ''))
     
     def test_partner_redirected_from_inspector_dashboard(self):
         """Partner should be redirected from inspector dashboard"""
@@ -629,7 +967,8 @@ class FAEvaluationModelTests(TestCase):
             spectral_reflectance_requirement='alpha',
             fa_lot_number='EVAL-LOT-001',
             date_of_printing=date.today(),
-            name_of_printer_representative='Eval Tester'
+            submitter_first_name='Eval',
+            submitter_last_name='Tester',
         )
     
     def test_create_evaluation(self):
@@ -858,7 +1197,8 @@ class FAColorEvaluationModelTests(TestCase):
             spectral_reflectance_requirement='alpha',
             fa_lot_number='COLOR-LOT-001',
             date_of_printing=date.today(),
-            name_of_printer_representative='Color Tester'
+            submitter_first_name='Color',
+            submitter_last_name='Tester',
         )
         eval = FAEvaluation.objects.create(
             fa=fa,
@@ -964,7 +1304,8 @@ class LotEvaluationModelTests(TestCase):
             spectral_reflectance_requirement='alpha',
             fa_lot_number='FA-LOT-001',
             date_of_printing=date.today(),
-            name_of_printer_representative='John Doe',
+            submitter_first_name='John',
+            submitter_last_name='Doe',
             status='approved'
         )
         
@@ -979,7 +1320,8 @@ class LotEvaluationModelTests(TestCase):
             number_of_samples=3,
             individual_sample_numbers='PROD-LOT-001-1, PROD-LOT-001-2, PROD-LOT-001-3',
             date_of_printing=date.today(),
-            name_of_submitter='John Doe',
+            submitter_first_name='John',
+            submitter_last_name='Doe',
             original_fa=self.fa
         )
     
@@ -1008,7 +1350,8 @@ class LotEvaluationModelTests(TestCase):
             number_of_samples=2,
             individual_sample_numbers='',  # Empty, should auto-generate
             date_of_printing=date.today(),
-            name_of_submitter='John Doe',
+            submitter_first_name='John',
+            submitter_last_name='Doe',
             original_fa=self.fa
         )
         self.assertIn('AUTO-LOT-001-1', lot.individual_sample_numbers)
@@ -1219,7 +1562,8 @@ class FAEvaluationPersistenceTests(TestCase):
             spectral_reflectance_requirement='alpha',
             fa_lot_number='LOT-001',
             date_of_printing=date.today(),
-            name_of_printer_representative='John Doe',
+            submitter_first_name='John',
+            submitter_last_name='Doe',
             status='pending'
         )
     
@@ -1298,7 +1642,7 @@ class FAEvaluationPersistenceTests(TestCase):
             self.assertTrue(color_eval.is_passing)
     
     def test_evaluation_visible_after_rejection(self):
-        """Evaluation should be visible and editable after FA is rejected"""
+        """Rejected FAs should be visible to inspectors, but remain read-only (status is final)."""
         # Create a submitted (failed) evaluation
         evaluation = FAEvaluation.objects.create(
             fa=self.fa,
@@ -1329,8 +1673,8 @@ class FAEvaluationPersistenceTests(TestCase):
         
         self.assertEqual(response.status_code, 200)
         
-        # Inspectors can always edit - not read-only
-        self.assertFalse(response.context['is_read_only'])
+        # Completed FAs are read-only
+        self.assertTrue(response.context['is_read_only'])
         self.assertTrue(response.context['is_completed'])
         
         # Should have the evaluation data

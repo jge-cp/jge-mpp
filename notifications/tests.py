@@ -124,6 +124,35 @@ class NotificationViewTest(TestCase):
         """Test the notification dropdown HTMX endpoint."""
         response = self.client.get(reverse('notifications:dropdown'))
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Notifications')
+
+    def test_notification_dropdown_shows_mark_all_read_when_unread(self):
+        """Dropdown should show 'Mark all read' link when unread notifications exist."""
+        Notification.objects.create(
+            recipient=self.user,
+            channel='in_app',
+            notification_type='fa_submitted',
+            title='Test',
+            message='Test',
+            status='sent'
+        )
+        response = self.client.get(reverse('notifications:dropdown'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Mark all read')
+
+    def test_notification_badge_view(self):
+        """Test the notification badge HTMX endpoint."""
+        Notification.objects.create(
+            recipient=self.user,
+            channel='in_app',
+            notification_type='fa_submitted',
+            title='Test',
+            message='Test',
+            status='sent'
+        )
+        response = self.client.get(reverse('notifications:badge'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'bg-red-500')
     
     def test_mark_all_read_view(self):
         """Test the mark all read view."""

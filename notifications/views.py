@@ -30,15 +30,29 @@ def notification_list(request):
 
 
 @login_required
+def notification_badge(request):
+    """
+    HTMX endpoint for unread notification badge.
+    Returns a small fragment that can be polled to update the bell count.
+    """
+    unread_count = NotificationService.get_unread_count(request.user)
+    return render(request, 'notifications/badge.html', {
+        'unread_notification_count': unread_count,
+    })
+
+
+@login_required
 def notification_dropdown(request):
     """
     HTMX endpoint for the notification dropdown.
     Returns recent notifications for the bell dropdown menu.
     """
     notifications = NotificationService.get_recent_notifications(request.user, limit=5)
-    
+    unread_count = NotificationService.get_unread_count(request.user)
+
     return render(request, 'notifications/dropdown.html', {
         'notifications': notifications,
+        'unread_notification_count': unread_count,
     })
 
 

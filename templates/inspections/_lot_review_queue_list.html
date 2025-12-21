@@ -1,0 +1,33 @@
+<ul class="divide-y border-theme">
+  {% for lot in pending_lots %}
+    <li>
+      <a href="{% url 'inspections:lot_review' lot.lot_id %}" class="block hover:bg-elevated p-4">
+        <div class="flex items-center justify-between">
+          <p class="text-sm font-medium text-blue-600 truncate">
+            {{ lot.display_name }}
+          </p>
+          <div class="ml-2 flex-shrink-0 flex flex-col items-end">
+            <span class="badge-warning">Ready for Review</span>
+            <span class="text-xs text-yellow-600 mt-1">Waiting {{ lot.submission_date|timesince }}</span>
+          </div>
+        </div>
+        <div class="mt-2 sm:flex sm:justify-between">
+          <div class="sm:flex">
+            <p class="flex items-center text-sm text-muted">
+              <span class="font-medium">{{ lot.vendor.company_name }}</span> | Lot #: {{ lot.lot_lot_number }} | {{ lot.number_of_yards_printed }} yards | {{ lot.number_of_samples }} samples
+            </p>
+          </div>
+          <div class="mt-2 flex items-center text-sm text-muted sm:mt-0">
+            <p>{{ lot.original_fa.multicam_variant.camouflage_name }} | {{ lot.submission_date|date:"M d, Y" }}</p>
+          </div>
+        </div>
+      </a>
+    </li>
+  {% empty %}
+    <li class="px-4 py-4">
+      <p class="text-muted">No pending lot submissions.</p>
+    </li>
+  {% endfor %}
+</ul>
+
+

@@ -8,6 +8,7 @@ app_name = 'notifications'
 
 urlpatterns = [
     path('', views.notification_list, name='list'),
+    path('badge/', views.notification_badge, name='badge'),
     path('dropdown/', views.notification_dropdown, name='dropdown'),
     path('<int:notification_id>/', views.notification_detail, name='detail'),
     path('<int:notification_id>/read/', views.mark_notification_read, name='mark_read'),

@@ -124,11 +124,13 @@ railway run python manage.py createsuperuser
 
 ## Post-Deployment
 
-### Import Printers
+### Import Partners
 
 ```bash
-railway run python manage.py import_printers printers_import.csv
+railway run python manage.py import_printers partners_import.csv
 ```
+
+> Note: the management command is named `import_printers` for legacy reasons, but it imports **Partners**.
 
 ### Import Historical Data (After Export from Google Sheets)
 
