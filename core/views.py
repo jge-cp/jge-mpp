@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.db.models import Count
 from django.utils import timezone
 from .models import RawMaterialArticle, TechnicalDataSheet, CamouflageType, MarketingOrder
+from .file_validation import validate_upload, FileValidationError
 from accounts.models import UserProfile
 from inspections.models import FirstArticleInspection
 
@@ -98,9 +99,17 @@ def rm_new_article(request):
         if camouflage_ids:
             article.approved_camouflages.set(camouflage_ids)
         
-        # Handle TDS upload if provided
+        # Handle TDS upload if provided (with server-side validation)
         tds_file = request.FILES.get('tds_file')
         if tds_file:
+            try:
+                validate_upload(tds_file)
+            except FileValidationError as e:
+                messages.error(request, f'File upload error: {e.message}')
+                return render(request, 'core/rm_new_article.html', {
+                    'camouflages': CamouflageType.objects.filter(status='active'),
+                })
+            
             TechnicalDataSheet.objects.create(
                 article=article,
                 file=tds_file,
@@ -172,6 +181,13 @@ def rm_upload_tds(request):
             if article.supplier != profile:
                 messages.error(request, 'You can only upload TDS for your own articles.')
                 return redirect('core:rm_upload_tds')
+        
+        # Validate file before saving
+        try:
+            validate_upload(tds_file)
+        except FileValidationError as e:
+            messages.error(request, f'File upload error: {e.message}')
+            return render(request, 'core/rm_upload_tds.html', {'articles': articles})
         
         TechnicalDataSheet.objects.create(
             article=article,

@@ -6,6 +6,7 @@ from django.db.models import Count, Q, Sum
 from datetime import timedelta
 from inspections.models import FirstArticleInspection, LotAcceptance, MonthlyReport
 from accounts.models import UserProfile
+from inspections.listing import parse_list_filters, build_fa_queryset, build_lot_queryset, submitted_by_options_for_inspector, company_options_for_inspector
 
 
 def get_or_create_profile(user):
@@ -104,30 +105,60 @@ def inspector_dashboard(request):
     is_primary = profile.is_primary_inspector()
     is_final = profile.is_final_inspector()
     
-    # === Queue Stats based on inspector type ===
+    # === Parse filters and build querysets ===
+    # Use separate parameter namespaces for FA and Lot filters
+    fa_params = {k.replace('fa_', ''): v for k, v in request.GET.items() if k.startswith('fa_')}
+    lot_params = {k.replace('lot_', ''): v for k, v in request.GET.items() if k.startswith('lot_')}
+    
+    fa_filters = parse_list_filters(fa_params)
+    lot_filters = parse_list_filters(lot_params)
+    
+    # Base querysets depending on inspector type
     if is_primary:
-        # Primary Inspector sees pending FAs and all lots
+        # Primary Inspector sees pending FAs and all pending lots
+        fa_base = FirstArticleInspection.objects.filter(status='pending').select_related('vendor', 'company', 'multicam_variant')
+        lot_base = LotAcceptance.objects.filter(status='pending').select_related('vendor', 'company', 'original_fa__multicam_variant')
         fa_pending = FirstArticleInspection.objects.filter(status='pending').count()
         fa_pending_final = FirstArticleInspection.objects.filter(status='pending_final').count()
         lot_pending = LotAcceptance.objects.filter(status='pending').count()
-        
-        # Priority queue (oldest first)
-        priority_fas = FirstArticleInspection.objects.filter(
-            status='pending'
-        ).select_related('vendor').order_by('submission_date')[:10]
-        priority_lots = LotAcceptance.objects.filter(
-            status='pending'
-        ).select_related('vendor').order_by('submission_date')[:10]
     else:
         # Final Inspector sees pending_final FAs only
+        fa_base = FirstArticleInspection.objects.filter(status='pending_final').select_related('vendor', 'company', 'multicam_variant')
+        lot_base = LotAcceptance.objects.none()
         fa_pending = 0
         fa_pending_final = FirstArticleInspection.objects.filter(status='pending_final').count()
         lot_pending = 0
-        
-        priority_fas = FirstArticleInspection.objects.filter(
-            status='pending_final'
-        ).select_related('vendor').order_by('submission_date')[:10]
-        priority_lots = []
+    
+    # Apply filters
+    fas = build_fa_queryset(profile, fa_filters, base_qs=fa_base)
+    lots = build_lot_queryset(profile, lot_filters, base_qs=lot_base)
+    
+    # Filter options for dropdowns
+    fa_status_options = [
+        ('pending', 'Awaiting Primary'),
+        ('pending_final', 'Awaiting Final'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+    lot_status_options = [
+        ('pending', 'Awaiting Review'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+    fa_submitted_by_options = submitted_by_options_for_inspector()
+    fa_company_options = company_options_for_inspector()
+    lot_submitted_by_options = submitted_by_options_for_inspector()
+    lot_company_options = company_options_for_inspector()
+    
+    # Clear URLs - preserve the other section's filters when clearing one section
+    fa_clear_url = request.path + '?' + '&'.join(f"{k}={v}" for k, v in request.GET.items() if k.startswith('lot_'))
+    lot_clear_url = request.path + '?' + '&'.join(f"{k}={v}" for k, v in request.GET.items() if k.startswith('fa_'))
+    
+    # Remove trailing ? if no params
+    if fa_clear_url.endswith('?'):
+        fa_clear_url = request.path
+    if lot_clear_url.endswith('?'):
+        lot_clear_url = request.path
     
     # === Overall Stats ===
     total_partners = UserProfile.objects.filter(user_functionality='partner').count()
@@ -218,8 +249,21 @@ def inspector_dashboard(request):
         'fa_pending': fa_pending,
         'fa_pending_final': fa_pending_final,
         'lot_pending': lot_pending,
-        'priority_fas': priority_fas,
-        'priority_lots': priority_lots,
+        # Filtered querysets
+        'fas': fas,
+        'lots': lots,
+        # Filter context for FA
+        'fa_filters': fa_filters,
+        'fa_status_options': fa_status_options,
+        'fa_submitted_by_options': fa_submitted_by_options,
+        'fa_company_options': fa_company_options,
+        'fa_clear_url': fa_clear_url,
+        # Filter context for Lot
+        'lot_filters': lot_filters,
+        'lot_status_options': lot_status_options,
+        'lot_submitted_by_options': lot_submitted_by_options,
+        'lot_company_options': lot_company_options,
+        'lot_clear_url': lot_clear_url,
         # User stats
         'total_partners': total_partners,
         'active_partners': active_partners,
@@ -236,7 +280,32 @@ def inspector_dashboard(request):
     }
     
     if getattr(request, "htmx", False):
-        return render(request, 'dashboard/_inspector_dashboard_live.html', context)
+        htmx_target = getattr(request.htmx, 'target', None)
+        
+        # Return only the specific partial based on HTMX target
+        if htmx_target == 'fa-queue-results':
+            return render(request, 'partials/submissions/_results.html', {
+                'items': fas,
+                'kind': 'fa',
+                'mode': 'queue',
+                'row_url': 'inspections:fa_review',
+                'is_inspector': True,
+                'show_company_column': True,
+                'empty_text': 'No First Articles in queue',
+            })
+        elif htmx_target == 'lot-queue-results':
+            return render(request, 'partials/submissions/_results.html', {
+                'items': lots,
+                'kind': 'lot',
+                'mode': 'queue',
+                'row_url': 'inspections:lot_review',
+                'is_inspector': True,
+                'show_company_column': True,
+                'empty_text': 'No Lots in queue',
+            })
+        else:
+            # Default: return full dashboard fragment
+            return render(request, 'dashboard/_inspector_dashboard_live.html', context)
     return render(request, 'dashboard/inspector_dashboard.html', context)
 
 

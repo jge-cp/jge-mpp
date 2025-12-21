@@ -49,30 +49,32 @@
     </div>
 
     <div class="space-y-3">
+        {% load inspections_ui %}
         {% for fa in recent_fas %}
-            <div class="flex items-center justify-between p-3 rounded-lg border" style="background-color: var(--color-bg-elevated); border-color: var(--color-border);">
-                <div class="flex items-center space-x-3">
-                    <div class="icon-container w-10 h-10 bg-primary-100 dark:bg-primary-900/30 border-primary-200 dark:border-primary-700">
-                        <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
+            {% fa_status_meta fa "dashboard" as meta %}
+            <a href="{% url 'inspections:fa_detail' fa.fai_id %}" class="block group">
+                <div class="flex items-center justify-between p-3 rounded-lg border hover:shadow-sm transition-all" style="background-color: var(--color-bg-elevated); border-color: var(--color-border);">
+                    <div class="flex items-center space-x-3">
+                        <div class="icon-container w-10 h-10 bg-primary-100 dark:bg-primary-900/30 border-primary-200 dark:border-primary-700">
+                            <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="font-medium group-hover:text-primary-600">
+                                {{ fa.display_name }}
+                            </div>
+                            <p class="text-sm text-muted">FA Lot #: {{ fa.fa_lot_number }}</p>
+                        </div>
                     </div>
-                    <div>
-                        <a href="{% url 'inspections:fa_detail' fa.fai_id %}" class="font-medium hover:text-primary-600">
-                            {{ fa.display_name }}
-                        </a>
-                        <p class="text-sm text-muted">FA Lot #: {{ fa.fa_lot_number }}</p>
+                    <div class="text-right">
+                        <span class="badge {{ meta.badge_variant }}">{{ meta.badge_label }}</span>
+                        {% if meta.subtext %}
+                            <p class="text-xs {{ meta.subtext_class }} mt-1">{{ meta.subtext }}</p>
+                        {% endif %}
                     </div>
                 </div>
-                <div class="text-right">
-                    <span class="badge {% if fa.status == 'approved' %}badge-approved{% elif fa.status == 'rejected' %}badge-rejected{% elif fa.status == 'pending_final' %}badge-pending-final{% else %}badge-pending{% endif %}">
-                        {% if fa.status == 'approved' %}✓ Approved{% elif fa.status == 'rejected' %}✗ Rejected{% elif fa.status == 'pending_final' %}Awaiting Final{% else %}Awaiting Primary{% endif %}
-                    </span>
-                    <p class="text-xs {% if fa.status == 'approved' %}text-green-600{% elif fa.status == 'rejected' %}text-red-600{% elif fa.status == 'pending_final' %}text-blue-600{% else %}text-yellow-600{% endif %} mt-1">
-                        {% if fa.status == 'approved' %}Passed Both Reviews{% elif fa.status == 'rejected' %}{% if fa.final_inspector %}Failed Final{% else %}Failed Primary{% endif %}{% elif fa.status == 'pending_final' %}✓ Passed Primary{% else %}{{ fa.submission_date|timesince }} ago{% endif %}
-                    </p>
-                </div>
-            </div>
+            </a>
         {% empty %}
             <div class="text-center py-8">
                 <svg class="w-12 h-12 mx-auto text-muted mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -83,29 +85,30 @@
         {% endfor %}
 
         {% for lot in recent_lots %}
-            <div class="flex items-center justify-between p-3 rounded-lg border" style="background-color: var(--color-bg-elevated); border-color: var(--color-border);">
-                <div class="flex items-center space-x-3">
-                    <div class="icon-container w-10 h-10 bg-green-100 dark:bg-green-900/30 border-green-200 dark:border-green-700">
-                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                        </svg>
+            {% lot_status_meta lot "dashboard" as meta %}
+            <a href="{% url 'inspections:lot_detail' lot.lot_id %}" class="block group">
+                <div class="flex items-center justify-between p-3 rounded-lg border hover:shadow-sm transition-all" style="background-color: var(--color-bg-elevated); border-color: var(--color-border);">
+                    <div class="flex items-center space-x-3">
+                        <div class="icon-container w-10 h-10 bg-green-100 dark:bg-green-900/30 border-green-200 dark:border-green-700">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="font-medium group-hover:text-green-600">
+                                {{ lot.display_name }}
+                            </div>
+                            <p class="text-sm text-muted">Lot #: {{ lot.lot_lot_number }} - {{ lot.number_of_yards_printed }} yards</p>
+                        </div>
                     </div>
-                    <div>
-                        <a href="{% url 'inspections:lot_detail' lot.lot_id %}" class="font-medium hover:text-green-600">
-                            {{ lot.display_name }}
-                        </a>
-                        <p class="text-sm text-muted">Lot #: {{ lot.lot_lot_number }} - {{ lot.number_of_yards_printed }} yards</p>
+                    <div class="text-right">
+                        <span class="badge {{ meta.badge_variant }}">{{ meta.badge_label }}</span>
+                        {% if meta.subtext %}
+                            <p class="text-xs {{ meta.subtext_class }} mt-1">{{ meta.subtext }}</p>
+                        {% endif %}
                     </div>
                 </div>
-                <div class="text-right">
-                    <span class="badge {% if lot.status == 'approved' %}badge-approved{% elif lot.status == 'rejected' %}badge-rejected{% else %}badge-pending{% endif %}">
-                        {% if lot.status == 'approved' %}✓ Approved{% elif lot.status == 'rejected' %}✗ Rejected{% else %}Awaiting Review{% endif %}
-                    </span>
-                    <p class="text-xs {% if lot.status == 'approved' %}text-green-600{% elif lot.status == 'rejected' %}text-red-600{% else %}text-yellow-600{% endif %} mt-1">
-                        {% if lot.status == 'approved' %}Ready for Production{% elif lot.status == 'rejected' %}See Review Comments{% else %}{{ lot.submission_date|timesince }} ago{% endif %}
-                    </p>
-                </div>
-            </div>
+            </a>
         {% endfor %}
     </div>
 </div>

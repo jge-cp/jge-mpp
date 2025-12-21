@@ -5,55 +5,11 @@
 {% block content %}
 <div class="px-4 py-6">
     <h1 class="text-3xl font-bold mb-6">First Article Submissions</h1>
-    
-    <div class="card overflow-hidden">
-        <ul class="divide-y border-theme">
-            {% for fa in fas %}
-                <li>
-                    <a href="{% url 'inspections:fa_detail' fa.fai_id %}" class="block hover:bg-elevated p-4">
-                        <div class="flex items-center justify-between">
-                            <p class="text-sm font-medium text-blue-600 truncate">
-                                {{ fa.display_name }}
-                            </p>
-                            <div class="ml-2 flex-shrink-0 flex flex-col items-end">
-                                {% if fa.status == 'approved' %}
-                                    <span class="badge-success">✓ Fully Approved</span>
-                                    <span class="text-xs text-green-600 mt-1">Passed Primary & Final Review</span>
-                                {% elif fa.status == 'rejected' %}
-                                    <span class="badge-danger">✗ Rejected</span>
-                                    <span class="text-xs text-red-600 mt-1">
-                                        {% if fa.final_inspector %}at Final Review{% else %}at Primary Review{% endif %}
-                                    </span>
-                                {% elif fa.status == 'pending_final' %}
-                                    <span class="badge-info">Awaiting Final Review</span>
-                                    <span class="text-xs text-blue-600 mt-1">✓ Passed Primary Review</span>
-                                {% else %}
-                                    <span class="badge-warning">Awaiting Primary Review</span>
-                                    <span class="text-xs text-yellow-600 mt-1">Submitted {{ fa.submission_date|timesince }} ago</span>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="mt-2 sm:flex sm:justify-between">
-                            <div class="sm:flex">
-                                <p class="flex items-center text-sm text-muted">
-                                    <span class="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-xs px-2 py-0.5 rounded mr-2">Attempt #{{ fa.current_attempt }}</span>
-                                    FA Lot #: {{ fa.fa_lot_number }} | {{ fa.vendor.company_name }}
-                                </p>
-                            </div>
-                            <div class="mt-2 flex items-center text-sm text-muted sm:mt-0">
-                                <p>
-                                    {{ fa.multicam_variant.camouflage_name }} | {{ fa.submission_date|date:"M d, Y" }}
-                                </p>
-                            </div>
-                        </div>
-                    </a>
-                </li>
-            {% empty %}
-                <li class="px-4 py-4">
-                    <p class="text-muted">No First Article submissions yet.</p>
-                </li>
-            {% endfor %}
-        </ul>
+
+    {% include 'partials/submissions/_list_filters.html' %}
+
+    <div id="list-results">
+        {% include 'partials/submissions/_results.html' with items=items kind=kind mode=mode row_url=row_url is_inspector=is_inspector show_company_column=show_company_column empty_text=empty_text %}
     </div>
 </div>
 {% endblock %}

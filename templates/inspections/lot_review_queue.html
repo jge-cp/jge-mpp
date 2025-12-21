@@ -5,16 +5,17 @@
 {% block content %}
 <div class="px-4 py-6">
     <h1 class="text-3xl font-bold mb-6">Lot Review Queue</h1>
-    
-    <div class="card overflow-hidden">
-        <div
-            id="lot-queue-list"
-            hx-get="{% url 'inspections:lot_review_queue' %}"
-            hx-trigger="load, every 10s"
-            hx-swap="innerHTML"
-        >
-            {% include 'inspections/_lot_review_queue_list.html' %}
-        </div>
+
+    {% include 'partials/submissions/_list_filters.html' %}
+
+    <div
+        id="list-results"
+        hx-get="{% url 'inspections:lot_review_queue' %}"
+        hx-trigger="load, every 10s"
+        hx-swap="innerHTML"
+        hx-include="#filters-form"
+    >
+        {% include 'partials/submissions/_results.html' with items=items kind=kind mode=mode row_url=row_url is_inspector=is_inspector show_company_column=show_company_column empty_text=empty_text %}
     </div>
 </div>
 {% endblock %}

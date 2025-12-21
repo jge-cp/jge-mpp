@@ -3,12 +3,7 @@
 {% block title %}Inspector Dashboard - Multicam Partner Portal{% endblock %}
 
 {% block dashboard_content %}
-    <div
-        id="inspector-dashboard-live"
-        hx-get="{% url 'dashboard:inspector_dashboard' %}"
-        hx-trigger="every 10s"
-        hx-swap="innerHTML"
-    >
+    <div id="inspector-dashboard-live">
         {% include 'dashboard/_inspector_dashboard_live.html' %}
     </div>
 {% endblock %}

@@ -14,6 +14,17 @@ from .forms import (
     FAEvaluationForm, FAColorEvaluationForm, create_color_evaluation_formset,
     LotEvaluationForm, LotSampleEvaluationForm, LotSampleColorEvaluationForm
 )
+from core.file_validation import validate_uploads, FileValidationError
+from .listing import (
+    parse_list_filters,
+    FA_STATUS_OPTIONS,
+    LOT_STATUS_OPTIONS,
+    build_fa_queryset,
+    build_lot_queryset,
+    submitted_by_options_for_partner,
+    submitted_by_options_for_inspector,
+    company_options_for_inspector,
+)
 
 
 @login_required
@@ -36,18 +47,26 @@ def fa_submit(request):
             fa.submitted = True
             fa.save()
             
-            # Handle file uploads if any
+            # Handle file uploads if any (with server-side validation)
             if 'submission_documents' in request.FILES:
+                files = request.FILES.getlist('submission_documents')
+                try:
+                    # Validate all files before saving any
+                    validate_uploads(files)
+                except FileValidationError as e:
+                    messages.error(request, f'File upload error: {e.message}')
+                    return render(request, 'inspections/fa_submit.html', {'form': form})
+                
                 from core.models import FileUpload
-                for file in request.FILES.getlist('submission_documents'):
+                for file in files:
                     file_upload = FileUpload.objects.create(
                         uploaded_by=request.user,
                         file=file,
                         file_name=file.name,
-                        file_type=file.name.split('.')[-1],
+                        file_type=file.name.split('.')[-1].lower(),
                         file_size=file.size,
                         related_to_model='FirstArticleInspection',
-                        related_to_id=fa.pk,
+                        related_to_id=fa.fai_id,
                     )
                     fa.submission_documents.add(file_upload)
             
@@ -75,18 +94,35 @@ def fa_list(request):
             technical_email=request.user.email,
         )
     
-    # Partners see their company's FAs (all employees see company submissions)
-    # Inspectors/staff see all
-    if profile.is_partner():
-        if profile.company:
-            fas = FirstArticleInspection.objects.filter(company=profile.company).order_by('-submission_date')
-        else:
-            # Fallback for legacy users without company FK
-            fas = FirstArticleInspection.objects.filter(vendor=profile).order_by('-submission_date')
-    else:
-        fas = FirstArticleInspection.objects.select_related('vendor', 'company').order_by('-submission_date')
-    
-    return render(request, 'inspections/fa_list.html', {'fas': fas, 'profile': profile})
+    filters = parse_list_filters(request.GET)
+    fas = build_fa_queryset(profile, filters)
+
+    is_inspector = not profile.is_partner()
+    submitted_by_options = submitted_by_options_for_partner(profile) if profile.is_partner() else submitted_by_options_for_inspector()
+    company_options = company_options_for_inspector() if is_inspector else []
+
+    context = {
+        'profile': profile,
+        'filters': filters.__dict__,
+        'status_options': FA_STATUS_OPTIONS,
+        'submitted_by_options': submitted_by_options,
+        'company_options': company_options,
+        'show_status_filter': True,
+        'show_submitted_by_filter': True,
+        'show_company_filter': is_inspector,
+        'show_date_filters': True,
+        'clear_url': request.path,
+        'items': fas,
+        'kind': 'fa',
+        'mode': 'list',
+        'row_url': 'inspections:fa_detail',
+        'is_inspector': is_inspector,
+        'show_company_column': is_inspector,
+        'empty_text': 'No First Article submissions yet.',
+    }
+    if request.headers.get('HX-Request'):
+        return render(request, 'partials/submissions/_results.html', context)
+    return render(request, 'inspections/fa_list.html', context)
 
 
 @login_required
@@ -349,18 +385,35 @@ def lot_list(request):
             technical_email=request.user.email,
         )
     
-    # Partners see their company's Lots (all employees see company submissions)
-    # Inspectors/staff see all
-    if profile.is_partner():
-        if profile.company:
-            lots = LotAcceptance.objects.filter(company=profile.company).order_by('-submission_date')
-        else:
-            # Fallback for legacy users without company FK
-            lots = LotAcceptance.objects.filter(vendor=profile).order_by('-submission_date')
-    else:
-        lots = LotAcceptance.objects.select_related('vendor', 'company').order_by('-submission_date')
-    
-    return render(request, 'inspections/lot_list.html', {'lots': lots, 'profile': profile})
+    filters = parse_list_filters(request.GET)
+    lots = build_lot_queryset(profile, filters)
+
+    is_inspector = not profile.is_partner()
+    submitted_by_options = submitted_by_options_for_partner(profile) if profile.is_partner() else submitted_by_options_for_inspector()
+    company_options = company_options_for_inspector() if is_inspector else []
+
+    context = {
+        'profile': profile,
+        'filters': filters.__dict__,
+        'status_options': LOT_STATUS_OPTIONS,
+        'submitted_by_options': submitted_by_options,
+        'company_options': company_options,
+        'show_status_filter': True,
+        'show_submitted_by_filter': True,
+        'show_company_filter': is_inspector,
+        'show_date_filters': True,
+        'clear_url': request.path,
+        'items': lots,
+        'kind': 'lot',
+        'mode': 'list',
+        'row_url': 'inspections:lot_detail',
+        'is_inspector': is_inspector,
+        'show_company_column': is_inspector,
+        'empty_text': 'No lot submissions yet.',
+    }
+    if request.headers.get('HX-Request'):
+        return render(request, 'partials/submissions/_results.html', context)
+    return render(request, 'inspections/lot_list.html', context)
 
 
 @login_required
@@ -430,15 +483,35 @@ def fa_review_queue_primary(request):
     if not profile or not (profile.is_primary_inspector() or profile.admin_role == 'full_admin'):
         messages.error(request, 'You do not have permission to access this page.')
         return redirect('dashboard:partner_dashboard')
-    
-    pending_fas = FirstArticleInspection.objects.filter(status='pending').order_by('submission_date')
+
+    filters = parse_list_filters(request.GET)
+    base_qs = FirstArticleInspection.objects.filter(status='pending')
+    pending_fas = build_fa_queryset(profile, filters, base_qs=base_qs)
+
     context = {
         'pending_fas': pending_fas,
         'queue_type': 'primary',
         'queue_title': 'Primary Review Queue',
+        'filters': filters.__dict__,
+        'status_options': [],
+        'submitted_by_options': submitted_by_options_for_inspector(),
+        'company_options': company_options_for_inspector(),
+        'show_status_filter': False,
+        'show_submitted_by_filter': True,
+        'show_company_filter': True,
+        'show_date_filters': True,
+        'clear_url': request.path,
+        # shared results config
+        'items': pending_fas,
+        'kind': 'fa',
+        'mode': 'queue',
+        'row_url': 'inspections:fa_review',
+        'is_inspector': True,
+        'show_company_column': True,
+        'empty_text': 'No pending First Article submissions.',
     }
     if request.headers.get('HX-Request'):
-        return render(request, 'inspections/_fa_review_queue_list.html', context)
+        return render(request, 'partials/submissions/_results.html', context)
     return render(request, 'inspections/fa_review_queue.html', context)
 
 
@@ -449,19 +522,41 @@ def fa_review_queue_final(request):
     if not profile or not (profile.is_final_inspector() or profile.admin_role == 'full_admin'):
         messages.error(request, 'You do not have permission to access this page.')
         return redirect('dashboard:partner_dashboard')
-    
-    pending_fas = FirstArticleInspection.objects.filter(status='pending_final').order_by('submission_date')
-    # Also show rejected FAs for visibility (read-only)
-    rejected_fas = FirstArticleInspection.objects.filter(status='rejected').order_by('-updated_at')[:10]
-    
+
+    filters = parse_list_filters(request.GET)
+    base_qs = FirstArticleInspection.objects.filter(status='pending_final')
+    pending_fas = build_fa_queryset(profile, filters, base_qs=base_qs)
+
+    # Also show rejected FAs for visibility (read-only) - not filtered
+    rejected_fas = FirstArticleInspection.objects.filter(status='rejected').select_related(
+        "vendor", "vendor__user", "company", "multicam_variant"
+    ).order_by('-updated_at')[:10]
+
     context = {
         'pending_fas': pending_fas,
         'rejected_fas': rejected_fas,
         'queue_type': 'final',
         'queue_title': 'Final Review Queue',
+        'filters': filters.__dict__,
+        'status_options': [],
+        'submitted_by_options': submitted_by_options_for_inspector(),
+        'company_options': company_options_for_inspector(),
+        'show_status_filter': False,
+        'show_submitted_by_filter': True,
+        'show_company_filter': True,
+        'show_date_filters': True,
+        'clear_url': request.path,
+        # shared results config
+        'items': pending_fas,
+        'kind': 'fa',
+        'mode': 'queue',
+        'row_url': 'inspections:fa_review',
+        'is_inspector': True,
+        'show_company_column': True,
+        'empty_text': 'No pending First Article submissions.',
     }
     if request.headers.get('HX-Request'):
-        return render(request, 'inspections/_fa_review_queue_list.html', context)
+        return render(request, 'partials/submissions/_results.html', context)
     return render(request, 'inspections/fa_review_queue.html', context)
 
 
@@ -813,11 +908,32 @@ def lot_review_queue(request):
     if not profile or not profile.is_primary_inspector():
         messages.error(request, 'Only Primary Inspectors can review lots.')
         return redirect('dashboard:partner_dashboard')
-    
-    pending_lots = LotAcceptance.objects.filter(status='pending').order_by('submission_date')
-    context = {'pending_lots': pending_lots}
+
+    filters = parse_list_filters(request.GET)
+    base_qs = LotAcceptance.objects.filter(status='pending')
+    pending_lots = build_lot_queryset(profile, filters, base_qs=base_qs)
+
+    context = {
+        'pending_lots': pending_lots,
+        'filters': filters.__dict__,
+        'submitted_by_options': submitted_by_options_for_inspector(),
+        'company_options': company_options_for_inspector(),
+        'show_status_filter': False,
+        'show_submitted_by_filter': True,
+        'show_company_filter': True,
+        'show_date_filters': True,
+        'clear_url': request.path,
+        # shared results config
+        'items': pending_lots,
+        'kind': 'lot',
+        'mode': 'queue',
+        'row_url': 'inspections:lot_review',
+        'is_inspector': True,
+        'show_company_column': True,
+        'empty_text': 'No pending lot submissions.',
+    }
     if request.headers.get('HX-Request'):
-        return render(request, 'inspections/_lot_review_queue_list.html', context)
+        return render(request, 'partials/submissions/_results.html', context)
     return render(request, 'inspections/lot_review_queue.html', context)
 
 

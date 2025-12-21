@@ -5,17 +5,25 @@
 {% block content %}
 <div class="px-4 py-6">
     <h1 class="text-3xl font-bold mb-6">First Article Review Queue</h1>
-    
-    <div class="card overflow-hidden">
-        <div
-            id="fa-queue-list"
-            hx-get="{% if queue_type == 'final' %}{% url 'inspections:fa_review_queue_final' %}{% else %}{% url 'inspections:fa_review_queue_primary' %}{% endif %}"
-            hx-trigger="load, every 10s"
-            hx-swap="innerHTML"
-        >
-            {% include 'inspections/_fa_review_queue_list.html' %}
-        </div>
+
+    {% include 'partials/submissions/_list_filters.html' %}
+
+    <div
+        id="list-results"
+        hx-get="{% if queue_type == 'final' %}{% url 'inspections:fa_review_queue_final' %}{% else %}{% url 'inspections:fa_review_queue_primary' %}{% endif %}"
+        hx-trigger="load, every 10s"
+        hx-swap="innerHTML"
+        hx-include="#filters-form"
+    >
+        {% include 'partials/submissions/_results.html' with items=items kind=kind mode=mode row_url=row_url is_inspector=is_inspector show_company_column=show_company_column empty_text=empty_text %}
     </div>
+
+    {% if queue_type == 'final' and rejected_fas %}
+      <div class="mt-8">
+        <h2 class="text-xl font-bold mb-4">Recently Rejected (Visibility)</h2>
+        {% include 'partials/submissions/_results.html' with items=rejected_fas kind='fa' mode='list' row_url='inspections:fa_review' is_inspector=True show_company_column=True empty_text='No rejected FAs.' %}
+      </div>
+    {% endif %}
 </div>
 {% endblock %}
 

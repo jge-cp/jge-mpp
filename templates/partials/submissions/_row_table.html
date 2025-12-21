@@ -1,0 +1,66 @@
+{% load inspections_ui %}
+{% if kind == 'fa' %}
+  {% fa_status_meta item mode as meta %}
+  <tr class="hover:bg-elevated relative cursor-pointer">
+    <td class="px-3 py-3">
+      <a href="{% url row_url item.fai_id %}" class="absolute inset-0" aria-label="Open {{ item.display_name }}"></a>
+      <div>
+        <div class="font-medium text-primary-600 truncate">{{ item.display_name }}</div>
+        <div class="text-xs text-muted truncate">FA Lot #: {{ item.fa_lot_number }}{% if item.multicam_variant %} • {{ item.multicam_variant.camouflage_name }}{% endif %}</div>
+      </div>
+    </td>
+    <td class="px-3 py-3 text-muted whitespace-nowrap">{{ item.submission_date|date:"M d, Y" }}</td>
+    <td class="px-3 py-3 text-muted">
+      <div class="truncate">{{ item.submitter_full_name|default:item.vendor.user.get_full_name|default:item.vendor.user.username }}</div>
+      <div class="text-xs text-muted truncate">{{ item.submitter_email|default:item.vendor.user.email }}</div>
+    </td>
+    {% if show_company_column %}
+      <td class="px-3 py-3 text-muted">
+        {{ item.company.name|default:item.vendor.company_name }}
+        {% if item.company.code %}<span class="text-xs text-muted">({{ item.company.code }})</span>{% endif %}
+      </td>
+    {% endif %}
+    <td class="px-3 py-3 text-muted whitespace-nowrap">
+      {{ item.multicam_variant.camouflage_name|default:"—" }}
+    </td>
+    <td class="px-3 py-3">
+      <span class="badge {{ meta.badge_variant }}">{{ meta.badge_label }}</span>
+      {% if meta.subtext %}
+        <div class="text-xs {{ meta.subtext_class }} mt-1">{{ meta.subtext }}</div>
+      {% endif %}
+    </td>
+  </tr>
+{% else %}
+  {% lot_status_meta item mode as meta %}
+  <tr class="hover:bg-elevated relative cursor-pointer">
+    <td class="px-3 py-3">
+      <a href="{% url row_url item.lot_id %}" class="absolute inset-0" aria-label="Open {{ item.display_name }}"></a>
+      <div>
+        <div class="font-medium text-primary-600 truncate">{{ item.display_name }}</div>
+        <div class="text-xs text-muted truncate">Lot #: {{ item.lot_lot_number }} • {{ item.number_of_yards_printed }} yards</div>
+      </div>
+    </td>
+    <td class="px-3 py-3 text-muted whitespace-nowrap">{{ item.submission_date|date:"M d, Y" }}</td>
+    <td class="px-3 py-3 text-muted">
+      <div class="truncate">{{ item.submitter_full_name|default:item.vendor.user.get_full_name|default:item.vendor.user.username }}</div>
+      <div class="text-xs text-muted truncate">{{ item.submitter_email|default:item.vendor.user.email }}</div>
+    </td>
+    {% if show_company_column %}
+      <td class="px-3 py-3 text-muted">
+        {{ item.company.name|default:item.vendor.company_name }}
+        {% if item.company.code %}<span class="text-xs text-muted">({{ item.company.code }})</span>{% endif %}
+      </td>
+    {% endif %}
+    <td class="px-3 py-3 text-muted whitespace-nowrap">
+      {{ item.original_fa.multicam_variant.camouflage_name|default:"—" }}
+    </td>
+    <td class="px-3 py-3">
+      <span class="badge {{ meta.badge_variant }}">{{ meta.badge_label }}</span>
+      {% if meta.subtext %}
+        <div class="text-xs {{ meta.subtext_class }} mt-1">{{ meta.subtext }}</div>
+      {% endif %}
+    </td>
+  </tr>
+{% endif %}
+
+

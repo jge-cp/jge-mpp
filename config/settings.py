@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
 
 # Load environment variables from .env file
 load_dotenv()
@@ -22,16 +23,48 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+# =============================================================================
+# SECURITY SETTINGS
+# =============================================================================
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-rd6jd*9w9(@7mwm97(om6-gn95tdpgo$#_c(m1c96695w#2b3q')
-
-# SECURITY WARNING: don't run with debug turned on in production!
+# Debug mode - defaults to True for local development
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',') if os.getenv('ALLOWED_HOSTS') else []
+# SECRET_KEY: Required in production, uses dev fallback only when DEBUG=True
+_secret_key = os.getenv('SECRET_KEY')
+if not _secret_key and not DEBUG:
+    raise ImproperlyConfigured(
+        "SECRET_KEY environment variable is required in production. "
+        "Generate one with: python -c \"import secrets; print(secrets.token_urlsafe(50))\""
+    )
+SECRET_KEY = _secret_key or 'django-insecure-dev-only-key-do-not-use-in-production'
+
+# ALLOWED_HOSTS: Required in production
+_allowed_hosts = os.getenv('ALLOWED_HOSTS', '')
+if not _allowed_hosts and not DEBUG:
+    raise ImproperlyConfigured(
+        "ALLOWED_HOSTS environment variable is required in production. "
+        "Set it to your domain (e.g., 'your-app.up.railway.app')"
+    )
+ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts.split(',') if h.strip()] if _allowed_hosts else []
+
+# Production security settings (enabled when DEBUG=False)
+if not DEBUG:
+    # HTTPS/SSL
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    
+    # Secure cookies
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    
+    # HSTS (HTTP Strict Transport Security)
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    
+    # Prevent MIME type sniffing
+    SECURE_CONTENT_TYPE_NOSNIFF = True
 
 
 # Application definition
