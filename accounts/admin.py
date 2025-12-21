@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import PasswordResetForm
+from django.conf import settings
 from unfold.admin import ModelAdmin, TabularInline
 from .models import UserProfile, PartnerCompany
 
@@ -25,12 +27,41 @@ class UserAdmin(BaseUserAdmin):
     """Custom User admin with UserProfile inline"""
     inlines = [UserProfileInline]
     list_display = ['username', 'email', 'first_name', 'last_name', 'is_staff', 'get_user_type']
+    actions = ['send_password_reset_email']
     
     def get_user_type(self, obj):
         if hasattr(obj, 'profile'):
             return obj.profile.get_user_functionality_display()
         return '-'
     get_user_type.short_description = 'User Type'
+    
+    @admin.action(description='Send password reset email to selected users')
+    def send_password_reset_email(self, request, queryset):
+        """Send password reset email to selected users"""
+        sent_count = 0
+        skipped_count = 0
+        
+        for user in queryset:
+            if not user.email:
+                skipped_count += 1
+                continue
+            
+            # Use Django's PasswordResetForm to send the email
+            form = PasswordResetForm({'email': user.email})
+            if form.is_valid():
+                form.save(
+                    request=request,
+                    use_https=request.is_secure(),
+                    email_template_name='registration/password_reset_email.html',
+                    subject_template_name='registration/password_reset_subject.txt',
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                )
+                sent_count += 1
+        
+        if sent_count:
+            self.message_user(request, f'Password reset email sent to {sent_count} user(s).')
+        if skipped_count:
+            self.message_user(request, f'Skipped {skipped_count} user(s) without email addresses.', level='warning')
 
 
 @admin.register(PartnerCompany)
