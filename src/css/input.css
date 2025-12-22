@@ -1,0 +1,344 @@
+/* Multicam Partner Portal - Custom Styles */
+/* Typography: Golden Ratio (1.618) with 24px base */
+/* Fonts: Roboto Condensed (headers), Roboto Mono (body) */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+   BASE LAYER - Typography & Defaults
+   ============================================ */
+@layer base {
+  /* Import Google Fonts */
+  @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;500;600;700&family=Roboto+Mono:wght@300;400;500;600;700&display=swap');
+
+  /* Default body styles */
+  body {
+    @apply font-body text-base text-gray-700 bg-white antialiased;
+  }
+
+  /* Headings use Roboto Condensed */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-semibold text-gray-900 tracking-tight;
+  }
+
+  h1 {
+    @apply text-xl; /* 63px */
+  }
+
+  h2 {
+    @apply text-lg; /* 39px */
+  }
+
+  h3 {
+    @apply text-md; /* 30px */
+  }
+
+  h4 {
+    @apply text-base font-bold; /* 24px */
+  }
+
+  h5 {
+    @apply text-sm font-bold; /* 15px */
+  }
+
+  h6 {
+    @apply text-xs font-bold uppercase tracking-wide; /* 9px */
+  }
+
+  /* Links */
+  a {
+    @apply text-primary-700 hover:text-primary-900 transition-colors;
+  }
+
+  /* Code elements use Roboto Mono (already default) */
+  code, pre, kbd {
+    @apply font-body;
+  }
+}
+
+/* ============================================
+   COMPONENT LAYER - Custom Components
+   ============================================ */
+@layer components {
+  /* Card Component */
+  .card {
+    @apply bg-white rounded-2xl border border-gray-200 shadow-sm;
+  }
+
+  .card-body {
+    @apply p-8;
+  }
+
+  .card-header {
+    @apply px-8 py-5 border-b border-gray-100 font-heading font-semibold text-lg text-gray-900;
+  }
+
+  /* Stat Card */
+  .stat-card {
+    @apply bg-white rounded-2xl border border-gray-200 p-8;
+  }
+
+  .stat-value {
+    @apply font-heading text-lg font-bold text-gray-900;
+  }
+
+  .stat-label {
+    @apply text-sm text-gray-500 uppercase tracking-wide;
+  }
+
+  /* Status Badges - pill style matching Flowbite theme */
+  .badge {
+    @apply inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide;
+  }
+
+  .badge-pending {
+    @apply bg-warning-400 text-gray-900;
+  }
+
+  .badge-pending-final {
+    @apply bg-gray-900 text-white;
+  }
+
+  .badge-approved {
+    @apply bg-success-500 text-white;
+  }
+
+  .badge-rejected {
+    @apply bg-error-500 text-white;
+  }
+
+  .badge-active {
+    @apply bg-success-500 text-white;
+  }
+
+  .badge-in-progress {
+    @apply bg-info-500 text-white;
+  }
+
+  /* Form Components */
+  .form-label {
+    @apply block text-sm font-semibold text-gray-700 mb-2;
+  }
+
+  .form-input {
+    @apply w-full px-4 py-3 text-base border-2 border-gray-300 rounded-lg 
+           focus:ring-2 focus:ring-primary-500 focus:border-primary-500 
+           transition-colors;
+  }
+
+  .form-select {
+    @apply w-full px-4 py-3 text-base border-2 border-gray-300 rounded-lg 
+           focus:ring-2 focus:ring-primary-500 focus:border-primary-500 
+           bg-white transition-colors;
+  }
+
+  .form-textarea {
+    @apply w-full px-4 py-3 text-base border-2 border-gray-300 rounded-lg 
+           focus:ring-2 focus:ring-primary-500 focus:border-primary-500 
+           transition-colors resize-y;
+  }
+
+  /* Button Components */
+  .btn {
+    @apply inline-flex items-center justify-center px-6 py-3 
+           font-heading font-semibold text-sm uppercase tracking-wide
+           rounded-xl border-2 transition-all duration-200
+           focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+
+  .btn-primary {
+    @apply btn bg-gray-900 border-gray-900 text-white 
+           hover:bg-black hover:border-black
+           focus:ring-gray-500;
+  }
+
+  .btn-secondary {
+    @apply btn bg-white border-gray-300 text-gray-700 
+           hover:bg-gray-50 hover:border-gray-400
+           focus:ring-gray-500;
+  }
+
+  .btn-danger {
+    @apply btn bg-error-600 border-error-600 text-white 
+           hover:bg-error-700 hover:border-error-700
+           focus:ring-error-500;
+  }
+
+  .btn-success {
+    @apply btn bg-success-600 border-success-600 text-white 
+           hover:bg-success-700 hover:border-success-700
+           focus:ring-success-500;
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent border-transparent text-gray-700 
+           hover:bg-gray-100 
+           focus:ring-gray-500;
+  }
+
+  .btn-sm {
+    @apply px-4 py-2 text-xs;
+  }
+
+  .btn-lg {
+    @apply px-8 py-4 text-base;
+  }
+
+  /* Sidebar Styles */
+  .sidebar-link {
+    @apply flex items-center gap-3 px-4 py-3 text-sm text-gray-600 
+           rounded-lg transition-colors
+           hover:bg-primary-50 hover:text-primary-700;
+  }
+
+  .sidebar-link.active {
+    @apply bg-primary-100 text-primary-800 font-semibold;
+  }
+
+  .sidebar-section-title {
+    @apply px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider;
+  }
+
+  /* Table Styles */
+  .table-header {
+    @apply bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide;
+  }
+
+  .table-row {
+    @apply border-b border-gray-200 hover:bg-gray-50 transition-colors;
+  }
+
+  .table-cell {
+    @apply px-4 py-4 text-sm text-gray-700;
+  }
+
+  /* Alert Components */
+  .alert {
+    @apply p-4 rounded-lg border-2 flex items-start gap-3;
+  }
+
+  .alert-info {
+    @apply bg-info-50 border-info-200 text-info-800;
+  }
+
+  .alert-success {
+    @apply bg-success-50 border-success-200 text-success-800;
+  }
+
+  .alert-warning {
+    @apply bg-warning-50 border-warning-200 text-warning-800;
+  }
+
+  .alert-error {
+    @apply bg-error-50 border-error-200 text-error-800;
+  }
+}
+
+/* ============================================
+   UTILITIES LAYER - Custom Utilities
+   ============================================ */
+@layer utilities {
+  /* Text utilities */
+  .text-muted {
+    @apply text-gray-500;
+  }
+
+  .text-heading {
+    @apply font-heading text-gray-900;
+  }
+
+  /* Background utilities */
+  .bg-elevated {
+    @apply bg-gray-50;
+  }
+
+  /* Border utilities */
+  .border-theme {
+    @apply border-gray-200;
+  }
+
+  /* Focus ring */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+  }
+
+  /* Truncate multiple lines */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* ============================================
+   DARK MODE OVERRIDES
+   ============================================ */
+.dark {
+  body {
+    @apply bg-gray-900 text-gray-300;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-white;
+  }
+
+  .card {
+    @apply bg-gray-800 border-gray-700;
+  }
+
+  .card-header {
+    @apply border-gray-700 text-white;
+  }
+
+  .stat-card {
+    @apply bg-gray-800 border-gray-700;
+  }
+
+  .form-input, .form-select, .form-textarea {
+    @apply bg-gray-800 border-gray-600 text-gray-200 
+           focus:border-primary-500;
+  }
+
+  .sidebar-link {
+    @apply text-gray-400 hover:bg-gray-800 hover:text-white;
+  }
+
+  .sidebar-link.active {
+    @apply bg-gray-800 text-primary-400;
+  }
+
+  .table-header {
+    @apply bg-gray-800 text-gray-400;
+  }
+
+  .table-row {
+    @apply border-gray-700 hover:bg-gray-800;
+  }
+
+  .table-cell {
+    @apply text-gray-300;
+  }
+
+  .text-muted {
+    @apply text-gray-500;
+  }
+
+  .bg-elevated {
+    @apply bg-gray-800;
+  }
+
+  .border-theme {
+    @apply border-gray-700;
+  }
+}
+

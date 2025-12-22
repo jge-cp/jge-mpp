@@ -1,0 +1,15 @@
+{
+  "name": "multicam-partner-portal",
+  "version": "1.0.0",
+  "description": "Multicam Partner Portal - Frontend Assets",
+  "scripts": {
+    "build:css": "npx tailwindcss -i ./src/css/input.css -o ./static/css/output.css",
+    "watch:css": "npx tailwindcss -i ./src/css/input.css -o ./static/css/output.css --watch",
+    "build": "npm run build:css"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.1",
+    "flowbite": "^2.2.1"
+  }
+}
+

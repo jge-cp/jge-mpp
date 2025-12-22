@@ -1,10 +1,12 @@
-{% extends 'base.html' %}
+{% extends 'base_dashboard.html' %}
 
 {% block title %}First Article List - Multicam Partner Portal{% endblock %}
 
-{% block content %}
-<div class="px-4 py-6">
-    <h1 class="text-3xl font-bold mb-6">First Article Submissions</h1>
+{% block dashboard_content %}
+<div class="max-w-6xl mx-auto">
+    <div class="mb-6">
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">First Article Submissions</h1>
+    </div>
 
     {% include 'partials/submissions/_list_filters.html' %}
 
@@ -12,5 +14,5 @@
         {% include 'partials/submissions/_results.html' with items=items kind=kind mode=mode row_url=row_url is_inspector=is_inspector show_company_column=show_company_column empty_text=empty_text %}
     </div>
 </div>
-{% endblock %}
+{% endblock dashboard_content %}
 

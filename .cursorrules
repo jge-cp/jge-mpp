@@ -10,6 +10,24 @@ Django-based portal replacing 3,000+ Google Sheets for the Multicam Partner Prog
 - **Email**: Resend (prod), Console (dev)
 - **Hosting**: Railway
 
+### Frontend Build (Tailwind + Flowbite)
+- **Config**: `tailwind.config.js` - custom theme with Multicam brand colors
+- **Source CSS**: `src/css/input.css` - custom component styles
+- **Output CSS**: `static/css/output.css` - compiled CSS (gitignored)
+- **Build command**: `npm run build:css`
+- **Watch command**: `npm run watch:css` (for development)
+
+**Typography**:
+- Headers: Roboto Condensed
+- Body: Roboto Mono
+- Scale: Golden Ratio (1.618) with 24px base
+
+**Custom Colors**:
+- `brand-*` / `primary-*`: Multicam earth tones (#756148 base)
+- `success-*`, `warning-*`, `error-*`, `info-*`: Status colors
+
+After cloning, run `npm install` then `npm run build:css` before starting Django.
+
 ## MVP User Roles (IMPORTANT)
 | Role | Code | Description |
 |------|------|-------------|

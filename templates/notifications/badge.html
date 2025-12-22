@@ -1,10 +1,10 @@
 {# HTMX fragment: notification unread badge #}
 {% if unread_notification_count %}
-<span class="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
+<span id="sidebar-notification-badge" class="inline-flex items-center justify-center min-w-5 h-5 px-1.5 text-xs font-bold text-white bg-red-500 rounded-full">
   {{ unread_notification_count }}
 </span>
 {% else %}
-<span class="hidden"></span>
+<span id="sidebar-notification-badge" class="hidden"></span>
 {% endif %}
 
 

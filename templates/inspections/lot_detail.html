@@ -1,9 +1,9 @@
-{% extends 'base.html' %}
+{% extends 'base_dashboard.html' %}
 
 {% block title %}{{ lot.display_name }} - Multicam Partner Portal{% endblock %}
 
-{% block content %}
-<div class="px-4 py-6">
+{% block dashboard_content %}
+<div class="max-w-5xl mx-auto">
     <div class="flex justify-between items-start mb-6">
         <div>
             <h1 class="text-3xl font-bold">Lot: {{ lot.display_name }}</h1>
@@ -242,4 +242,4 @@
         </a>
     </div>
 </div>
-{% endblock %}
+{% endblock dashboard_content %}
