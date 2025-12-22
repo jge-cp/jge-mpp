@@ -190,6 +190,11 @@ Proprietary - Multicam Partner Program
 ## Useful Commands
 
 ```bash
+#Compiles src/css/input.css → static/css/output.css
+npm run build:css
+```
+
+```bash
 # Backfill TEMP COLOR for any Multicam variants missing colors
 python manage.py backfill_variant_temp_colors
 

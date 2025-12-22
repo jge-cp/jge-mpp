@@ -1,7 +1,7 @@
 <!-- Prominent Action Buttons -->
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
     <a href="{% url 'inspections:fa_submit' %}"
-       class="p-6 rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-900 dark:hover:border-gray-500 transition-all group hover:shadow-lg">
+       class="p-6 rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-950 hover:border-gray-900 dark:hover:border-gray-500 transition-all group hover:shadow-lg">
         <div class="flex items-center space-x-4">
             <div class="flex-shrink-0 w-14 h-14 bg-gray-100 dark:bg-gray-700 rounded-2xl flex items-center justify-center">
                 <svg class="w-7 h-7 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -19,7 +19,7 @@
     </a>
 
     <a href="{% url 'inspections:lot_submit' %}"
-       class="p-6 rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-900 dark:hover:border-gray-500 transition-all group hover:shadow-lg {% if not fa_stats.approved %}opacity-50 pointer-events-none{% endif %}">
+       class="p-6 rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-950 hover:border-gray-900 dark:hover:border-gray-500 transition-all group hover:shadow-lg {% if not fa_stats.approved %}opacity-50 pointer-events-none{% endif %}">
         <div class="flex items-center space-x-4">
             <div class="flex-shrink-0 w-14 h-14 bg-gray-100 dark:bg-gray-700 rounded-2xl flex items-center justify-center">
                 <svg class="w-7 h-7 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -40,7 +40,7 @@
 </div>
 
 <!-- Recent Activity -->
-<div class="p-8 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+<div class="p-8 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-950">
     <div class="flex items-center justify-between mb-6">
         <h2 class="text-lg font-bold text-gray-900 dark:text-white">Recent Activity</h2>
         <a href="{% url 'inspections:fa_list' %}" class="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
@@ -55,7 +55,7 @@
             <a href="{% url 'inspections:fa_detail' fa.fai_id %}" class="block group">
                 <div class="flex items-center justify-between p-4 rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 transition-all">
                     <div class="flex items-center space-x-4">
-                        <div class="flex-shrink-0 w-12 h-12 bg-white dark:bg-gray-800 rounded-xl flex items-center justify-center border border-gray-200 dark:border-gray-700">
+                        <div class="flex-shrink-0 w-12 h-12 bg-white dark:bg-gray-950 rounded-xl flex items-center justify-center border border-gray-200 dark:border-gray-700">
                             <svg class="w-6 h-6 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                             </svg>
@@ -89,7 +89,7 @@
             <a href="{% url 'inspections:lot_detail' lot.lot_id %}" class="block group">
                 <div class="flex items-center justify-between p-4 rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 transition-all">
                     <div class="flex items-center space-x-4">
-                        <div class="flex-shrink-0 w-12 h-12 bg-white dark:bg-gray-800 rounded-xl flex items-center justify-center border border-gray-200 dark:border-gray-700">
+                        <div class="flex-shrink-0 w-12 h-12 bg-white dark:bg-gray-950 rounded-xl flex items-center justify-center border border-gray-200 dark:border-gray-700">
                             <svg class="w-6 h-6 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                             </svg>

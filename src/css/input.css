@@ -285,7 +285,7 @@
    ============================================ */
 .dark {
   body {
-    @apply bg-gray-900 text-gray-300;
+    @apply bg-black text-gray-300;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -293,7 +293,7 @@
   }
 
   .card {
-    @apply bg-gray-800 border-gray-700;
+    @apply bg-gray-950 border-gray-700;
   }
 
   .card-header {
@@ -334,7 +334,7 @@
   }
 
   .bg-elevated {
-    @apply bg-gray-800;
+    @apply bg-gray-950;
   }
 
   .border-theme {
