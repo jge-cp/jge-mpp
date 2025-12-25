@@ -1,12 +1,16 @@
-<form id="filters-form" class="card p-4 mb-4 space-y-3">
+<form id="filters-form" class="mb-4 space-y-3">
+  <!-- Hidden inputs to preserve sort state when filtering -->
+  <input type="hidden" name="sort" value="{{ filters.sort|default:'' }}" />
+  <input type="hidden" name="sort_dir" value="{{ filters.sort_dir|default:'' }}" />
   <div class="flex flex-wrap gap-3 items-end">
-    <div class="flex-1 min-w-[250px]">
+    <!-- Search -->
+    <div class="flex-1 min-w-[200px]">
       <label for="q" class="form-label">Search</label>
       <input
         id="q"
         name="q"
         value="{{ filters.q|default:'' }}"
-        placeholder="Search fabric, variant, lot #, company, submitter…"
+        placeholder="Search fabric, variant, lot #…"
         class="form-input"
         hx-get="."
         hx-trigger="keyup changed delay:300ms"
@@ -17,7 +21,106 @@
       />
     </div>
 
-    {% if show_status_filter %}
+    <!-- Variant -->
+    <div class="w-[160px]">
+      <label for="variant" class="form-label">Variant</label>
+      <select
+        id="variant"
+        name="variant"
+        class="form-input"
+        hx-get="."
+        hx-trigger="change"
+        hx-target="#list-results"
+        hx-swap="innerHTML"
+        hx-include="#filters-form"
+        hx-replace-url="true"
+      >
+        <option value="">All</option>
+        {% for value,label in variant_options %}
+          <option value="{{ value }}" {% if filters.variant == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Company -->
+    <div class="w-[160px]">
+      <label for="company" class="form-label">Company</label>
+      <select
+        id="company"
+        name="company"
+        class="form-input"
+        hx-get="."
+        hx-trigger="change"
+        hx-target="#list-results"
+        hx-swap="innerHTML"
+        hx-include="#filters-form"
+        hx-replace-url="true"
+      >
+        <option value="">All</option>
+        {% for value,label in company_options %}
+          <option value="{{ value }}" {% if filters.company == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- From Date -->
+    <div class="w-[130px]">
+      <label for="date_from" class="form-label">From</label>
+      <input
+        id="date_from"
+        name="date_from"
+        type="date"
+        value="{{ filters.date_from|default:'' }}"
+        class="form-input"
+        hx-get="."
+        hx-trigger="change"
+        hx-target="#list-results"
+        hx-swap="innerHTML"
+        hx-include="#filters-form"
+        hx-replace-url="true"
+      />
+    </div>
+
+    <!-- To Date -->
+    <div class="w-[130px]">
+      <label for="date_to" class="form-label">To</label>
+      <input
+        id="date_to"
+        name="date_to"
+        type="date"
+        value="{{ filters.date_to|default:'' }}"
+        class="form-input"
+        hx-get="."
+        hx-trigger="change"
+        hx-target="#list-results"
+        hx-swap="innerHTML"
+        hx-include="#filters-form"
+        hx-replace-url="true"
+      />
+    </div>
+
+    <!-- Submitted By -->
+    <div class="w-[160px]">
+      <label for="submitted_by" class="form-label">Submitted By</label>
+      <select
+        id="submitted_by"
+        name="submitted_by"
+        class="form-input"
+        hx-get="."
+        hx-trigger="change"
+        hx-target="#list-results"
+        hx-swap="innerHTML"
+        hx-include="#filters-form"
+        hx-replace-url="true"
+      >
+        <option value="">All</option>
+        {% for value,label in submitted_by_options %}
+          <option value="{{ value }}" {% if filters.submitted_by == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Status -->
     <div class="w-[140px]">
       <label for="status" class="form-label">Status</label>
       <select
@@ -37,94 +140,9 @@
         {% endfor %}
       </select>
     </div>
-    {% endif %}
-
-    {% if show_submitted_by_filter %}
-    <div class="w-[180px]">
-      <label for="submitted_by" class="form-label">Submitted by</label>
-      <select
-        id="submitted_by"
-        name="submitted_by"
-        class="form-input"
-        hx-get="."
-        hx-trigger="change"
-        hx-target="#list-results"
-        hx-swap="innerHTML"
-        hx-include="#filters-form"
-        hx-replace-url="true"
-      >
-        <option value="">All</option>
-        {% for value,label in submitted_by_options %}
-          <option value="{{ value }}" {% if filters.submitted_by == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
-        {% endfor %}
-      </select>
-    </div>
-    {% endif %}
-
-    {% if show_company_filter %}
-    <div class="w-[180px]">
-      <label for="company" class="form-label">Company</label>
-      <select
-        id="company"
-        name="company"
-        class="form-input"
-        hx-get="."
-        hx-trigger="change"
-        hx-target="#list-results"
-        hx-swap="innerHTML"
-        hx-include="#filters-form"
-        hx-replace-url="true"
-      >
-        <option value="">All</option>
-        {% for value,label in company_options %}
-          <option value="{{ value }}" {% if filters.company == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
-        {% endfor %}
-      </select>
-    </div>
-    {% endif %}
-
-    {% if show_date_filters %}
-    <div class="w-[140px]">
-      <label for="date_from" class="form-label">From</label>
-      <input
-        id="date_from"
-        name="date_from"
-        type="date"
-        value="{{ filters.date_from|default:'' }}"
-        class="form-input"
-        hx-get="."
-        hx-trigger="change"
-        hx-target="#list-results"
-        hx-swap="innerHTML"
-        hx-include="#filters-form"
-        hx-replace-url="true"
-      />
-    </div>
-    <div class="w-[140px]">
-      <label for="date_to" class="form-label">To</label>
-      <input
-        id="date_to"
-        name="date_to"
-        type="date"
-        value="{{ filters.date_to|default:'' }}"
-        class="form-input"
-        hx-get="."
-        hx-trigger="change"
-        hx-target="#list-results"
-        hx-swap="innerHTML"
-        hx-include="#filters-form"
-        hx-replace-url="true"
-      />
-    </div>
-    {% endif %}
   </div>
 
-  <div class="flex items-center justify-between">
-    <p class="text-xs text-muted">
-      Tip: search supports fabric style, variant, lot #, company, and submitter.
-    </p>
-    <a href="{{ clear_url }}" class="text-sm text-primary-600 hover:text-primary-700">Clear</a>
+  <div class="flex items-center justify-end">
+    <a href="{{ clear_url }}" class="text-sm text-accent-600 hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300">Clear</a>
   </div>
 </form>
-
-

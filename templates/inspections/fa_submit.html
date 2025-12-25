@@ -4,21 +4,21 @@
 
 {% block dashboard_content %}
 <div class="max-w-4xl mx-auto">
-    <!-- Page Header -->
-    <div class="mb-8">
-        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Submit First Article Inspection</h1>
-        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            Complete this form to submit a new First Article for inspection. Required fields are marked with an asterisk (*).
-        </p>
-    </div>
-
-    <!-- Form Card -->
+    <!-- Form Card with Header Inside -->
     <div class="card p-6">
+        <!-- Card Header -->
+        <div class="mb-6">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white">Submit First Article Inspection</h2>
+            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                Complete this form to submit a new First Article for inspection. Required fields are marked with an asterisk (*).
+            </p>
+        </div>
+
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             
             <!-- Form Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <!-- Fabric Style -->
                 <div>
                     <label for="{{ form.fabric_style.id_for_label }}" class="form-label">
@@ -93,6 +93,15 @@
                     {% endif %}
                 </div>
                 
+                <!-- First Article Ship Date -->
+                <div>
+                    <label for="{{ form.first_article_ship_date.id_for_label }}" class="form-label">
+                        First Article Ship Date
+                    </label>
+                    {{ form.first_article_ship_date }}
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">When the First Article sample will be/was shipped</p>
+                </div>
+                
                 <!-- Submitter First Name -->
                 <div>
                     <label for="{{ form.submitter_first_name.id_for_label }}" class="form-label">
@@ -115,15 +124,6 @@
                     {% endif %}
                 </div>
                 
-                <!-- First Article Ship Date -->
-                <div>
-                    <label for="{{ form.first_article_ship_date.id_for_label }}" class="form-label">
-                        First Article Ship Date
-                    </label>
-                    {{ form.first_article_ship_date }}
-                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">When the First Article sample will be/was shipped</p>
-                </div>
-                
                 <!-- Tracking Number -->
                 <div>
                     <label for="{{ form.tracking_number.id_for_label }}" class="form-label">
@@ -137,7 +137,7 @@
             <div class="mb-8">
                 <label class="form-label">Supporting Documents</label>
                 <div class="flex items-center justify-center w-full">
-                    <label for="submission_documents" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500">
+                    <label for="submission_documents" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer bg-cream-100 dark:bg-dark-card hover:bg-cream-200 dark:hover:bg-dark-elevated transition-colors border-warm">
                         <div class="flex flex-col items-center justify-center pt-5 pb-6">
                             <svg class="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
@@ -157,7 +157,7 @@
             </div>
             
             <!-- Form Actions -->
-            <div class="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <div class="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200 dark:border-dark-border">
                 <a href="{% url 'dashboard:partner_dashboard' %}" class="btn-secondary text-center">
                     Cancel
                 </a>

@@ -1,48 +1,70 @@
 {# HTMX fragment: Lot status banner + evaluation summary #}
 
-<div class="card p-4 mb-6 {% if lot.status == 'approved' %}bg-green-50 border-green-200{% elif lot.status == 'rejected' %}bg-red-50 border-red-200{% else %}bg-yellow-50 border-yellow-200{% endif %}">
+{% if lot.status == 'approved' %}
+<div class="card p-6 mb-6 bg-green-600 border-0">
   <div class="flex flex-col gap-2">
     <div class="flex items-center gap-4">
-      {% if lot.status == 'approved' %}
-        <span class="badge-success text-lg">✓ Approved</span>
-        <span class="text-green-700">
-          Ready for Production
-          {% if lot.inspector %}
-            - Reviewed by {{ lot.inspector.get_full_name|default:lot.inspector.username }}
-            {% if lot.review_date %}on {{ lot.review_date|date:"M d, Y" }}{% endif %}
-          {% endif %}
-        </span>
-      {% elif lot.status == 'rejected' %}
-        <span class="badge-danger text-lg">✗ Rejected</span>
-        <span class="text-red-700">
-          {% if lot.inspector %}
-            Rejected by {{ lot.inspector.get_full_name|default:lot.inspector.username }}
-            {% if lot.review_date %}on {{ lot.review_date|date:"M d, Y" }}{% endif %}
-          {% endif %}
-        </span>
-      {% else %}
-        <span class="badge-warning text-lg">Awaiting Review</span>
-        <span class="text-yellow-700">Submitted {{ lot.submission_date|timesince }} ago</span>
-      {% endif %}
+      <h2 class="text-lg font-bold text-white">✓ Approved</h2>
+      <span class="text-white/90">
+        Ready for Production
+        {% if lot.inspector %}
+          - Reviewed by {{ lot.inspector.get_full_name|default:lot.inspector.username }}
+          {% if lot.review_date %}on {{ lot.review_date|date:"M d, Y" }}{% endif %}
+        {% endif %}
+      </span>
     </div>
-    <div class="text-sm text-muted">
+    <div class="text-sm text-white/80">
       <span class="font-medium">Company:</span> {{ lot.company.name|default:lot.vendor.company_name }}
       <span class="mx-2">|</span>
       <span class="font-medium">Submitted by:</span> {{ lot.submitter_full_name|default:"-" }}
     </div>
   </div>
 </div>
+{% elif lot.status == 'rejected' %}
+<div class="card p-6 mb-6 bg-red-600 border-0">
+  <div class="flex flex-col gap-2">
+    <div class="flex items-center gap-4">
+      <h2 class="text-lg font-bold text-white">✗ Rejected</h2>
+      <span class="text-white/90">
+        {% if lot.inspector %}
+          Rejected by {{ lot.inspector.get_full_name|default:lot.inspector.username }}
+          {% if lot.review_date %}on {{ lot.review_date|date:"M d, Y" }}{% endif %}
+        {% endif %}
+      </span>
+    </div>
+    <div class="text-sm text-white/80">
+      <span class="font-medium">Company:</span> {{ lot.company.name|default:lot.vendor.company_name }}
+      <span class="mx-2">|</span>
+      <span class="font-medium">Submitted by:</span> {{ lot.submitter_full_name|default:"-" }}
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="card p-6 mb-6 border-0" style="background-color: #e3d39c;">
+  <div class="flex flex-col gap-2">
+    <div class="flex items-center gap-4">
+      <h2 class="text-lg font-bold text-gray-900">Awaiting Review</h2>
+      <span class="text-gray-800">Submitted {{ lot.submission_date|timesince }} ago</span>
+    </div>
+    <div class="text-sm text-gray-700">
+      <span class="font-medium">Company:</span> {{ lot.company.name|default:lot.vendor.company_name }}
+      <span class="mx-2">|</span>
+      <span class="font-medium">Submitted by:</span> {{ lot.submitter_full_name|default:"-" }}
+    </div>
+  </div>
+</div>
+{% endif %}
 
 {% if evaluation %}
 <div class="card p-6 mb-6">
-  <h2 class="text-xl font-semibold mb-4">Evaluation Results</h2>
+  <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Evaluation Results</h2>
 
-  <div class="mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+  <div class="mb-4 p-3 rounded-lg bg-warm">
     <p class="text-sm">
       <span class="font-medium">Reviewed by:</span>
       {{ evaluation.inspector.get_full_name|default:evaluation.inspector.username }}
     </p>
-    <p class="text-sm text-muted">
+    <p class="text-sm text-gray-600 dark:text-gray-400">
       <span class="font-medium">Date:</span>
       {{ evaluation.submitted_at|date:"M d, Y g:i A" }}
     </p>
@@ -53,7 +75,7 @@
     </p>
     {% endif %}
   </div>
-  <p class="text-sm text-muted">Sample-level detail remains below (static). Refresh not required for status.</p>
+  <p class="text-sm text-gray-500 dark:text-gray-400">Sample-level detail remains below (static). Refresh not required for status.</p>
 </div>
 {% endif %}
 

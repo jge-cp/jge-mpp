@@ -27,7 +27,7 @@
     
     <!-- Lot Details -->
     <div class="card p-6 mb-6">
-        <h2 class="text-xl font-semibold mb-4">Lot Information</h2>
+        <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Lot Information</h2>
         <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
             <div>
                 <dt class="text-sm font-medium text-muted">Fabric Style</dt>
@@ -81,10 +81,10 @@
     <!-- Sample Numbers -->
     {% if lot.individual_sample_numbers %}
     <div class="card p-6 mb-6">
-        <h2 class="text-xl font-semibold mb-4">Sample Numbers</h2>
+        <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Sample Numbers</h2>
         <div class="flex flex-wrap gap-2">
             {% for sample in lot.individual_sample_numbers.split %}
-            <span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-sm">{{ sample|cut:"," }}</span>
+            <span class="px-3 py-1 rounded-full text-sm bg-warm">{{ sample|cut:"," }}</span>
             {% endfor %}
         </div>
     </div>
@@ -93,15 +93,15 @@
     <!-- Evaluation Results (only show if reviewed) -->
     {% if evaluation %}
     <div class="card p-6 mb-6">
-        <h2 class="text-xl font-semibold mb-4">Evaluation Results</h2>
+        <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Evaluation Results</h2>
         
         <!-- Inspector Info -->
-        <div class="mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+        <div class="mb-4 p-3 rounded-lg bg-warm">
             <p class="text-sm">
                 <span class="font-medium">Reviewed by:</span> 
                 {{ evaluation.inspector.get_full_name|default:evaluation.inspector.username }}
             </p>
-            <p class="text-sm text-muted">
+            <p class="text-sm text-gray-600 dark:text-gray-400">
                 <span class="font-medium">Date:</span> 
                 {{ evaluation.submitted_at|date:"M d, Y g:i A" }}
             </p>
@@ -116,7 +116,7 @@
         <!-- Sample Evaluations -->
         {% for sample in sample_evaluations %}
         {% with is_even=forloop.counter|divisibleby:2 %}
-        <div class="mb-6 last:mb-0 {% if is_even %}bg-gray-50 dark:bg-gray-800{% endif %} p-4 rounded-lg">
+        <div class="mb-6 last:mb-0 p-4 rounded-lg {% if is_even %}bg-warm{% endif %}">
             <h3 class="text-lg font-medium mb-3 flex items-center gap-2">
                 Sample {{ sample.sample_number }}: {{ sample.sample_id }}
                 {% if sample.pattern_execution == 'pass' and sample.scale == 'pass' and sample.spectral_reflectance == 'pass' %}
@@ -129,7 +129,7 @@
             <div class="overflow-x-auto">
                 <table class="eval-table w-full">
                     <thead>
-                        <tr class="{% if is_even %}bg-gray-100 dark:bg-gray-700{% else %}bg-gray-50 dark:bg-gray-800{% endif %}">
+                        <tr class="bg-warm">
                             <th class="text-left px-4 py-2">Criteria</th>
                             <th class="text-center px-4 py-2">Rating</th>
                         </tr>
@@ -178,11 +178,11 @@
             <!-- Color Evaluations for this sample -->
             {% if sample.color_evaluations.all %}
             <div class="mt-4">
-                <h4 class="text-sm font-medium text-muted mb-2">Color Ratings</h4>
+
                 <div class="overflow-x-auto">
                     <table class="eval-table w-full">
                         <thead>
-                            <tr class="{% if is_even %}bg-gray-100 dark:bg-gray-700{% else %}bg-gray-50 dark:bg-gray-800{% endif %}">
+                            <tr class="bg-warm">
                                 <th class="text-left px-4 py-2">Color</th>
                                 <th class="text-center px-4 py-2">Rating</th>
                                 <th class="text-left px-4 py-2">Status</th>
@@ -222,15 +222,15 @@
         {% endfor %}
     </div>
     {% elif lot.status == 'pending' %}
-    <div class="card p-6 mb-6 bg-yellow-50 border-yellow-200">
-        <p class="text-yellow-700">
-            <strong>Awaiting Review</strong> - This lot has not yet been evaluated by an inspector.
+    <div class="card p-6 mb-6 border-0" style="background-color: #e3d39c;">
+        <p class="text-gray-900">
+            <span class="font-bold">Awaiting Review</span> - This lot has not yet been evaluated by an inspector.
         </p>
     </div>
     {% elif lot.inspector_comments %}
     <!-- Fallback for older lots that have comments but no structured evaluation -->
     <div class="card p-6 mb-6">
-        <h2 class="text-xl font-semibold mb-4">Inspector Comments</h2>
+        <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Inspector Comments</h2>
         <p>{{ lot.inspector_comments }}</p>
     </div>
     {% endif %}

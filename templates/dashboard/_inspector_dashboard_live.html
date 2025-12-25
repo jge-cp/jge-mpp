@@ -23,38 +23,31 @@
 <!-- PRIMARY INSPECTOR VIEW -->
 
 <!-- First Article Queue with Filters -->
-<div class="mb-8">
+<div class="card p-6 mb-8">
     <div class="flex items-center justify-between mb-4">
-        <h2 class="text-2xl font-bold">First Article Queue</h2>
-        <span class="badge badge-pending">{{ fa_pending }} pending</span>
+        <h2 class="text-xl font-bold">First Article Queue</h2>
+        <span class="badge badge-count">{{ fa_pending }} pending</span>
     </div>
     
-    <form id="fa-filters-form" class="card p-4 mb-4 space-y-3">
+    <form id="fa-filters-form" class="mb-4 space-y-3">
+        <input type="hidden" name="fa_sort" value="{{ fa_filters.sort|default:'' }}" />
+        <input type="hidden" name="fa_sort_dir" value="{{ fa_filters.sort_dir|default:'' }}" />
         <div class="flex flex-wrap gap-3 items-end">
-            <div class="flex-1 min-w-[250px]">
+            <div class="flex-1 min-w-[180px]">
                 <label for="fa-q" class="form-label">Search</label>
-                <input id="fa-q" name="fa_q" value="{{ fa_filters.q|default:'' }}" placeholder="Search fabric, variant, lot #, company, submitter…" class="form-input"
+                <input id="fa-q" name="fa_q" value="{{ fa_filters.q|default:'' }}" placeholder="Search…" class="form-input"
                     hx-get="{{ request.path }}" hx-trigger="keyup changed delay:300ms" hx-target="#fa-queue-results" hx-swap="innerHTML" hx-include="#fa-filters-form" hx-replace-url="true" />
             </div>
             <div class="w-[140px]">
-                <label for="fa-status" class="form-label">Status</label>
-                <select id="fa-status" name="fa_status" class="form-input" hx-get="{{ request.path }}" hx-trigger="change" hx-target="#fa-queue-results" hx-swap="innerHTML" hx-include="#fa-filters-form" hx-replace-url="true">
+                <label for="fa-variant" class="form-label">Variant</label>
+                <select id="fa-variant" name="fa_variant" class="form-input" hx-get="{{ request.path }}" hx-trigger="change" hx-target="#fa-queue-results" hx-swap="innerHTML" hx-include="#fa-filters-form" hx-replace-url="true">
                     <option value="">All</option>
-                    {% for value,label in fa_status_options %}
-                        <option value="{{ value }}" {% if fa_filters.status == value %}selected{% endif %}>{{ label }}</option>
+                    {% for value,label in fa_variant_options %}
+                        <option value="{{ value }}" {% if fa_filters.variant == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <div class="w-[180px]">
-                <label for="fa-submitted_by" class="form-label">Submitted by</label>
-                <select id="fa-submitted_by" name="fa_submitted_by" class="form-input" hx-get="{{ request.path }}" hx-trigger="change" hx-target="#fa-queue-results" hx-swap="innerHTML" hx-include="#fa-filters-form" hx-replace-url="true">
-                    <option value="">All</option>
-                    {% for value,label in fa_submitted_by_options %}
-                        <option value="{{ value }}" {% if fa_filters.submitted_by == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="w-[180px]">
+            <div class="w-[140px]">
                 <label for="fa-company" class="form-label">Company</label>
                 <select id="fa-company" name="fa_company" class="form-input" hx-get="{{ request.path }}" hx-trigger="change" hx-target="#fa-queue-results" hx-swap="innerHTML" hx-include="#fa-filters-form" hx-replace-url="true">
                     <option value="">All</option>
@@ -63,61 +56,68 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="w-[140px]">
+            <div class="w-[120px]">
                 <label for="fa-date_from" class="form-label">From</label>
                 <input id="fa-date_from" name="fa_date_from" type="date" value="{{ fa_filters.date_from|default:'' }}" class="form-input"
                     hx-get="{{ request.path }}" hx-trigger="change" hx-target="#fa-queue-results" hx-swap="innerHTML" hx-include="#fa-filters-form" hx-replace-url="true" />
             </div>
-            <div class="w-[140px]">
+            <div class="w-[120px]">
                 <label for="fa-date_to" class="form-label">To</label>
                 <input id="fa-date_to" name="fa_date_to" type="date" value="{{ fa_filters.date_to|default:'' }}" class="form-input"
                     hx-get="{{ request.path }}" hx-trigger="change" hx-target="#fa-queue-results" hx-swap="innerHTML" hx-include="#fa-filters-form" hx-replace-url="true" />
             </div>
-        </div>
-        <div class="flex items-center justify-between">
-            <p class="text-xs text-muted">Tip: search supports fabric style, variant, lot #, company, and submitter.</p>
-            <a href="{{ fa_clear_url }}" class="text-sm text-primary-600 hover:text-primary-700">Clear</a>
+            <div class="w-[140px]">
+                <label for="fa-submitted_by" class="form-label">Submitted By</label>
+                <select id="fa-submitted_by" name="fa_submitted_by" class="form-input" hx-get="{{ request.path }}" hx-trigger="change" hx-target="#fa-queue-results" hx-swap="innerHTML" hx-include="#fa-filters-form" hx-replace-url="true">
+                    <option value="">All</option>
+                    {% for value,label in fa_submitted_by_options %}
+                        <option value="{{ value }}" {% if fa_filters.submitted_by == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="w-[130px]">
+                <label for="fa-status" class="form-label">Status</label>
+                <select id="fa-status" name="fa_status" class="form-input" hx-get="{{ request.path }}" hx-trigger="change" hx-target="#fa-queue-results" hx-swap="innerHTML" hx-include="#fa-filters-form" hx-replace-url="true">
+                    <option value="">All</option>
+                    {% for value,label in fa_status_options %}
+                        <option value="{{ value }}" {% if fa_filters.status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
         </div>
     </form>
     
     <div id="fa-queue-results">
-        {% include 'partials/submissions/_results.html' with items=fas kind='fa' mode='queue' row_url='inspections:fa_review' is_inspector=True show_company_column=True empty_text='No First Articles in queue' %}
+        {% include 'partials/submissions/_results.html' with items=fas kind='fa' mode='queue' row_url='inspections:fa_review' empty_text='No First Articles in queue' filters=fa_filters form_id='fa-filters-form' target_id='fa-queue-results' sort_prefix='fa_' %}
     </div>
 </div>
 
 <!-- Lot Review Queue with Filters -->
-<div class="mb-8">
+<div class="card p-6 mb-8">
     <div class="flex items-center justify-between mb-4">
-        <h2 class="text-2xl font-bold">Lot Review Queue</h2>
-        <span class="badge badge-pending">{{ lot_pending }} pending</span>
+        <h2 class="text-xl font-bold">Lot Review Queue</h2>
+        <span class="badge badge-count">{{ lot_pending }} pending</span>
     </div>
     
-    <form id="lot-filters-form" class="card p-4 mb-4 space-y-3">
+    <form id="lot-filters-form" class="mb-4 space-y-3">
+        <input type="hidden" name="lot_sort" value="{{ lot_filters.sort|default:'' }}" />
+        <input type="hidden" name="lot_sort_dir" value="{{ lot_filters.sort_dir|default:'' }}" />
         <div class="flex flex-wrap gap-3 items-end">
-            <div class="flex-1 min-w-[250px]">
+            <div class="flex-1 min-w-[180px]">
                 <label for="lot-q" class="form-label">Search</label>
-                <input id="lot-q" name="lot_q" value="{{ lot_filters.q|default:'' }}" placeholder="Search fabric, variant, lot #, company, submitter…" class="form-input"
+                <input id="lot-q" name="lot_q" value="{{ lot_filters.q|default:'' }}" placeholder="Search…" class="form-input"
                     hx-get="{{ request.path }}" hx-trigger="keyup changed delay:300ms" hx-target="#lot-queue-results" hx-swap="innerHTML" hx-include="#lot-filters-form" hx-replace-url="true" />
             </div>
             <div class="w-[140px]">
-                <label for="lot-status" class="form-label">Status</label>
-                <select id="lot-status" name="lot_status" class="form-input" hx-get="{{ request.path }}" hx-trigger="change" hx-target="#lot-queue-results" hx-swap="innerHTML" hx-include="#lot-filters-form" hx-replace-url="true">
+                <label for="lot-variant" class="form-label">Variant</label>
+                <select id="lot-variant" name="lot_variant" class="form-input" hx-get="{{ request.path }}" hx-trigger="change" hx-target="#lot-queue-results" hx-swap="innerHTML" hx-include="#lot-filters-form" hx-replace-url="true">
                     <option value="">All</option>
-                    {% for value,label in lot_status_options %}
-                        <option value="{{ value }}" {% if lot_filters.status == value %}selected{% endif %}>{{ label }}</option>
+                    {% for value,label in lot_variant_options %}
+                        <option value="{{ value }}" {% if lot_filters.variant == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <div class="w-[180px]">
-                <label for="lot-submitted_by" class="form-label">Submitted by</label>
-                <select id="lot-submitted_by" name="lot_submitted_by" class="form-input" hx-get="{{ request.path }}" hx-trigger="change" hx-target="#lot-queue-results" hx-swap="innerHTML" hx-include="#lot-filters-form" hx-replace-url="true">
-                    <option value="">All</option>
-                    {% for value,label in lot_submitted_by_options %}
-                        <option value="{{ value }}" {% if lot_filters.submitted_by == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="w-[180px]">
+            <div class="w-[140px]">
                 <label for="lot-company" class="form-label">Company</label>
                 <select id="lot-company" name="lot_company" class="form-input" hx-get="{{ request.path }}" hx-trigger="change" hx-target="#lot-queue-results" hx-swap="innerHTML" hx-include="#lot-filters-form" hx-replace-url="true">
                     <option value="">All</option>
@@ -126,25 +126,39 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="w-[140px]">
+            <div class="w-[120px]">
                 <label for="lot-date_from" class="form-label">From</label>
                 <input id="lot-date_from" name="lot_date_from" type="date" value="{{ lot_filters.date_from|default:'' }}" class="form-input"
                     hx-get="{{ request.path }}" hx-trigger="change" hx-target="#lot-queue-results" hx-swap="innerHTML" hx-include="#lot-filters-form" hx-replace-url="true" />
             </div>
-            <div class="w-[140px]">
+            <div class="w-[120px]">
                 <label for="lot-date_to" class="form-label">To</label>
                 <input id="lot-date_to" name="lot_date_to" type="date" value="{{ lot_filters.date_to|default:'' }}" class="form-input"
                     hx-get="{{ request.path }}" hx-trigger="change" hx-target="#lot-queue-results" hx-swap="innerHTML" hx-include="#lot-filters-form" hx-replace-url="true" />
             </div>
-        </div>
-        <div class="flex items-center justify-between">
-            <p class="text-xs text-muted">Tip: search supports fabric style, variant, lot #, company, and submitter.</p>
-            <a href="{{ lot_clear_url }}" class="text-sm text-primary-600 hover:text-primary-700">Clear</a>
+            <div class="w-[140px]">
+                <label for="lot-submitted_by" class="form-label">Submitted By</label>
+                <select id="lot-submitted_by" name="lot_submitted_by" class="form-input" hx-get="{{ request.path }}" hx-trigger="change" hx-target="#lot-queue-results" hx-swap="innerHTML" hx-include="#lot-filters-form" hx-replace-url="true">
+                    <option value="">All</option>
+                    {% for value,label in lot_submitted_by_options %}
+                        <option value="{{ value }}" {% if lot_filters.submitted_by == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="w-[130px]">
+                <label for="lot-status" class="form-label">Status</label>
+                <select id="lot-status" name="lot_status" class="form-input" hx-get="{{ request.path }}" hx-trigger="change" hx-target="#lot-queue-results" hx-swap="innerHTML" hx-include="#lot-filters-form" hx-replace-url="true">
+                    <option value="">All</option>
+                    {% for value,label in lot_status_options %}
+                        <option value="{{ value }}" {% if lot_filters.status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
         </div>
     </form>
     
     <div id="lot-queue-results">
-        {% include 'partials/submissions/_results.html' with items=lots kind='lot' mode='queue' row_url='inspections:lot_review' is_inspector=True show_company_column=True empty_text='No Lots in queue' %}
+        {% include 'partials/submissions/_results.html' with items=lots kind='lot' mode='queue' row_url='inspections:lot_review' empty_text='No Lots in queue' filters=lot_filters form_id='lot-filters-form' target_id='lot-queue-results' sort_prefix='lot_' %}
     </div>
 </div>
 
@@ -152,38 +166,31 @@
 <!-- FINAL INSPECTOR VIEW -->
 
 <!-- First Article Queue with Filters (Final Inspector) -->
-<div class="mb-8">
+<div class="card p-6 mb-8">
     <div class="flex items-center justify-between mb-4">
-        <h2 class="text-2xl font-bold">First Article Queue</h2>
-        <span class="badge badge-pending-final">{{ fa_pending_final }} pending</span>
+        <h2 class="text-xl font-bold">First Article Queue</h2>
+        <span class="badge badge-count">{{ fa_pending_final }} pending</span>
     </div>
     
-    <form id="fa-filters-form" class="card p-4 mb-4 space-y-3">
+    <form id="fa-filters-form" class="mb-4 space-y-3">
+        <input type="hidden" name="fa_sort" value="{{ fa_filters.sort|default:'' }}" />
+        <input type="hidden" name="fa_sort_dir" value="{{ fa_filters.sort_dir|default:'' }}" />
         <div class="flex flex-wrap gap-3 items-end">
-            <div class="flex-1 min-w-[250px]">
+            <div class="flex-1 min-w-[180px]">
                 <label for="fa-q" class="form-label">Search</label>
-                <input id="fa-q" name="fa_q" value="{{ fa_filters.q|default:'' }}" placeholder="Search fabric, variant, lot #, company, submitter…" class="form-input"
+                <input id="fa-q" name="fa_q" value="{{ fa_filters.q|default:'' }}" placeholder="Search…" class="form-input"
                     hx-get="{{ request.path }}" hx-trigger="keyup changed delay:300ms" hx-target="#fa-queue-results" hx-swap="innerHTML" hx-include="#fa-filters-form" hx-replace-url="true" />
             </div>
             <div class="w-[140px]">
-                <label for="fa-status" class="form-label">Status</label>
-                <select id="fa-status" name="fa_status" class="form-input" hx-get="{{ request.path }}" hx-trigger="change" hx-target="#fa-queue-results" hx-swap="innerHTML" hx-include="#fa-filters-form" hx-replace-url="true">
+                <label for="fa-variant" class="form-label">Variant</label>
+                <select id="fa-variant" name="fa_variant" class="form-input" hx-get="{{ request.path }}" hx-trigger="change" hx-target="#fa-queue-results" hx-swap="innerHTML" hx-include="#fa-filters-form" hx-replace-url="true">
                     <option value="">All</option>
-                    {% for value,label in fa_status_options %}
-                        <option value="{{ value }}" {% if fa_filters.status == value %}selected{% endif %}>{{ label }}</option>
+                    {% for value,label in fa_variant_options %}
+                        <option value="{{ value }}" {% if fa_filters.variant == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <div class="w-[180px]">
-                <label for="fa-submitted_by" class="form-label">Submitted by</label>
-                <select id="fa-submitted_by" name="fa_submitted_by" class="form-input" hx-get="{{ request.path }}" hx-trigger="change" hx-target="#fa-queue-results" hx-swap="innerHTML" hx-include="#fa-filters-form" hx-replace-url="true">
-                    <option value="">All</option>
-                    {% for value,label in fa_submitted_by_options %}
-                        <option value="{{ value }}" {% if fa_filters.submitted_by == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="w-[180px]">
+            <div class="w-[140px]">
                 <label for="fa-company" class="form-label">Company</label>
                 <select id="fa-company" name="fa_company" class="form-input" hx-get="{{ request.path }}" hx-trigger="change" hx-target="#fa-queue-results" hx-swap="innerHTML" hx-include="#fa-filters-form" hx-replace-url="true">
                     <option value="">All</option>
@@ -192,28 +199,40 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="w-[140px]">
+            <div class="w-[120px]">
                 <label for="fa-date_from" class="form-label">From</label>
                 <input id="fa-date_from" name="fa_date_from" type="date" value="{{ fa_filters.date_from|default:'' }}" class="form-input"
                     hx-get="{{ request.path }}" hx-trigger="change" hx-target="#fa-queue-results" hx-swap="innerHTML" hx-include="#fa-filters-form" hx-replace-url="true" />
             </div>
-            <div class="w-[140px]">
+            <div class="w-[120px]">
                 <label for="fa-date_to" class="form-label">To</label>
                 <input id="fa-date_to" name="fa_date_to" type="date" value="{{ fa_filters.date_to|default:'' }}" class="form-input"
                     hx-get="{{ request.path }}" hx-trigger="change" hx-target="#fa-queue-results" hx-swap="innerHTML" hx-include="#fa-filters-form" hx-replace-url="true" />
             </div>
-        </div>
-        <div class="flex items-center justify-between">
-            <p class="text-xs text-muted">Tip: search supports fabric style, variant, lot #, company, and submitter.</p>
-            <a href="{{ fa_clear_url }}" class="text-sm text-primary-600 hover:text-primary-700">Clear</a>
+            <div class="w-[140px]">
+                <label for="fa-submitted_by" class="form-label">Submitted By</label>
+                <select id="fa-submitted_by" name="fa_submitted_by" class="form-input" hx-get="{{ request.path }}" hx-trigger="change" hx-target="#fa-queue-results" hx-swap="innerHTML" hx-include="#fa-filters-form" hx-replace-url="true">
+                    <option value="">All</option>
+                    {% for value,label in fa_submitted_by_options %}
+                        <option value="{{ value }}" {% if fa_filters.submitted_by == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="w-[130px]">
+                <label for="fa-status" class="form-label">Status</label>
+                <select id="fa-status" name="fa_status" class="form-input" hx-get="{{ request.path }}" hx-trigger="change" hx-target="#fa-queue-results" hx-swap="innerHTML" hx-include="#fa-filters-form" hx-replace-url="true">
+                    <option value="">All</option>
+                    {% for value,label in fa_status_options %}
+                        <option value="{{ value }}" {% if fa_filters.status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
         </div>
     </form>
     
     <div id="fa-queue-results">
-        {% include 'partials/submissions/_results.html' with items=fas kind='fa' mode='queue' row_url='inspections:fa_review' is_inspector=True show_company_column=True empty_text='No First Articles in queue' %}
+        {% include 'partials/submissions/_results.html' with items=fas kind='fa' mode='queue' row_url='inspections:fa_review' empty_text='No First Articles in queue' filters=fa_filters form_id='fa-filters-form' target_id='fa-queue-results' sort_prefix='fa_' %}
     </div>
 </div>
 
 {% endif %}
-
-

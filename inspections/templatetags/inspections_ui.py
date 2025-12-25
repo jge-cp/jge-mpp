@@ -14,12 +14,12 @@ def _timesince_or_blank(dt) -> str:
 
 
 def _subtext_class_for_badge(badge_variant: str) -> str:
-    # keep consistent with existing dashboard styling
+    # keep consistent with existing dashboard styling - all use muted text
     return {
-        "badge-approved": "text-green-600",
-        "badge-rejected": "text-red-600",
-        "badge-pending-final": "text-blue-600",
-        "badge-pending": "text-yellow-600",
+        "badge-approved": "text-gray-500",
+        "badge-rejected": "text-gray-500",
+        "badge-pending-final": "text-gray-500",
+        "badge-pending": "text-gray-500",
     }.get(badge_variant, "text-muted")
 
 

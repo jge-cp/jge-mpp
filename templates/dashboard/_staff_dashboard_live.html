@@ -37,7 +37,7 @@
                 {% load inspections_ui %}
                 {% fa_status_meta fa "dashboard" as meta %}
                 <a href="{% url 'inspections:fa_detail' fa.fai_id %}" class="block group">
-                    <div class="flex items-center justify-between p-3 rounded-lg border hover:shadow-sm transition-all" style="background-color: var(--color-bg-elevated); border-color: var(--color-border);">
+                    <div class="flex items-center justify-between p-3 rounded-lg border hover:shadow-sm transition-all" class="bg-cream-100 dark:bg-dark-card border-warm-gray-200 dark:border-dark-border">
                         <div class="min-w-0 flex-1 mr-2">
                             <p class="font-medium truncate group-hover:text-primary-600">{{ fa.display_name }}</p>
                             <p class="text-sm text-muted">{{ fa.company.name|default:fa.vendor.company_name }}</p>
@@ -63,7 +63,7 @@
         <h2 class="text-lg font-bold mb-4">Top Partners by Volume</h2>
         <div class="space-y-3">
             {% for partner in top_partners %}
-                <div class="flex items-center justify-between p-3 rounded-lg" style="background-color: var(--color-bg-elevated);">
+                <div class="flex items-center justify-between p-3 rounded-lg" class="bg-cream-100 dark:bg-dark-card">
                     <div>
                         <p class="font-medium">{{ partner.company_name }}</p>
                         <p class="text-sm text-muted">{{ partner.approved_fas }} approved FAs</p>
@@ -103,7 +103,7 @@
                 <div class="stat-label">Approved</div>
             </div>
         </div>
-        <div class="pt-4 border-t space-y-2" style="border-color: var(--color-border);">
+        <div class="pt-4 border-t space-y-2" class="border-warm-gray-200 dark:border-dark-border">
             <div class="flex justify-between text-sm">
                 <span class="text-muted">This Month:</span>
                 <span class="font-medium">{{ fa_stats.this_month }} submitted</span>
@@ -140,7 +140,7 @@
                 <div class="stat-label">Rejected</div>
             </div>
         </div>
-        <div class="pt-4 border-t space-y-2" style="border-color: var(--color-border);">
+        <div class="pt-4 border-t space-y-2" class="border-warm-gray-200 dark:border-dark-border">
             <div class="flex justify-between text-sm">
                 <span class="text-muted">This Month:</span>
                 <span class="font-medium">{{ lot_stats.this_month }} submitted</span>

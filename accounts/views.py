@@ -17,4 +17,4 @@ def custom_logout(request):
     """
     logout(request)
     messages.success(request, 'You have been successfully logged out.')
-    return redirect('core:home')
+    return redirect('accounts:login')

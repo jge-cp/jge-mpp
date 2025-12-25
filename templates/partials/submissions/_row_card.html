@@ -3,37 +3,32 @@
   {% fa_status_meta item mode as meta %}
     <a href="{% url row_url item.fai_id %}" class="block group">
       <div class="card p-4 hover:shadow-md transition-shadow">
-        <div class="mb-3">
-          <div class="font-medium text-primary-600 group-hover:text-primary-700 mb-1">{{ item.display_name }}</div>
-          <div class="flex items-center justify-between gap-2 mt-2">
-            <div class="text-xs text-muted">FA Lot #: {{ item.fa_lot_number }}</div>
-            <span class="badge {{ meta.badge_variant }} flex-shrink-0">{{ meta.badge_label }}</span>
-          </div>
+        <div class="flex items-start justify-between gap-3 mb-3">
+          <div class="font-medium text-gray-900 dark:text-white group-hover:text-accent-600 dark:group-hover:text-accent-400">{{ item.display_name }}</div>
+          <span class="badge {{ meta.badge_variant }} flex-shrink-0">{{ meta.badge_label }}</span>
         </div>
         
-        <dl class="space-y-2 text-sm">
+        <dl class="space-y-1 text-sm">
           <div class="flex justify-between">
-            <dt class="text-muted">Submitted:</dt>
-            <dd class="font-medium">{{ item.submission_date|date:"M d, Y" }}</dd>
+            <dt class="text-muted">Variant:</dt>
+            <dd>{{ item.multicam_variant.camouflage_name|default:"—" }}</dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-muted">Company:</dt>
+            <dd>{{ item.company.name|default:item.vendor.company_name|default:"—" }}</dd>
           </div>
           <div class="flex justify-between">
             <dt class="text-muted">By:</dt>
-            <dd class="font-medium truncate ml-2">{{ item.submitter_full_name|default:item.vendor.user.get_full_name|default:item.vendor.user.username }}</dd>
+            <dd class="truncate ml-2">{{ item.submitter_full_name|default:item.vendor.user.get_full_name|default:item.vendor.user.username }}</dd>
           </div>
-          {% if is_inspector %}
           <div class="flex justify-between">
-            <dt class="text-muted">Company:</dt>
-            <dd class="font-medium">{{ item.company.name|default:item.vendor.company_name }}</dd>
-          </div>
-          {% endif %}
-          <div class="flex justify-between">
-            <dt class="text-muted">Variant:</dt>
-            <dd class="font-medium">{{ item.multicam_variant.camouflage_name|default:"—" }}</dd>
+            <dt class="text-muted">Submitted:</dt>
+            <dd>{{ item.submission_date|date:"M d, Y" }}</dd>
           </div>
         </dl>
         
         {% if meta.subtext %}
-          <div class="text-xs {{ meta.subtext_class }} mt-3 pt-3 border-t" style="border-color: var(--color-border);">{{ meta.subtext }}</div>
+          <div class="text-xs {{ meta.subtext_class }} mt-3 pt-3 border-t border-gray-200 dark:border-dark-border">{{ meta.subtext }}</div>
         {% endif %}
       </div>
     </a>
@@ -41,40 +36,37 @@
   {% lot_status_meta item mode as meta %}
     <a href="{% url row_url item.lot_id %}" class="block group">
       <div class="card p-4 hover:shadow-md transition-shadow">
-        <div class="mb-3">
-          <div class="font-medium text-primary-600 group-hover:text-primary-700 mb-1">{{ item.display_name }}</div>
-          <div class="flex items-center justify-between gap-2 mt-2">
-            <div class="text-xs text-muted">Lot #: {{ item.lot_lot_number }} • {{ item.number_of_yards_printed }} yards</div>
-            <span class="badge {{ meta.badge_variant }} flex-shrink-0">{{ meta.badge_label }}</span>
-          </div>
+        <div class="flex items-start justify-between gap-3 mb-3">
+          <div class="font-medium text-gray-900 dark:text-white group-hover:text-accent-600 dark:group-hover:text-accent-400">{{ item.display_name }}</div>
+          <span class="badge {{ meta.badge_variant }} flex-shrink-0">{{ meta.badge_label }}</span>
         </div>
         
-        <dl class="space-y-2 text-sm">
+        <dl class="space-y-1 text-sm">
           <div class="flex justify-between">
-            <dt class="text-muted">Submitted:</dt>
-            <dd class="font-medium">{{ item.submission_date|date:"M d, Y" }}</dd>
+            <dt class="text-muted">Variant:</dt>
+            <dd>{{ item.original_fa.multicam_variant.camouflage_name|default:"—" }}</dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-muted">Company:</dt>
+            <dd>{{ item.company.name|default:item.vendor.company_name|default:"—" }}</dd>
           </div>
           <div class="flex justify-between">
             <dt class="text-muted">By:</dt>
-            <dd class="font-medium truncate ml-2">{{ item.submitter_full_name|default:item.vendor.user.get_full_name|default:item.vendor.user.username }}</dd>
+            <dd class="truncate ml-2">{{ item.submitter_full_name|default:item.vendor.user.get_full_name|default:item.vendor.user.username }}</dd>
           </div>
-          {% if is_inspector %}
           <div class="flex justify-between">
-            <dt class="text-muted">Company:</dt>
-            <dd class="font-medium">{{ item.company.name|default:item.vendor.company_name }}</dd>
+            <dt class="text-muted">Submitted:</dt>
+            <dd>{{ item.submission_date|date:"M d, Y" }}</dd>
           </div>
-          {% endif %}
           <div class="flex justify-between">
-            <dt class="text-muted">Variant:</dt>
-            <dd class="font-medium">{{ item.original_fa.multicam_variant.camouflage_name|default:"—" }}</dd>
+            <dt class="text-muted">Yards:</dt>
+            <dd>{{ item.number_of_yards_printed }}</dd>
           </div>
         </dl>
         
         {% if meta.subtext %}
-          <div class="text-xs {{ meta.subtext_class }} mt-3 pt-3 border-t" style="border-color: var(--color-border);">{{ meta.subtext }}</div>
+          <div class="text-xs {{ meta.subtext_class }} mt-3 pt-3 border-t border-gray-200 dark:border-dark-border">{{ meta.subtext }}</div>
         {% endif %}
       </div>
     </a>
 {% endif %}
-
-

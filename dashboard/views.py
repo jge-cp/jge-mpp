@@ -6,7 +6,14 @@ from django.db.models import Count, Q, Sum
 from datetime import timedelta
 from inspections.models import FirstArticleInspection, LotAcceptance, MonthlyReport
 from accounts.models import UserProfile
-from inspections.listing import parse_list_filters, build_fa_queryset, build_lot_queryset, submitted_by_options_for_inspector, company_options_for_inspector
+from inspections.listing import (
+    parse_list_filters, build_fa_queryset, build_lot_queryset,
+    submitted_by_options_for_inspector, submitted_by_options_for_partner,
+    company_options_for_inspector, variant_options,
+    FA_STATUS_OPTIONS, LOT_STATUS_OPTIONS,
+    FA_SORT_FIELDS, LOT_SORT_FIELDS, _apply_sort, _apply_date_range,
+    _apply_variant_fa, _apply_variant_lot, _apply_company,
+)
 
 
 def get_or_create_profile(user):
@@ -59,9 +66,67 @@ def partner_dashboard(request):
         'rejected': LotAcceptance.objects.filter(vendor=profile, status='rejected').count(),
     }
     
-    # Recent activity
-    recent_fas = FirstArticleInspection.objects.filter(vendor=profile).order_by('-submission_date')[:5]
-    recent_lots = LotAcceptance.objects.filter(vendor=profile).order_by('-submission_date')[:5]
+    # Get filter values from request
+    fa_filters = {
+        'q': request.GET.get('fa_q', ''),
+        'status': request.GET.get('fa_status', ''),
+        'variant': request.GET.get('fa_variant', ''),
+        'company': request.GET.get('fa_company', ''),
+        'submitted_by': request.GET.get('fa_submitted_by', ''),
+        'date_from': request.GET.get('fa_date_from', ''),
+        'date_to': request.GET.get('fa_date_to', ''),
+        'sort': request.GET.get('fa_sort', ''),
+        'sort_dir': request.GET.get('fa_sort_dir', ''),
+    }
+    lot_filters = {
+        'q': request.GET.get('lot_q', ''),
+        'status': request.GET.get('lot_status', ''),
+        'variant': request.GET.get('lot_variant', ''),
+        'company': request.GET.get('lot_company', ''),
+        'submitted_by': request.GET.get('lot_submitted_by', ''),
+        'date_from': request.GET.get('lot_date_from', ''),
+        'date_to': request.GET.get('lot_date_to', ''),
+        'sort': request.GET.get('lot_sort', ''),
+        'sort_dir': request.GET.get('lot_sort_dir', ''),
+    }
+    
+    # Build FA queryset with filters
+    fa_qs = FirstArticleInspection.objects.filter(vendor=profile).select_related('multicam_variant', 'vendor', 'company')
+    if fa_filters['q']:
+        fa_qs = fa_qs.filter(
+            Q(fabric_style__icontains=fa_filters['q']) |
+            Q(fa_lot_number__icontains=fa_filters['q']) |
+            Q(multicam_variant__camouflage_name__icontains=fa_filters['q']) |
+            Q(company__name__icontains=fa_filters['q'])
+        )
+    if fa_filters['status']:
+        fa_qs = fa_qs.filter(status=fa_filters['status'])
+    fa_qs = _apply_variant_fa(fa_qs, fa_filters['variant'])
+    fa_qs = _apply_company(fa_qs, fa_filters['company'])
+    fa_qs = _apply_date_range(fa_qs, 'submission_date', fa_filters['date_from'], fa_filters['date_to'])
+    fa_qs = _apply_sort(fa_qs, fa_filters['sort'], fa_filters['sort_dir'], FA_SORT_FIELDS)
+    recent_fas = fa_qs[:10]
+    
+    # Build Lot queryset with filters
+    lot_qs = LotAcceptance.objects.filter(vendor=profile).select_related('original_fa', 'original_fa__multicam_variant', 'vendor', 'company')
+    if lot_filters['q']:
+        lot_qs = lot_qs.filter(
+            Q(fabric_style__icontains=lot_filters['q']) |
+            Q(lot_lot_number__icontains=lot_filters['q']) |
+            Q(original_fa__multicam_variant__camouflage_name__icontains=lot_filters['q']) |
+            Q(company__name__icontains=lot_filters['q'])
+        )
+    if lot_filters['status']:
+        lot_qs = lot_qs.filter(status=lot_filters['status'])
+    lot_qs = _apply_variant_lot(lot_qs, lot_filters['variant'])
+    lot_qs = _apply_company(lot_qs, lot_filters['company'])
+    lot_qs = _apply_date_range(lot_qs, 'submission_date', lot_filters['date_from'], lot_filters['date_to'])
+    lot_qs = _apply_sort(lot_qs, lot_filters['sort'], lot_filters['sort_dir'], LOT_SORT_FIELDS)
+    recent_lots = lot_qs[:10]
+    
+    # Get filter options - same for all users
+    fa_submitted_by_options = submitted_by_options_for_partner(profile)
+    lot_submitted_by_options = submitted_by_options_for_partner(profile)
     
     context = {
         'profile': profile,
@@ -69,10 +134,49 @@ def partner_dashboard(request):
         'lot_stats': lot_stats,
         'recent_fas': recent_fas,
         'recent_lots': recent_lots,
+        'fa_status_options': FA_STATUS_OPTIONS,
+        'lot_status_options': LOT_STATUS_OPTIONS,
+        'fa_variant_options': variant_options(),
+        'lot_variant_options': variant_options(),
+        'fa_company_options': company_options_for_inspector(),
+        'lot_company_options': company_options_for_inspector(),
+        'fa_submitted_by_options': fa_submitted_by_options,
+        'lot_submitted_by_options': lot_submitted_by_options,
+        'fa_filters': fa_filters,
+        'lot_filters': lot_filters,
     }
     
     if getattr(request, "htmx", False):
-        return render(request, 'dashboard/_partner_dashboard_live.html', context)
+        htmx_target = getattr(request.htmx, 'target', None)
+        
+        # Return only the specific partial based on HTMX target
+        if htmx_target == 'fa-queue-results':
+            return render(request, 'partials/submissions/_results.html', {
+                'items': recent_fas,
+                'kind': 'fa',
+                'mode': 'list',
+                'row_url': 'inspections:fa_detail',
+                'empty_text': 'No First Articles yet. Submit your first one above!',
+                'filters': fa_filters,
+                'form_id': 'fa-filters-form',
+                'target_id': 'fa-queue-results',
+                'sort_prefix': 'fa_',
+            })
+        elif htmx_target == 'lot-queue-results':
+            return render(request, 'partials/submissions/_results.html', {
+                'items': recent_lots,
+                'kind': 'lot',
+                'mode': 'list',
+                'row_url': 'inspections:lot_detail',
+                'empty_text': 'No Lots yet. You can submit lots after an FA is approved.',
+                'filters': lot_filters,
+                'form_id': 'lot-filters-form',
+                'target_id': 'lot-queue-results',
+                'sort_prefix': 'lot_',
+            })
+        else:
+            # Default: return full dashboard fragment
+            return render(request, 'dashboard/_partner_dashboard_live.html', context)
     return render(request, 'dashboard/partner_dashboard.html', context)
 
 
@@ -134,21 +238,12 @@ def inspector_dashboard(request):
     lots = build_lot_queryset(profile, lot_filters, base_qs=lot_base)
     
     # Filter options for dropdowns
-    fa_status_options = [
-        ('pending', 'Awaiting Primary'),
-        ('pending_final', 'Awaiting Final'),
-        ('approved', 'Approved'),
-        ('rejected', 'Rejected'),
-    ]
-    lot_status_options = [
-        ('pending', 'Awaiting Review'),
-        ('approved', 'Approved'),
-        ('rejected', 'Rejected'),
-    ]
     fa_submitted_by_options = submitted_by_options_for_inspector()
     fa_company_options = company_options_for_inspector()
+    fa_variant_options = variant_options()
     lot_submitted_by_options = submitted_by_options_for_inspector()
     lot_company_options = company_options_for_inspector()
+    lot_variant_options = variant_options()
     
     # Clear URLs - preserve the other section's filters when clearing one section
     fa_clear_url = request.path + '?' + '&'.join(f"{k}={v}" for k, v in request.GET.items() if k.startswith('lot_'))
@@ -254,13 +349,15 @@ def inspector_dashboard(request):
         'lots': lots,
         # Filter context for FA
         'fa_filters': fa_filters,
-        'fa_status_options': fa_status_options,
+        'fa_status_options': FA_STATUS_OPTIONS,
+        'fa_variant_options': fa_variant_options,
         'fa_submitted_by_options': fa_submitted_by_options,
         'fa_company_options': fa_company_options,
         'fa_clear_url': fa_clear_url,
         # Filter context for Lot
         'lot_filters': lot_filters,
-        'lot_status_options': lot_status_options,
+        'lot_status_options': LOT_STATUS_OPTIONS,
+        'lot_variant_options': lot_variant_options,
         'lot_submitted_by_options': lot_submitted_by_options,
         'lot_company_options': lot_company_options,
         'lot_clear_url': lot_clear_url,
@@ -289,9 +386,11 @@ def inspector_dashboard(request):
                 'kind': 'fa',
                 'mode': 'queue',
                 'row_url': 'inspections:fa_review',
-                'is_inspector': True,
-                'show_company_column': True,
                 'empty_text': 'No First Articles in queue',
+                'filters': fa_filters,
+                'form_id': 'fa-filters-form',
+                'target_id': 'fa-queue-results',
+                'sort_prefix': 'fa_',
             })
         elif htmx_target == 'lot-queue-results':
             return render(request, 'partials/submissions/_results.html', {
@@ -299,9 +398,11 @@ def inspector_dashboard(request):
                 'kind': 'lot',
                 'mode': 'queue',
                 'row_url': 'inspections:lot_review',
-                'is_inspector': True,
-                'show_company_column': True,
                 'empty_text': 'No Lots in queue',
+                'filters': lot_filters,
+                'form_id': 'lot-filters-form',
+                'target_id': 'lot-queue-results',
+                'sort_prefix': 'lot_',
             })
         else:
             # Default: return full dashboard fragment

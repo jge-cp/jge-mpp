@@ -9,13 +9,12 @@ from .models import (
 from core.models import CamouflageType, VariantColor
 
 
-# Form classes - CSS custom properties in base.html handle theming globally
-# These are minimal classes for layout/sizing only
-FORM_INPUT = ''  # Global styles in base.html handle this
-FORM_SELECT = ''  # Global styles in base.html handle this
-FORM_TEXTAREA = ''  # Global styles in base.html handle this
+# Form classes - applying form-input, form-select etc from input.css
+FORM_INPUT = 'form-input'
+FORM_SELECT = 'form-select'
+FORM_TEXTAREA = 'form-textarea'
 FORM_CHECKBOX = 'w-4 h-4 rounded'
-FORM_FILE = ''  # Global styles in base.html handle this
+FORM_FILE = 'form-input'
 
 
 class FirstArticleInspectionForm(forms.ModelForm):
@@ -38,30 +37,38 @@ class FirstArticleInspectionForm(forms.ModelForm):
         ]
         widgets = {
             'fabric_style': forms.TextInput(attrs={
+                'class': FORM_INPUT,
                 'placeholder': 'Enter fabric style'
             }),
-            'multicam_variant': forms.Select(attrs={}),
-            'shade_standard': forms.Select(attrs={}),
+            'multicam_variant': forms.Select(attrs={'class': FORM_SELECT}),
+            'shade_standard': forms.Select(attrs={'class': FORM_SELECT}),
             'shade_standard_number': forms.TextInput(attrs={
+                'class': FORM_INPUT,
                 'placeholder': 'Optional'
             }),
-            'spectral_reflectance_requirement': forms.Select(attrs={}),
+            'spectral_reflectance_requirement': forms.Select(attrs={'class': FORM_SELECT}),
             'fa_lot_number': forms.TextInput(attrs={
+                'class': FORM_INPUT,
                 'placeholder': 'Enter FA lot number'
             }),
             'date_of_printing': forms.DateInput(attrs={
+                'class': FORM_INPUT,
                 'type': 'date'
             }),
             'first_article_ship_date': forms.DateInput(attrs={
+                'class': FORM_INPUT,
                 'type': 'date'
             }),
             'tracking_number': forms.TextInput(attrs={
+                'class': FORM_INPUT,
                 'placeholder': 'Optional tracking number'
             }),
             'submitter_first_name': forms.TextInput(attrs={
+                'class': FORM_INPUT,
                 'placeholder': 'First name'
             }),
             'submitter_last_name': forms.TextInput(attrs={
+                'class': FORM_INPUT,
                 'placeholder': 'Last name'
             }),
         }
@@ -90,31 +97,39 @@ class LotAcceptanceForm(forms.ModelForm):
         ]
         widgets = {
             'original_fa': forms.Select(attrs={
+                'class': FORM_SELECT,
                 'hx-get': '/portal/lot/fa-details/',
                 'hx-target': '#fa-details'
             }),
             'lot_lot_number': forms.TextInput(attrs={
+                'class': FORM_INPUT,
                 'placeholder': 'Enter lot number'
             }),
             'number_of_yards_printed': forms.NumberInput(attrs={
+                'class': FORM_INPUT,
                 'min': '1',
                 'placeholder': 'Enter yards printed',
                 'x-model': 'yardsP printed',
                 '@input': 'updateSampleCount()',
             }),
             'date_of_printing': forms.DateInput(attrs={
+                'class': FORM_INPUT,
                 'type': 'date'
             }),
             'date_shipped': forms.DateInput(attrs={
+                'class': FORM_INPUT,
                 'type': 'date'
             }),
             'tracking_number': forms.TextInput(attrs={
+                'class': FORM_INPUT,
                 'placeholder': 'Optional tracking number'
             }),
             'submitter_first_name': forms.TextInput(attrs={
+                'class': FORM_INPUT,
                 'placeholder': 'First name'
             }),
             'submitter_last_name': forms.TextInput(attrs={
+                'class': FORM_INPUT,
                 'placeholder': 'Last name'
             }),
         }

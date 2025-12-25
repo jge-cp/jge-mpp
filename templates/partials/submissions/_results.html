@@ -1,6 +1,7 @@
+<!-- Mobile card view -->
 <div class="block lg:hidden space-y-3">
   {% for item in items %}
-    {% include 'partials/submissions/_row_card.html' with item=item kind=kind mode=mode row_url=row_url is_inspector=is_inspector %}
+    {% include 'partials/submissions/_row_card.html' with item=item kind=kind mode=mode row_url=row_url %}
   {% empty %}
     <div class="card p-4">
       <p class="text-muted">{{ empty_text }}</p>
@@ -8,36 +9,35 @@
   {% endfor %}
 </div>
 
+<!-- Desktop table view -->
 <div class="hidden lg:block">
-  <div class="card overflow-hidden">
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm">
-        <thead>
-          <tr class="border-b" style="border-color: var(--color-border);">
-            <th class="px-3 py-3 text-left">{% if kind == 'fa' %}First Article{% else %}Lot{% endif %}</th>
-            <th class="px-3 py-3 text-left">Submitted</th>
-            <th class="px-3 py-3 text-left">Submitted By</th>
-            {% if show_company_column %}
-              <th class="px-3 py-3 text-left">Company</th>
-            {% endif %}
-            <th class="px-3 py-3 text-left">Variant</th>
-            <th class="px-3 py-3 text-left">Status</th>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm table-striped">
+      <thead>
+        <tr class="border-b border-warm-gray-200 dark:border-dark-border">
+          {% if kind == 'lot' %}
+            {% include 'partials/submissions/_sortable_header.html' with label='Lot' field='display_name' current_sort=filters.sort current_dir=filters.sort_dir form_id=form_id target_id=target_id sort_prefix=sort_prefix %}
+          {% else %}
+            {% include 'partials/submissions/_sortable_header.html' with label='First Article' field='display_name' current_sort=filters.sort current_dir=filters.sort_dir form_id=form_id target_id=target_id sort_prefix=sort_prefix %}
+          {% endif %}
+          {% include 'partials/submissions/_sortable_header.html' with label='Variant' field='variant' current_sort=filters.sort current_dir=filters.sort_dir form_id=form_id target_id=target_id sort_prefix=sort_prefix %}
+          {% include 'partials/submissions/_sortable_header.html' with label='Company' field='company' current_sort=filters.sort current_dir=filters.sort_dir form_id=form_id target_id=target_id sort_prefix=sort_prefix %}
+          {% include 'partials/submissions/_sortable_header.html' with label='Submitted By' field='submitted_by' current_sort=filters.sort current_dir=filters.sort_dir form_id=form_id target_id=target_id sort_prefix=sort_prefix %}
+          {% include 'partials/submissions/_sortable_header.html' with label='Submitted' field='submission_date' current_sort=filters.sort current_dir=filters.sort_dir form_id=form_id target_id=target_id sort_prefix=sort_prefix %}
+          {% include 'partials/submissions/_sortable_header.html' with label='Status' field='status' current_sort=filters.sort current_dir=filters.sort_dir form_id=form_id target_id=target_id sort_prefix=sort_prefix width='w-[140px]' %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+          {% include 'partials/submissions/_row_table.html' with item=item kind=kind mode=mode row_url=row_url %}
+        {% empty %}
+          <tr>
+            <td colspan="6" class="px-5 py-12 text-center text-gray-500 dark:text-gray-400">
+              {{ empty_text }}
+            </td>
           </tr>
-        </thead>
-        <tbody class="divide-y" style="border-color: var(--color-border);">
-          {% for item in items %}
-            {% include 'partials/submissions/_row_table.html' with item=item kind=kind mode=mode row_url=row_url is_inspector=is_inspector show_company_column=show_company_column %}
-          {% empty %}
-            <tr>
-              <td colspan="{% if show_company_column %}6{% else %}5{% endif %}" class="px-3 py-8 text-center text-muted">
-                {{ empty_text }}
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 </div>
-
-

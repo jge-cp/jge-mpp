@@ -15,14 +15,23 @@
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        color: var(--color-text-muted);
-        background-color: var(--color-bg-elevated);
-        border-bottom: 1px solid var(--color-border);
+        color: #6b7280;
+        background-color: #efece8;
+        border-bottom: 1px solid #efece8;
+    }
+    .dark .eval-table thead th {
+        color: #d1d5db;
+        background-color: #0a0a0a;
+        border-bottom-color: #2a2d2d;
     }
     .eval-table tbody td {
         padding: 0.75rem 1rem;
         vertical-align: middle;
-        border-bottom: 1px solid var(--color-border);
+        border-bottom: 1px solid #efece8;
+    }
+    .dark .eval-table tbody td {
+        border-bottom-color: #2a2d2d;
+        color: #d1d5db;
     }
     .eval-table tbody tr:last-child td {
         border-bottom: none;
@@ -62,7 +71,7 @@
         letter-spacing: 0.05em;
     }
     .result-pending {
-        background-color: #6b7280;
+        background-color: #b9ac9e;
         color: white;
         font-weight: bold;
         padding: 4px 12px;
@@ -119,15 +128,22 @@
     
     /* Evaluation table */
     .eval-table th {
-        background-color: var(--color-bg-elevated);
+        background-color: #efece8;
         font-weight: 600;
         text-transform: uppercase;
         font-size: 0.75rem;
         letter-spacing: 0.05em;
     }
+    .dark .eval-table th {
+        background-color: #0a0a0a;
+        color: #d1d5db;
+    }
     .eval-table td, .eval-table th {
         padding: 0.75rem 1rem;
-        border: 1px solid var(--color-border);
+        border: 1px solid #efece8;
+    }
+    .dark .eval-table td, .dark .eval-table th {
+        border-color: #2a2d2d;
     }
 </style>
 {% endblock %}
@@ -137,16 +153,15 @@
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
         <div>
-            <h1 class="text-3xl font-bold text-primary">First Article Evaluation</h1>
-            <p class="text-lg text-muted mt-1">{{ fa.display_name }}</p>
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white">First Article Evaluation</h2>
         </div>
         <div class="flex items-center space-x-3">
-            <!-- Attempt Number Badge -->
-            <span class="bg-purple-600 text-white text-sm px-3 py-1 rounded font-bold">
+            <!-- Attempt Number Badge - neutral warm color -->
+            <span class="text-sm px-3 py-1 rounded-full font-semibold" style="background-color: #d9d4cc; color: #594936;">
                 ATTEMPT #{{ current_attempt }}
             </span>
             {% if is_read_only and not is_primary_viewing_pending_final %}
-                <span class="bg-gray-600 text-white text-sm px-3 py-1 rounded font-bold">VIEW ONLY</span>
+                <span class="text-white text-sm px-3 py-1 rounded-full font-semibold" style="background-color: #a19181;">VIEW ONLY</span>
             {% elif is_primary_viewing_pending_final and final_has_started %}
                 <span class="bg-yellow-600 text-white text-sm px-3 py-1 rounded font-bold">FINAL IN PROGRESS</span>
             {% elif is_primary_viewing_pending_final %}
@@ -170,14 +185,12 @@
     
     <!-- Review Status Summary (always show if any reviews exist) -->
     {% if primary_eval_for_display or final_eval_for_display %}
-    <div class="mb-6 card p-4">
-        <h2 class="text-lg font-bold mb-4 border-b border-theme pb-2">
-            Review Status 
-            <span class="text-sm font-normal text-muted ml-2">(Current Attempt: #{{ current_attempt }})</span>
-        </h2>
+    <div class="mb-6 card p-6">
+        <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Review Status</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Current Attempt: #{{ current_attempt }}</p>
         <div class="grid md:grid-cols-2 gap-4">
             <!-- Primary Review Status -->
-            <div class="p-4 rounded-lg {% if primary_eval_for_display and primary_eval_for_display.is_submitted %}{% if primary_eval_for_display.all_pass %}bg-green-50 dark:bg-green-900/20 border border-green-300 dark:border-green-700{% else %}bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-700{% endif %}{% else %}bg-gray-50 dark:bg-gray-900/20 border border-gray-300 dark:border-gray-700{% endif %}">
+            <div class="p-4 rounded-2xl border-2 border-warm {% if primary_eval_for_display and primary_eval_for_display.is_submitted %}{% if primary_eval_for_display.all_pass %}bg-green-50 dark:bg-green-900/20{% else %}bg-red-50 dark:bg-red-900/20{% endif %}{% else %}bg-cream-50 dark:bg-dark-card{% endif %}">
                 <div class="flex items-center justify-between mb-2">
                     <span class="font-bold text-primary">Primary Review</span>
                     {% if primary_eval_for_display and primary_eval_for_display.is_submitted %}
@@ -191,8 +204,8 @@
                     {% endif %}
                 </div>
                 {% if primary_eval_for_display and primary_eval_for_display.is_submitted %}
-                    <p class="text-sm text-muted">
-                        <span class="font-medium text-purple-600">Attempt #{{ primary_eval_for_display.attempt_number }}</span>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        <span class="font-medium text-gray-700 dark:text-gray-300">Attempt #{{ primary_eval_for_display.attempt_number }}</span>
                     </p>
                     <p class="text-sm text-muted">
                         Reviewed by: <span class="font-medium">{{ primary_eval_for_display.inspector.get_full_name|default:primary_eval_for_display.inspector.username }}</span>
@@ -209,7 +222,7 @@
             </div>
             
             <!-- Final Review Status -->
-            <div class="p-4 rounded-lg {% if final_eval_for_display and final_eval_for_display.is_submitted %}{% if final_eval_for_display.all_pass %}bg-green-50 dark:bg-green-900/20 border border-green-300 dark:border-green-700{% else %}bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-700{% endif %}{% elif fa.status == 'pending_final' %}bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-300 dark:border-yellow-700{% else %}bg-gray-50 dark:bg-gray-900/20 border border-gray-300 dark:border-gray-700{% endif %}">
+            <div class="p-4 rounded-2xl border-2 border-warm {% if final_eval_for_display and final_eval_for_display.is_submitted %}{% if final_eval_for_display.all_pass %}bg-green-50 dark:bg-green-900/20{% else %}bg-red-50 dark:bg-red-900/20{% endif %}{% elif fa.status == 'pending_final' %}bg-yellow-50 dark:bg-yellow-900/20{% else %}bg-cream-50 dark:bg-dark-card{% endif %}">
                 <div class="flex items-center justify-between mb-2">
                     <span class="font-bold text-primary">Final Review</span>
                     {% if final_eval_for_display and final_eval_for_display.is_submitted %}
@@ -225,8 +238,8 @@
                     {% endif %}
                 </div>
                 {% if final_eval_for_display and final_eval_for_display.is_submitted %}
-                    <p class="text-sm text-muted">
-                        <span class="font-medium text-purple-600">Attempt #{{ final_eval_for_display.attempt_number }}</span>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        <span class="font-medium text-gray-700 dark:text-gray-300">Attempt #{{ final_eval_for_display.attempt_number }}</span>
                     </p>
                     <p class="text-sm text-muted">
                         Reviewed by: <span class="font-medium">{{ final_eval_for_display.inspector.get_full_name|default:final_eval_for_display.inspector.username }}</span>
@@ -249,19 +262,19 @@
     
     <!-- Evaluation History (show if more than one attempt) -->
     {% if evaluation_history and evaluation_history|length > 1 %}
-    <div class="mb-6 card p-4">
+    <div class="mb-6 card p-6">
         <details class="group">
             <summary class="cursor-pointer flex items-center justify-between">
-                <h2 class="text-lg font-bold">Evaluation History ({{ evaluation_history|length }} Attempts)</h2>
-                <span class="text-muted group-open:rotate-180 transition-transform">▼</span>
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white">Evaluation History ({{ evaluation_history|length }} Attempts)</h2>
+                <span class="text-gray-500 dark:text-gray-400 group-open:rotate-180 transition-transform">▼</span>
             </summary>
             <div class="mt-4 space-y-3">
                 {% for attempt_num, evals in evaluation_history.items %}
-                <div class="p-3 rounded border {% if attempt_num == current_attempt %}border-purple-500 bg-purple-50 dark:bg-purple-900/20{% else %}border-gray-300 dark:border-gray-700{% endif %}">
+                <div class="p-3 rounded-2xl border-2 border-warm {% if attempt_num == current_attempt %}bg-cream-100 dark:bg-dark-card{% else %}bg-white dark:bg-dark-card{% endif %}">
                     <div class="flex items-center justify-between mb-2">
-                        <span class="font-bold">Attempt #{{ attempt_num }}</span>
+                        <span class="font-semibold text-gray-900 dark:text-white">Attempt #{{ attempt_num }}</span>
                         {% if attempt_num == current_attempt %}
-                            <span class="text-xs bg-purple-600 text-white px-2 py-1 rounded">CURRENT</span>
+                            <span class="text-xs px-2 py-1 rounded-full font-semibold" style="background-color: #d9d4cc; color: #594936;">CURRENT</span>
                         {% endif %}
                     </div>
                     <div class="grid md:grid-cols-2 gap-2 text-sm">
@@ -328,7 +341,7 @@
     
     <!-- FA Details Card -->
     <div class="card p-6 mb-6">
-        <h2 class="text-xl font-bold mb-4 border-b border-theme pb-2">Submission Details</h2>
+        <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Submission Details</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
                 <dt class="text-sm font-medium text-muted">Partner</dt>
@@ -371,12 +384,8 @@
         
         <!-- Shade Matching Section -->
         <div class="card p-6 mb-6">
-            <h2 class="text-xl font-bold mb-4 border-b border-theme pb-2">
-                Shade Matching Evaluation
-                <span class="text-sm font-normal text-muted ml-2">
-                    (Rating ≥ 3 = Pass)
-                </span>
-            </h2>
+            <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Shade Matching Evaluation</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Rating ≥ 3 = Pass</p>
             
             <table class="w-full eval-table">
                 <thead>
@@ -439,7 +448,7 @@
         
         <!-- Overall Criteria Section -->
         <div class="card p-6 mb-6">
-            <h2 class="text-xl font-bold mb-4 border-b border-theme pb-2">Overall Criteria</h2>
+            <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Overall Criteria</h2>
             
             <table class="w-full eval-table">
                 <thead>
@@ -531,20 +540,31 @@
         
         <!-- Comments Section -->
         <div class="card p-6 mb-6">
-            <h2 class="text-xl font-bold mb-4 border-b border-theme pb-2">Comments</h2>
+            <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Comments</h2>
             <textarea name="comments" 
                       class="form-textarea w-full"
                       rows="4"
                       placeholder="Overall evaluation comments...">{{ evaluation.comments|default:'' }}</textarea>
         </div>
         
-        <!-- File Upload Section -->
+        <!-- File Upload Section - drag/drop style -->
         <div class="card p-6 mb-6">
-            <h2 class="text-xl font-bold mb-4 border-b border-theme pb-2">Inspection Documents</h2>
-            <input type="file" name="inspection_documents" multiple 
-                   class="form-input"
-                   accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
-            <p class="text-sm text-muted mt-2">Attach any supporting documents (PDF, Word, images)</p>
+            <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Inspection Documents</h2>
+            <div class="flex items-center justify-center w-full">
+                <label for="inspection_documents" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer bg-cream-100 dark:bg-dark-card hover:bg-cream-200 dark:hover:bg-dark-elevated transition-colors border-warm">
+                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                        <svg class="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                            <span class="font-semibold">Click to upload</span> or drag and drop
+                        </p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">PDF, Word, or Images</p>
+                    </div>
+                    <input id="inspection_documents" name="inspection_documents" type="file" multiple 
+                           accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" class="hidden" />
+                </label>
+            </div>
         </div>
         
         <!-- Overall Result Preview - VERY PROMINENT -->
@@ -582,7 +602,7 @@
                     Save Draft
                 </button>
                 <button type="submit" name="submit_evaluation" 
-                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded border border-blue-700"
+                        class="btn-primary"
                         onclick="return confirmSubmit()">
                     Submit Evaluation
                 </button>
@@ -725,8 +745,8 @@
         overallCard.classList.remove('overall-pass', 'overall-fail');
         
         if (!allRated) {
-            overallDisplay.innerHTML = '<span class="overall-result-text text-gray-400">INCOMPLETE</span>';
-            overallCard.style.borderColor = 'var(--color-border)';
+            overallDisplay.innerHTML = '<span class="overall-result-text" style="color: #b9ac9e;">INCOMPLETE</span>';
+            overallCard.style.borderColor = document.documentElement.classList.contains('dark') ? '#2a2d2d' : '#efece8';
             if (overallTitle) overallTitle.className = 'text-2xl font-bold';
             if (overallSubtitle) overallSubtitle.className = 'text-muted text-sm';
         } else if (allPass) {

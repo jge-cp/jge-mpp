@@ -15,10 +15,9 @@
     {% endif %}
 </div>
 
-<div class="card divide-y" style="--tw-divide-opacity: 1; border-color: var(--color-border);">
+<div class="card divide-y divide-warm-gray-200 dark:divide-dark-border border-warm-gray-200 dark:border-dark-border">
     {% for notification in notifications %}
-    <div class="p-4 {% if not notification.is_read %}bg-primary-50 dark:bg-primary-900/20{% endif %}"
-         style="border-color: var(--color-border);">
+    <div class="p-4 {% if not notification.is_read %}bg-primary-50 dark:bg-primary-900/20{% endif %} border-warm-gray-200 dark:border-dark-border">
         <a href="{% if notification.action_url %}{{ notification.action_url }}{% else %}#{% endif %}"
            hx-post="{% url 'notifications:mark_read' notification.id %}"
            hx-swap="none"
@@ -29,7 +28,7 @@
                     {% elif 'rejected' in notification.notification_type %}bg-red-100 dark:bg-red-900/30
                     {% elif 'submitted' in notification.notification_type %}bg-blue-100 dark:bg-blue-900/30
                     {% elif 'pending' in notification.notification_type %}bg-yellow-100 dark:bg-yellow-900/30
-                    {% else %}bg-gray-100 dark:bg-gray-700{% endif %}">
+                    {% else %}bg-gray-100 dark:bg-dark-card{% endif %}">
                     {% if 'approved' in notification.notification_type %}
                     <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>

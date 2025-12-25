@@ -27,11 +27,19 @@ Optional context for badge counts (from inspector dashboard):
 
 <!-- Sidebar -->
 <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-       class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform bg-white border-r border-gray-200 md:translate-x-0 dark:bg-black dark:border-gray-800 flex flex-col"
+       class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform bg-background dark:bg-dark-bg md:bg-transparent md:dark:bg-transparent md:translate-x-0 flex flex-col"
        aria-label="Sidenav">
     
+    <!-- Mobile close button - positioned at top right of sidebar -->
+    <button @click="sidebarOpen = false" 
+            class="absolute top-6 right-4 z-50 md:hidden p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-dark-card rounded-lg transition-colors">
+        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+        </svg>
+    </button>
+
     <!-- Branding Section with MULTICAM SVG Logo -->
-    <div class="px-4 py-6 border-b border-gray-200 dark:border-gray-800">
+    <div class="px-4 pt-16 pb-6 md:pt-6">
         <a href="{% url 'dashboard:dashboard_router' %}" class="block">
             <!-- MULTICAM Logo - Light Mode (dark text) -->
             <svg class=" h-auto w-100% dark:hidden fill-gray-900" viewBox="0 0 569.17 98.36" xmlns="http://www.w3.org/2000/svg">
@@ -62,17 +70,10 @@ Optional context for badge counts (from inspector dashboard):
             <div class="font-heading text-s tracking-wide text-gray-500 dark:text-gray-400 uppercase mt-1">Partner Portal</div>
         </a>
         
-        <!-- Mobile close button -->
-        <button @click="sidebarOpen = false" 
-                class="absolute top-4 right-4 md:hidden p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-            </svg>
-        </button>
     </div>
     
     <!-- User Info Section -->
-    <div class="px-4 py-5 border-b border-gray-200 dark:border-gray-800">
+    <div class="px-4 py-5">
         {% if profile.is_partner %}
             <!-- Partner Badge + Info -->
             <div class="flex items-start space-x-3">
@@ -83,7 +84,6 @@ Optional context for badge counts (from inspector dashboard):
                 <div class="min-w-0 flex-1">
                     <p class="text-sm font-semibold text-gray-900 dark:text-white leading-tight">{{ profile.company_name|default:user.username }}</p>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Partner</p>
-                    <span class="inline-flex items-center px-2.5 py-0.5 mt-1.5 rounded-full text-[10px] font-semibold uppercase bg-success-500 text-white">Active</span>
                 </div>
             </div>
         {% elif profile.is_any_inspector %}
@@ -131,13 +131,12 @@ Optional context for badge counts (from inspector dashboard):
         <div x-data="{ notifOpen: false }" @click.outside="notifOpen = false" class="mt-4 relative">
             <button @click="notifOpen = !notifOpen; if (notifOpen) { $nextTick(() => htmx.trigger($refs.sidebarNotifContent, 'refresh')) }" 
                     type="button"
-                    class="relative w-full flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="relative w-full flex items-center px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-card transition-colors">
+                <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                 </svg>
-                Notifications
+                <span class="flex-1 text-left">Notifications</span>
                 <span id="sidebar-notification-badge"
-                      class="ml-auto"
                       hx-get="{% url 'notifications:badge' %}"
                       hx-trigger="load, every 10s, notifications-changed from:body"
                       hx-swap="outerHTML">
@@ -154,7 +153,7 @@ Optional context for badge counts (from inspector dashboard):
                  x-transition:leave="transition ease-in duration-150"
                  x-transition:leave-start="opacity-100 translate-y-0"
                  x-transition:leave-end="opacity-0 translate-y-1"
-                 class="fixed left-4 right-4 md:left-4 md:right-auto md:w-96 top-auto mt-2 z-50 rounded-2xl border-2 shadow-xl overflow-hidden bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700"
+                 class="fixed left-4 right-4 md:left-4 md:right-auto md:w-96 top-auto mt-2 z-50 rounded-2xl border-2 shadow-xl overflow-hidden bg-white dark:bg-dark-bg border-gray-200 dark:border-dark-border"
                  style="max-height: calc(100vh - 280px);">
                 <div x-ref="sidebarNotifContent"
                      hx-get="{% url 'notifications:dropdown' %}"
@@ -181,9 +180,8 @@ Optional context for badge counts (from inspector dashboard):
             <li>
                 <a href="{% url 'dashboard:dashboard_router' %}" 
                    class="sidebar-link {% if request.resolver_match.url_name == 'partner_dashboard' or request.resolver_match.url_name == 'inspector_dashboard' or request.resolver_match.url_name == 'staff_dashboard' %}active{% endif %}">
-                    <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
-                        <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
                     </svg>
                     Overview
                 </a>
@@ -205,7 +203,7 @@ Optional context for badge counts (from inspector dashboard):
             <li>
                 <a href="{% url 'inspections:fa_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'fa_list' %}active{% endif %}">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
                     </svg>
                     My First Articles
                 </a>
@@ -225,7 +223,7 @@ Optional context for badge counts (from inspector dashboard):
             <li>
                 <a href="{% url 'inspections:lot_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'lot_list' %}active{% endif %}">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
                     </svg>
                     My Lots
                 </a>
@@ -240,22 +238,22 @@ Optional context for badge counts (from inspector dashboard):
             {% if profile.is_primary_inspector %}
             <li>
                 <a href="{% url 'inspections:fa_review_queue_primary' %}" class="sidebar-link {% if request.resolver_match.url_name == 'fa_review_queue_primary' %}active{% endif %}">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                    <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                     </svg>
-                    FA Queue
-                    {% if fa_pending %}<span class="sidebar-badge ml-auto">{{ fa_pending }}</span>{% endif %}
+                    <span class="flex-1">FA Queue</span>
+                    {% if fa_pending %}<span class="sidebar-badge">{{ fa_pending }}</span>{% endif %}
                 </a>
             </li>
             {% endif %}
             {% if profile.is_final_inspector %}
             <li>
                 <a href="{% url 'inspections:fa_review_queue_final' %}" class="sidebar-link {% if request.resolver_match.url_name == 'fa_review_queue_final' %}active{% endif %}">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                     </svg>
-                    FA Queue
-                    {% if fa_pending_final %}<span class="sidebar-badge ml-auto">{{ fa_pending_final }}</span>{% endif %}
+                    <span class="flex-1">FA Queue</span>
+                    {% if fa_pending_final %}<span class="sidebar-badge">{{ fa_pending_final }}</span>{% endif %}
                 </a>
             </li>
             {% endif %}
@@ -274,11 +272,11 @@ Optional context for badge counts (from inspector dashboard):
         <ul class="space-y-1">
             <li>
                 <a href="{% url 'inspections:lot_review_queue' %}" class="sidebar-link {% if request.resolver_match.url_name == 'lot_review_queue' %}active{% endif %}">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7.99999 10.8571 12 13.1428m-4.00001-2.2857L4 13.1428m3.99999-2.2857.00004-4.57139M12 13.1428v4.5715m0-4.5715-4.00001 2.2857M12 13.1428l4-2.2857m-4 2.2857V8.57143m0 4.57137 4 2.2858m-4 2.2857L7.99999 20M12 17.7143 16 20m-8.00001 0L4 17.7143v-4.5715M7.99999 20v-4.5715M4 13.1428l3.99999 2.2857M16 6.28571 12 4 8.00003 6.28571m7.99997 0v4.57139m0-4.57139-4 2.28572m4 2.28567 4 2.2858M8.00003 6.28571 12 8.57143m8 4.57147v4.5714L16 20m4-6.8571-4 2.2857M16 20v-4.5714"></path>
                     </svg>
-                    Lot Queue
-                    {% if lot_pending %}<span class="sidebar-badge ml-auto">{{ lot_pending }}</span>{% endif %}
+                    <span class="flex-1">Lot Queue</span>
+                    {% if lot_pending %}<span class="sidebar-badge">{{ lot_pending }}</span>{% endif %}
                 </a>
             </li>
             <li>
@@ -312,7 +310,7 @@ Optional context for badge counts (from inspector dashboard):
             <li>
                 <a href="{% url 'inspections:fa_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'fa_list' %}active{% endif %}">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
                     </svg>
                     All First Articles
                 </a>
@@ -324,7 +322,7 @@ Optional context for badge counts (from inspector dashboard):
             <li>
                 <a href="{% url 'inspections:lot_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'lot_list' %}active{% endif %}">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
                     </svg>
                     All Lots
                 </a>
@@ -334,7 +332,7 @@ Optional context for badge counts (from inspector dashboard):
 
         <!-- Admin Link (only for superusers) -->
         {% if user.is_superuser %}
-        <ul class="pt-6 mt-6 space-y-1 border-t border-gray-200 dark:border-gray-800">
+        <ul class="pt-6 mt-6 space-y-1">
             <li>
                 <a href="{% url 'admin:index' %}" class="sidebar-link" target="_blank">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -349,11 +347,11 @@ Optional context for badge counts (from inspector dashboard):
     </div>
     
     <!-- Bottom Section: Settings, Sign Out, Dark Mode Toggle -->
-    <div class="px-4 py-4 border-t border-gray-200 dark:border-gray-800 mt-auto space-y-3">
+    <div class="px-4 py-4 mt-auto space-y-3">
         <!-- Settings & Sign Out -->
         <div class="flex items-center gap-2">
             <a href="{% url 'dashboard:dashboard_router' %}" 
-               class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+               class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-dark-card rounded-lg hover:bg-gray-200 dark:hover:bg-dark-elevated transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>

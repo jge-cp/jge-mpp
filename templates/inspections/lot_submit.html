@@ -4,13 +4,15 @@
 
 {% block dashboard_content %}
 <div class="max-w-4xl mx-auto" x-data="lotForm()">
-    <div class="mb-8">
-        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Submit Lot for Acceptance</h1>
-        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            Select an approved First Article and submit your lot for review.
-        </p>
-    </div>
     <div class="card p-6">
+        <!-- Card Header -->
+        <div class="mb-6">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white">Submit Lot for Acceptance</h2>
+            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                Select an approved First Article and submit your lot for review.
+            </p>
+        </div>
+
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             
@@ -73,18 +75,20 @@
                 </template>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                    <label class="form-label" for="{{ form.lot_lot_number.id_for_label }}">
-                        Lot Number *
-                    </label>
-                    {{ form.lot_lot_number }}
-                    {% if form.lot_lot_number.errors %}
-                        <p class="text-red-500 text-xs mt-1">{{ form.lot_lot_number.errors.0 }}</p>
-                    {% endif %}
-                    <p class="text-xs text-muted mt-1">Your unique identifier for this lot</p>
-                </div>
-                
+            <!-- Lot Number - full width -->
+            <div class="mb-4">
+                <label class="form-label" for="{{ form.lot_lot_number.id_for_label }}">
+                    Lot Number *
+                </label>
+                {{ form.lot_lot_number }}
+                {% if form.lot_lot_number.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.lot_lot_number.errors.0 }}</p>
+                {% endif %}
+                <p class="text-xs text-muted mt-1">Your unique identifier for this lot</p>
+            </div>
+
+            <!-- Yards Printed + Number of Samples -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                     <label class="form-label" for="{{ form.number_of_yards_printed.id_for_label }}">
                         Number of Yards Printed *
@@ -106,17 +110,19 @@
                     <label class="form-label">
                         Number of Samples (auto-calculated)
                     </label>
-                    <div class="form-input bg-gray-100 dark:bg-gray-800 cursor-not-allowed">
+                    <div class="form-input bg-gray-100 dark:bg-dark-card cursor-not-allowed">
                         <span x-text="sampleCount || '--'"></span>
                         <span class="text-muted text-sm ml-2" x-show="sampleCount">samples required</span>
                     </div>
                     <p class="text-xs text-muted mt-1">
                         0-800 yards = 2 samples, 801-22,000 = 3 samples, 22,001+ = 5 samples
                     </p>
-                    <!-- Hidden input for form submission -->
                     <input type="hidden" name="number_of_samples" :value="sampleCount">
                 </div>
-                
+            </div>
+
+            <!-- Date of Printing + Date Shipped -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                     <label class="form-label" for="{{ form.date_of_printing.id_for_label }}">
                         Date of Printing *
@@ -133,17 +139,10 @@
                     </label>
                     {{ form.date_shipped }}
                 </div>
-                
-                <div>
-                    <label class="form-label" for="{{ form.tracking_number.id_for_label }}">
-                        Tracking Number
-                    </label>
-                    {{ form.tracking_number }}
-                </div>
             </div>
-            
-            <!-- Submitter Name - separate first/last -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+
+            <!-- First Name + Last Name -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                     <label class="form-label" for="{{ form.submitter_first_name.id_for_label }}">
                         Submitter First Name *
@@ -162,6 +161,14 @@
                         <p class="text-red-500 text-xs mt-1">{{ form.submitter_last_name.errors.0 }}</p>
                     {% endif %}
                 </div>
+            </div>
+
+            <!-- Tracking Number - full width -->
+            <div class="mb-6">
+                <label class="form-label" for="{{ form.tracking_number.id_for_label }}">
+                    Tracking Number
+                </label>
+                {{ form.tracking_number }}
             </div>
             
             <!-- Dynamic Sample Number Inputs -->
@@ -200,14 +207,27 @@
                 <input type="hidden" name="individual_sample_numbers" :value="sampleInputs.filter(s => s).join(', ')">
             </div>
             
+            <!-- Supporting Documents - drag/drop style -->
             <div class="mb-6">
-                <label class="form-label">
-                    Supporting Documents
-                </label>
-                <input type="file" name="submission_documents" multiple 
-                       class="form-input"
-                       accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
-                <p class="text-xs text-muted mt-1">PDF, Word, or Image files (max 10MB each)</p>
+                <label class="form-label">Supporting Documents</label>
+                <div class="flex items-center justify-center w-full">
+                    <label for="submission_documents" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer bg-cream-100 dark:bg-dark-card hover:bg-cream-200 dark:hover:bg-dark-elevated transition-colors border-warm">
+                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                            <svg class="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                                <span class="font-semibold">Click to upload</span> or drag and drop
+                            </p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">PDF, Word, or Images (max 10MB each)</p>
+                        </div>
+                        <input id="submission_documents" name="submission_documents" type="file" multiple 
+                               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" class="hidden" />
+                    </label>
+                </div>
+                <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                    Upload any relevant documentation for the Lot submission.
+                </p>
             </div>
             
             <div class="flex justify-end space-x-4">

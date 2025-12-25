@@ -3,9 +3,9 @@
 {% block title %}First Article List - Multicam Partner Portal{% endblock %}
 
 {% block dashboard_content %}
-<div class="max-w-6xl mx-auto">
-    <div class="mb-6">
-        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">First Article Submissions</h1>
+<div class="card p-6">
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold">{% if profile.is_partner %}My First Articles{% else %}All First Articles{% endif %}</h2>
     </div>
 
     {% include 'partials/submissions/_list_filters.html' %}
@@ -15,4 +15,3 @@
     </div>
 </div>
 {% endblock dashboard_content %}
-

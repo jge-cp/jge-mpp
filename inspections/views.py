@@ -24,6 +24,7 @@ from .listing import (
     submitted_by_options_for_partner,
     submitted_by_options_for_inspector,
     company_options_for_inspector,
+    variant_options,
 )
 
 
@@ -97,27 +98,21 @@ def fa_list(request):
     filters = parse_list_filters(request.GET)
     fas = build_fa_queryset(profile, filters)
 
-    is_inspector = not profile.is_partner()
+    # All users get all filter options
     submitted_by_options = submitted_by_options_for_partner(profile) if profile.is_partner() else submitted_by_options_for_inspector()
-    company_options = company_options_for_inspector() if is_inspector else []
 
     context = {
         'profile': profile,
         'filters': filters.__dict__,
         'status_options': FA_STATUS_OPTIONS,
+        'variant_options': variant_options(),
+        'company_options': company_options_for_inspector(),
         'submitted_by_options': submitted_by_options,
-        'company_options': company_options,
-        'show_status_filter': True,
-        'show_submitted_by_filter': True,
-        'show_company_filter': is_inspector,
-        'show_date_filters': True,
         'clear_url': request.path,
         'items': fas,
         'kind': 'fa',
         'mode': 'list',
         'row_url': 'inspections:fa_detail',
-        'is_inspector': is_inspector,
-        'show_company_column': is_inspector,
         'empty_text': 'No First Article submissions yet.',
     }
     if request.headers.get('HX-Request'):
@@ -388,27 +383,21 @@ def lot_list(request):
     filters = parse_list_filters(request.GET)
     lots = build_lot_queryset(profile, filters)
 
-    is_inspector = not profile.is_partner()
+    # All users get all filter options
     submitted_by_options = submitted_by_options_for_partner(profile) if profile.is_partner() else submitted_by_options_for_inspector()
-    company_options = company_options_for_inspector() if is_inspector else []
 
     context = {
         'profile': profile,
         'filters': filters.__dict__,
         'status_options': LOT_STATUS_OPTIONS,
+        'variant_options': variant_options(),
+        'company_options': company_options_for_inspector(),
         'submitted_by_options': submitted_by_options,
-        'company_options': company_options,
-        'show_status_filter': True,
-        'show_submitted_by_filter': True,
-        'show_company_filter': is_inspector,
-        'show_date_filters': True,
         'clear_url': request.path,
         'items': lots,
         'kind': 'lot',
         'mode': 'list',
         'row_url': 'inspections:lot_detail',
-        'is_inspector': is_inspector,
-        'show_company_column': is_inspector,
         'empty_text': 'No lot submissions yet.',
     }
     if request.headers.get('HX-Request'):
@@ -492,22 +481,18 @@ def fa_review_queue_primary(request):
         'pending_fas': pending_fas,
         'queue_type': 'primary',
         'queue_title': 'Primary Review Queue',
+        'pending_count': pending_fas.count(),
         'filters': filters.__dict__,
-        'status_options': [],
-        'submitted_by_options': submitted_by_options_for_inspector(),
+        'status_options': FA_STATUS_OPTIONS,
+        'variant_options': variant_options(),
         'company_options': company_options_for_inspector(),
-        'show_status_filter': False,
-        'show_submitted_by_filter': True,
-        'show_company_filter': True,
-        'show_date_filters': True,
+        'submitted_by_options': submitted_by_options_for_inspector(),
         'clear_url': request.path,
         # shared results config
         'items': pending_fas,
         'kind': 'fa',
         'mode': 'queue',
         'row_url': 'inspections:fa_review',
-        'is_inspector': True,
-        'show_company_column': True,
         'empty_text': 'No pending First Article submissions.',
     }
     if request.headers.get('HX-Request'):
@@ -537,22 +522,18 @@ def fa_review_queue_final(request):
         'rejected_fas': rejected_fas,
         'queue_type': 'final',
         'queue_title': 'Final Review Queue',
+        'pending_count': pending_fas.count(),
         'filters': filters.__dict__,
-        'status_options': [],
-        'submitted_by_options': submitted_by_options_for_inspector(),
+        'status_options': FA_STATUS_OPTIONS,
+        'variant_options': variant_options(),
         'company_options': company_options_for_inspector(),
-        'show_status_filter': False,
-        'show_submitted_by_filter': True,
-        'show_company_filter': True,
-        'show_date_filters': True,
+        'submitted_by_options': submitted_by_options_for_inspector(),
         'clear_url': request.path,
         # shared results config
         'items': pending_fas,
         'kind': 'fa',
         'mode': 'queue',
         'row_url': 'inspections:fa_review',
-        'is_inspector': True,
-        'show_company_column': True,
         'empty_text': 'No pending First Article submissions.',
     }
     if request.headers.get('HX-Request'):
@@ -915,21 +896,18 @@ def lot_review_queue(request):
 
     context = {
         'pending_lots': pending_lots,
+        'pending_count': pending_lots.count(),
         'filters': filters.__dict__,
-        'submitted_by_options': submitted_by_options_for_inspector(),
+        'status_options': LOT_STATUS_OPTIONS,
+        'variant_options': variant_options(),
         'company_options': company_options_for_inspector(),
-        'show_status_filter': False,
-        'show_submitted_by_filter': True,
-        'show_company_filter': True,
-        'show_date_filters': True,
+        'submitted_by_options': submitted_by_options_for_inspector(),
         'clear_url': request.path,
         # shared results config
         'items': pending_lots,
         'kind': 'lot',
         'mode': 'queue',
         'row_url': 'inspections:lot_review',
-        'is_inspector': True,
-        'show_company_column': True,
         'empty_text': 'No pending lot submissions.',
     }
     if request.headers.get('HX-Request'):

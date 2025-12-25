@@ -6,69 +6,92 @@
 <style>
     /* Evaluation result indicators */
     .result-pass {
-        background-color: #22c55e !important;
+        background-color: #16a34a !important;
         color: white !important;
         font-weight: bold;
-        padding: 2px 8px;
+        padding: 4px 12px;
         border-radius: 4px;
+        display: inline-block;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.05em;
     }
     .result-fail {
-        background-color: #ef4444 !important;
+        background-color: #dc2626 !important;
         color: white !important;
         font-weight: bold;
-        padding: 2px 8px;
+        padding: 4px 12px;
         border-radius: 4px;
+        display: inline-block;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.05em;
     }
     .result-pending {
-        background-color: #6b7280;
+        background-color: #b9ac9e;
         color: white;
         font-weight: bold;
-        padding: 2px 8px;
+        padding: 4px 12px;
         border-radius: 4px;
+        display: inline-block;
     }
     
-    /* Sample section styling */
-    .sample-section {
-        border: 2px solid var(--color-border);
-        border-radius: 8px;
-        margin-bottom: 1.5rem;
-        transition: border-color 0.2s;
-    }
+    /* Sample section pass/fail border colors */
     .sample-section.pass-section {
-        border-color: #22c55e;
+        border-color: #16a34a !important;
     }
     .sample-section.fail-section {
-        border-color: #ef4444;
-    }
-    .sample-header {
-        background-color: var(--color-bg-elevated);
-        padding: 1rem;
-        border-bottom: 1px solid var(--color-border);
-        border-radius: 6px 6px 0 0;
+        border-color: #dc2626 !important;
     }
     
-    /* Rating row styling */
+    /* Rating row styling - warm backgrounds */
     .rating-row {
         transition: background-color 0.2s;
     }
     .rating-row.pass-row {
-        background-color: rgba(34, 197, 94, 0.1);
+        background-color: rgba(22, 163, 74, 0.15) !important;
     }
     .rating-row.fail-row {
-        background-color: rgba(239, 68, 68, 0.1);
+        background-color: rgba(220, 38, 38, 0.15) !important;
     }
     
     /* Evaluation table */
     .eval-table th {
-        background-color: var(--color-bg-elevated);
+        background-color: #efece8;
         font-weight: 600;
         text-transform: uppercase;
         font-size: 0.7rem;
         letter-spacing: 0.05em;
     }
+    .dark .eval-table th {
+        background-color: #0a0a0a;
+        color: #d1d5db;
+    }
     .eval-table td, .eval-table th {
         padding: 0.5rem 0.75rem;
-        border: 1px solid var(--color-border);
+        border: 1px solid #efece8;
+    }
+    .dark .eval-table td, .dark .eval-table th {
+        border-color: #2a2d2d;
+        color: #d1d5db;
+    }
+    
+    /* Overall result styling - matches FA */
+    .overall-pass {
+        background-color: #16a34a !important;
+        color: white !important;
+        border: 3px solid #15803d !important;
+    }
+    .overall-fail {
+        background-color: #dc2626 !important;
+        color: white !important;
+        border: 3px solid #b91c1c !important;
+    }
+    .overall-result-text {
+        font-size: 2rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
     }
 </style>
 {% endblock %}
@@ -78,17 +101,16 @@
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
         <div>
-            <h1 class="text-3xl font-bold text-primary">Lot Evaluation</h1>
-            <p class="text-lg text-muted mt-1">{{ lot.display_name }}</p>
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white">Lot Evaluation</h2>
         </div>
         <div>
-            <span class="badge-info text-lg px-4 py-2">{{ num_samples }} Samples</span>
+            <span class="text-sm px-3 py-1 rounded-full font-semibold" style="background-color: #d9d4cc; color: #594936;">{{ num_samples }} Samples</span>
         </div>
     </div>
     
     <!-- Lot Details Card -->
     <div class="card p-6 mb-6">
-        <h2 class="text-xl font-bold mb-4 border-b border-theme pb-2">Lot Details</h2>
+        <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Lot Details</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
                 <dt class="text-sm font-medium text-muted">Partner</dt>
@@ -135,21 +157,17 @@
         
         <!-- Sample Sections -->
         {% for sample in samples_data %}
-        <div class="sample-section" id="sample-section-{{ sample.sample_number }}" data-sample="{{ sample.sample_number }}">
-            <div class="sample-header flex justify-between items-center">
-                <div>
-                    <h3 class="text-lg font-bold text-primary">Sample {{ sample.sample_number }}: {{ sample.sample_id }}</h3>
-                </div>
-                <div>
-                    <span class="sample-result result-pending" id="sample-result-{{ sample.sample_number }}">
-                        {% if sample.sample_eval.pattern_execution and sample.sample_eval.scale %}
-                            {% if sample.sample_eval.all_pass %}Pass{% else %}Fail{% endif %}
-                        {% else %}--{% endif %}
-                    </span>
-                </div>
+        <div class="card p-6 mb-6 sample-section" id="sample-section-{{ sample.sample_number }}" data-sample="{{ sample.sample_number }}">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white">Sample {{ sample.sample_number }}: {{ sample.sample_id }}</h2>
+                <span class="sample-result result-pending" id="sample-result-{{ sample.sample_number }}">
+                    {% if sample.sample_eval.pattern_execution and sample.sample_eval.scale %}
+                        {% if sample.sample_eval.all_pass %}Pass{% else %}Fail{% endif %}
+                    {% else %}Incomplete{% endif %}
+                </span>
             </div>
             
-            <div class="p-4">
+            <div>
                 <!-- Shade Matching Table -->
                 <h4 class="font-semibold mb-2 text-sm text-muted uppercase">Shade Matching (Rating ≥ 3 = Pass)</h4>
                 <table class="w-full eval-table mb-4">
@@ -265,29 +283,29 @@
         
         <!-- Overall Comments Section -->
         <div class="card p-6 mb-6">
-            <h2 class="text-xl font-bold mb-4 border-b border-theme pb-2">Overall Comments</h2>
+            <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Overall Comments</h2>
             <textarea name="comments" 
                       class="form-textarea w-full"
                       rows="3"
                       placeholder="Overall lot evaluation comments...">{{ evaluation.comments|default:'' }}</textarea>
         </div>
         
-        <!-- Overall Result Preview -->
-        <div class="card p-6 mb-6 border-2" id="overall-result-card">
+        <!-- Overall Result Preview - matches FA style -->
+        <div class="card p-8 mb-6 border-4" id="overall-result-card">
             <div class="flex justify-between items-center">
                 <div>
-                    <h2 class="text-xl font-bold">Overall Lot Result</h2>
-                    <p class="text-muted text-sm">All {{ num_samples }} samples must pass</p>
+                    <h2 class="text-2xl font-bold" id="overall-result-title">OVERALL RESULT</h2>
+                    <p class="text-muted text-sm" id="overall-result-subtitle">All {{ num_samples }} samples must pass</p>
                 </div>
-                <div id="overall-result-display" class="text-2xl font-bold">
+                <div id="overall-result-display" class="text-3xl font-bold">
                     {% if evaluation.is_submitted %}
                         {% if evaluation.all_pass %}
-                            <span class="result-pass px-6 py-3">PASS</span>
+                            <span class="overall-result-text text-white">✓ PASS</span>
                         {% else %}
-                            <span class="result-fail px-6 py-3">FAIL</span>
+                            <span class="overall-result-text text-white">✗ FAIL</span>
                         {% endif %}
                     {% else %}
-                        <span class="result-pending px-6 py-3">Pending</span>
+                        <span class="overall-result-text" style="color: #b9ac9e;">INCOMPLETE</span>
                     {% endif %}
                 </div>
             </div>
@@ -304,7 +322,7 @@
                     Save Draft
                 </button>
                 <button type="submit" name="submit_evaluation" 
-                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded border border-blue-700"
+                        class="btn-primary"
                         onclick="return confirmSubmit()">
                     Submit Evaluation
                 </button>
@@ -410,6 +428,8 @@
     function updateOverallResult() {
         const overallDisplay = document.getElementById('overall-result-display');
         const overallCard = document.getElementById('overall-result-card');
+        const overallTitle = document.getElementById('overall-result-title');
+        const overallSubtitle = document.getElementById('overall-result-subtitle');
         
         let allSamplesComplete = true;
         let allSamplesPass = true;
@@ -425,15 +445,23 @@
             }
         }
         
+        overallCard.classList.remove('overall-pass', 'overall-fail');
+        
         if (!allSamplesComplete) {
-            overallDisplay.innerHTML = '<span class="result-pending px-6 py-3">Incomplete</span>';
-            overallCard.style.borderColor = 'var(--color-border)';
+            overallDisplay.innerHTML = '<span class="overall-result-text" style="color: #b9ac9e;">INCOMPLETE</span>';
+            overallCard.style.borderColor = '#efece8';
+            if (overallTitle) overallTitle.className = 'text-2xl font-bold';
+            if (overallSubtitle) overallSubtitle.className = 'text-muted text-sm';
         } else if (allSamplesPass) {
-            overallDisplay.innerHTML = '<span class="result-pass px-6 py-3">WILL PASS</span>';
-            overallCard.style.borderColor = '#22c55e';
+            overallDisplay.innerHTML = '<span class="overall-result-text text-white">✓ PASS</span>';
+            overallCard.classList.add('overall-pass');
+            if (overallTitle) overallTitle.className = 'text-2xl font-bold text-white';
+            if (overallSubtitle) overallSubtitle.className = 'text-white/80 text-sm';
         } else {
-            overallDisplay.innerHTML = '<span class="result-fail px-6 py-3">WILL FAIL</span>';
-            overallCard.style.borderColor = '#ef4444';
+            overallDisplay.innerHTML = '<span class="overall-result-text text-white">✗ FAIL</span>';
+            overallCard.classList.add('overall-fail');
+            if (overallTitle) overallTitle.className = 'text-2xl font-bold text-white';
+            if (overallSubtitle) overallSubtitle.className = 'text-white/80 text-sm';
         }
     }
     

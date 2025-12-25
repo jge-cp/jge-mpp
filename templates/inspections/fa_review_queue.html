@@ -3,9 +3,12 @@
 {% block title %}First Article Review Queue - Multicam Partner Portal{% endblock %}
 
 {% block dashboard_content %}
-<div class="max-w-6xl mx-auto">
-    <div class="mb-6">
-        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">First Article Review Queue</h1>
+<div class="card p-6 mb-8">
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold">First Article Review Queue</h2>
+        {% if pending_count is not None %}
+        <span class="badge badge-count">{{ pending_count }} pending</span>
+        {% endif %}
     </div>
 
     {% include 'partials/submissions/_list_filters.html' %}
@@ -19,13 +22,14 @@
     >
         {% include 'partials/submissions/_results.html' with items=items kind=kind mode=mode row_url=row_url is_inspector=is_inspector show_company_column=show_company_column empty_text=empty_text %}
     </div>
-
-    {% if queue_type == 'final' and rejected_fas %}
-      <div class="mt-8">
-        <h2 class="text-xl font-bold mb-4">Recently Rejected (Visibility)</h2>
-        {% include 'partials/submissions/_results.html' with items=rejected_fas kind='fa' mode='list' row_url='inspections:fa_review' is_inspector=True show_company_column=True empty_text='No rejected FAs.' %}
-      </div>
-    {% endif %}
 </div>
-{% endblock dashboard_content %}
 
+{% if queue_type == 'final' and rejected_fas %}
+<div class="card p-6">
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold">Recently Rejected (Visibility)</h2>
+    </div>
+    {% include 'partials/submissions/_results.html' with items=rejected_fas kind='fa' mode='list' row_url='inspections:fa_review' is_inspector=True show_company_column=True empty_text='No rejected FAs.' %}
+</div>
+{% endif %}
+{% endblock dashboard_content %}

@@ -17,7 +17,7 @@ Child templates should:
 {% include 'partials/sidebar.html' %}
 {% endblock %}
 
-{% block main_class %}p-6 md:ml-64 min-h-screen{% endblock %}
+{% block main_class %}p-6 md:p-8 md:ml-64 min-h-screen{% endblock %}
 
 {% block content_wrapper_class %}{% endblock %}
 
@@ -28,8 +28,7 @@ Child templates should:
     <!-- Mobile sidebar toggle - floats at top on mobile -->
     <button @click="sidebarOpen = !sidebarOpen"
             type="button"
-            class="fixed top-4 left-4 z-30 p-2 text-gray-600 bg-white rounded-xl shadow-lg cursor-pointer md:hidden hover:text-gray-900 hover:bg-gray-50 focus:ring-2 focus:ring-gray-300 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-600"
-            style="background-color: var(--color-bg-card);">
+            class="fixed top-4 left-4 z-30 p-2 text-gray-600 bg-cream rounded-xl shadow-lg cursor-pointer md:hidden hover:text-gray-900 hover:bg-cream-200 focus:ring-2 focus:ring-gray-300 dark:bg-dark-card dark:text-gray-400 dark:hover:bg-dark-elevated dark:hover:text-white dark:focus:ring-gray-600">
         <svg x-show="!sidebarOpen" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
         </svg>

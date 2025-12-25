@@ -1,16 +1,15 @@
-<!-- Prominent Action Buttons -->
+<!-- Prominent Action Buttons - Simplified -->
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
     <a href="{% url 'inspections:fa_submit' %}"
-       class="p-6 rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-950 hover:border-gray-900 dark:hover:border-gray-500 transition-all group hover:shadow-lg">
+       class="p-6 rounded-2xl border border-gray-300/50 dark:border-dark-border bg-cream dark:bg-dark-card hover:border-gray-400 dark:hover:border-dark-elevated transition-all group hover:shadow-lg">
         <div class="flex items-center space-x-4">
-            <div class="flex-shrink-0 w-14 h-14 bg-gray-100 dark:bg-gray-700 rounded-2xl flex items-center justify-center">
+            <div class="flex-shrink-0 w-14 h-14 bg-background dark:bg-dark-card rounded-2xl flex items-center justify-center">
                 <svg class="w-7 h-7 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
             </div>
             <div class="flex-1">
                 <h3 class="text-lg font-bold group-hover:text-gray-900 dark:group-hover:text-white">Submit First Article</h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Submit a new First Article for inspection</p>
             </div>
             <svg class="w-6 h-6 text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -19,18 +18,15 @@
     </a>
 
     <a href="{% url 'inspections:lot_submit' %}"
-       class="p-6 rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-950 hover:border-gray-900 dark:hover:border-gray-500 transition-all group hover:shadow-lg {% if not fa_stats.approved %}opacity-50 pointer-events-none{% endif %}">
+       class="p-6 rounded-2xl border border-gray-300/50 dark:border-dark-border bg-cream dark:bg-dark-card hover:border-gray-400 dark:hover:border-dark-elevated transition-all group hover:shadow-lg {% if not fa_stats.approved %}opacity-50 pointer-events-none{% endif %}">
         <div class="flex items-center space-x-4">
-            <div class="flex-shrink-0 w-14 h-14 bg-gray-100 dark:bg-gray-700 rounded-2xl flex items-center justify-center">
+            <div class="flex-shrink-0 w-14 h-14 bg-background dark:bg-dark-card rounded-2xl flex items-center justify-center">
                 <svg class="w-7 h-7 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
             </div>
             <div class="flex-1">
                 <h3 class="text-lg font-bold group-hover:text-gray-900 dark:group-hover:text-white">Submit Lot</h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400">
-                    {% if fa_stats.approved %}Submit production lots for approval{% else %}Requires approved First Article{% endif %}
-                </p>
             </div>
             <svg class="w-6 h-6 text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -39,78 +35,152 @@
     </a>
 </div>
 
-<!-- Recent Activity -->
-<div class="p-8 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-950">
-    <div class="flex items-center justify-between mb-6">
-        <h2 class="text-lg font-bold text-gray-900 dark:text-white">Recent Activity</h2>
+{% load inspections_ui %}
+
+<!-- First Articles List with Filters -->
+<div class="card p-6 mb-8">
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold">My First Articles</h2>
         <a href="{% url 'inspections:fa_list' %}" class="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
             View all →
         </a>
     </div>
-
-    <div class="space-y-4">
-        {% load inspections_ui %}
-        {% for fa in recent_fas %}
-            {% fa_status_meta fa "dashboard" as meta %}
-            <a href="{% url 'inspections:fa_detail' fa.fai_id %}" class="block group">
-                <div class="flex items-center justify-between p-4 rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 transition-all">
-                    <div class="flex items-center space-x-4">
-                        <div class="flex-shrink-0 w-12 h-12 bg-white dark:bg-gray-950 rounded-xl flex items-center justify-center border border-gray-200 dark:border-gray-700">
-                            <svg class="w-6 h-6 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
-                        </div>
-                        <div>
-                            <div class="font-semibold text-gray-900 dark:text-white group-hover:text-gray-700 dark:group-hover:text-gray-200">
-                                {{ fa.display_name }}
-                            </div>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">FA Lot #: {{ fa.fa_lot_number }}</p>
-                        </div>
-                    </div>
-                    <div class="text-right flex-shrink-0">
-                        <span class="badge {{ meta.badge_variant }}">{{ meta.badge_label }}</span>
-                        {% if meta.subtext %}
-                            <p class="text-xs {{ meta.subtext_class }} mt-1">{{ meta.subtext }}</p>
-                        {% endif %}
-                    </div>
-                </div>
-            </a>
-        {% empty %}
-            <div class="text-center py-12">
-                <svg class="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
-                <p class="text-gray-500 dark:text-gray-400">No submissions yet. Get started by submitting a First Article!</p>
+    
+    <!-- FA Filters -->
+    <form id="fa-filters-form" class="mb-4 space-y-3">
+        <input type="hidden" name="fa_sort" value="{{ fa_filters.sort|default:'' }}" />
+        <input type="hidden" name="fa_sort_dir" value="{{ fa_filters.sort_dir|default:'' }}" />
+        <div class="flex flex-wrap gap-3 items-end">
+            <div class="flex-1 min-w-[180px]">
+                <label for="fa-q" class="form-label">Search</label>
+                <input id="fa-q" name="fa_q" value="{{ fa_filters.q|default:'' }}" placeholder="Search…" class="form-input"
+                    hx-get="{{ request.path }}" hx-trigger="keyup changed delay:300ms" hx-target="#partner-dashboard-live" hx-swap="innerHTML" hx-include="#fa-filters-form" hx-replace-url="true" />
             </div>
-        {% endfor %}
-
-        {% for lot in recent_lots %}
-            {% lot_status_meta lot "dashboard" as meta %}
-            <a href="{% url 'inspections:lot_detail' lot.lot_id %}" class="block group">
-                <div class="flex items-center justify-between p-4 rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 hover:bg-white dark:hover:bg-gray-800 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 transition-all">
-                    <div class="flex items-center space-x-4">
-                        <div class="flex-shrink-0 w-12 h-12 bg-white dark:bg-gray-950 rounded-xl flex items-center justify-center border border-gray-200 dark:border-gray-700">
-                            <svg class="w-6 h-6 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                            </svg>
-                        </div>
-                        <div>
-                            <div class="font-semibold text-gray-900 dark:text-white group-hover:text-gray-700 dark:group-hover:text-gray-200">
-                                {{ lot.display_name }}
-                            </div>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Lot #: {{ lot.lot_lot_number }} - {{ lot.number_of_yards_printed }} yards</p>
-                        </div>
-                    </div>
-                    <div class="text-right flex-shrink-0">
-                        <span class="badge {{ meta.badge_variant }}">{{ meta.badge_label }}</span>
-                        {% if meta.subtext %}
-                            <p class="text-xs {{ meta.subtext_class }} mt-1">{{ meta.subtext }}</p>
-                        {% endif %}
-                    </div>
-                </div>
-            </a>
-        {% endfor %}
+            <div class="w-[140px]">
+                <label for="fa-variant" class="form-label">Variant</label>
+                <select id="fa-variant" name="fa_variant" class="form-input" hx-get="{{ request.path }}" hx-trigger="change" hx-target="#partner-dashboard-live" hx-swap="innerHTML" hx-include="#fa-filters-form" hx-replace-url="true">
+                    <option value="">All</option>
+                    {% for value,label in fa_variant_options %}
+                        <option value="{{ value }}" {% if fa_filters.variant == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="w-[140px]">
+                <label for="fa-company" class="form-label">Company</label>
+                <select id="fa-company" name="fa_company" class="form-input" hx-get="{{ request.path }}" hx-trigger="change" hx-target="#partner-dashboard-live" hx-swap="innerHTML" hx-include="#fa-filters-form" hx-replace-url="true">
+                    <option value="">All</option>
+                    {% for value,label in fa_company_options %}
+                        <option value="{{ value }}" {% if fa_filters.company == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="w-[120px]">
+                <label for="fa-date_from" class="form-label">From</label>
+                <input id="fa-date_from" name="fa_date_from" type="date" value="{{ fa_filters.date_from|default:'' }}" class="form-input"
+                    hx-get="{{ request.path }}" hx-trigger="change" hx-target="#partner-dashboard-live" hx-swap="innerHTML" hx-include="#fa-filters-form" hx-replace-url="true" />
+            </div>
+            <div class="w-[120px]">
+                <label for="fa-date_to" class="form-label">To</label>
+                <input id="fa-date_to" name="fa_date_to" type="date" value="{{ fa_filters.date_to|default:'' }}" class="form-input"
+                    hx-get="{{ request.path }}" hx-trigger="change" hx-target="#partner-dashboard-live" hx-swap="innerHTML" hx-include="#fa-filters-form" hx-replace-url="true" />
+            </div>
+            <div class="w-[140px]">
+                <label for="fa-submitted_by" class="form-label">Submitted By</label>
+                <select id="fa-submitted_by" name="fa_submitted_by" class="form-input" hx-get="{{ request.path }}" hx-trigger="change" hx-target="#partner-dashboard-live" hx-swap="innerHTML" hx-include="#fa-filters-form" hx-replace-url="true">
+                    <option value="">All</option>
+                    {% for value,label in fa_submitted_by_options %}
+                        <option value="{{ value }}" {% if fa_filters.submitted_by == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="w-[130px]">
+                <label for="fa-status" class="form-label">Status</label>
+                <select id="fa-status" name="fa_status" class="form-input" hx-get="{{ request.path }}" hx-trigger="change" hx-target="#partner-dashboard-live" hx-swap="innerHTML" hx-include="#fa-filters-form" hx-replace-url="true">
+                    <option value="">All</option>
+                    {% for value,label in fa_status_options %}
+                        <option value="{{ value }}" {% if fa_filters.status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </form>
+    
+    <!-- FA Results -->
+    <div id="fa-queue-results">
+        {% include 'partials/submissions/_results.html' with items=recent_fas kind='fa' mode='list' row_url='inspections:fa_detail' empty_text='No First Articles yet. Submit your first one above!' filters=fa_filters form_id='fa-filters-form' target_id='fa-queue-results' sort_prefix='fa_' %}
     </div>
 </div>
 
-
+<!-- Lots List with Filters -->
+<div class="card p-6">
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold">My Lots</h2>
+        <a href="{% url 'inspections:lot_list' %}" class="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+            View all →
+        </a>
+    </div>
+    
+    <!-- Lot Filters -->
+    <form id="lot-filters-form" class="mb-4 space-y-3">
+        <input type="hidden" name="lot_sort" value="{{ lot_filters.sort|default:'' }}" />
+        <input type="hidden" name="lot_sort_dir" value="{{ lot_filters.sort_dir|default:'' }}" />
+        <div class="flex flex-wrap gap-3 items-end">
+            <div class="flex-1 min-w-[180px]">
+                <label for="lot-q" class="form-label">Search</label>
+                <input id="lot-q" name="lot_q" value="{{ lot_filters.q|default:'' }}" placeholder="Search…" class="form-input"
+                    hx-get="{{ request.path }}" hx-trigger="keyup changed delay:300ms" hx-target="#partner-dashboard-live" hx-swap="innerHTML" hx-include="#lot-filters-form" hx-replace-url="true" />
+            </div>
+            <div class="w-[140px]">
+                <label for="lot-variant" class="form-label">Variant</label>
+                <select id="lot-variant" name="lot_variant" class="form-input" hx-get="{{ request.path }}" hx-trigger="change" hx-target="#partner-dashboard-live" hx-swap="innerHTML" hx-include="#lot-filters-form" hx-replace-url="true">
+                    <option value="">All</option>
+                    {% for value,label in lot_variant_options %}
+                        <option value="{{ value }}" {% if lot_filters.variant == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="w-[140px]">
+                <label for="lot-company" class="form-label">Company</label>
+                <select id="lot-company" name="lot_company" class="form-input" hx-get="{{ request.path }}" hx-trigger="change" hx-target="#partner-dashboard-live" hx-swap="innerHTML" hx-include="#lot-filters-form" hx-replace-url="true">
+                    <option value="">All</option>
+                    {% for value,label in lot_company_options %}
+                        <option value="{{ value }}" {% if lot_filters.company == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="w-[120px]">
+                <label for="lot-date_from" class="form-label">From</label>
+                <input id="lot-date_from" name="lot_date_from" type="date" value="{{ lot_filters.date_from|default:'' }}" class="form-input"
+                    hx-get="{{ request.path }}" hx-trigger="change" hx-target="#partner-dashboard-live" hx-swap="innerHTML" hx-include="#lot-filters-form" hx-replace-url="true" />
+            </div>
+            <div class="w-[120px]">
+                <label for="lot-date_to" class="form-label">To</label>
+                <input id="lot-date_to" name="lot_date_to" type="date" value="{{ lot_filters.date_to|default:'' }}" class="form-input"
+                    hx-get="{{ request.path }}" hx-trigger="change" hx-target="#partner-dashboard-live" hx-swap="innerHTML" hx-include="#lot-filters-form" hx-replace-url="true" />
+            </div>
+            <div class="w-[140px]">
+                <label for="lot-submitted_by" class="form-label">Submitted By</label>
+                <select id="lot-submitted_by" name="lot_submitted_by" class="form-input" hx-get="{{ request.path }}" hx-trigger="change" hx-target="#partner-dashboard-live" hx-swap="innerHTML" hx-include="#lot-filters-form" hx-replace-url="true">
+                    <option value="">All</option>
+                    {% for value,label in lot_submitted_by_options %}
+                        <option value="{{ value }}" {% if lot_filters.submitted_by == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="w-[130px]">
+                <label for="lot-status" class="form-label">Status</label>
+                <select id="lot-status" name="lot_status" class="form-input" hx-get="{{ request.path }}" hx-trigger="change" hx-target="#partner-dashboard-live" hx-swap="innerHTML" hx-include="#lot-filters-form" hx-replace-url="true">
+                    <option value="">All</option>
+                    {% for value,label in lot_status_options %}
+                        <option value="{{ value }}" {% if lot_filters.status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </form>
+    
+    <!-- Lot Results -->
+    <div id="lot-queue-results">
+        {% include 'partials/submissions/_results.html' with items=recent_lots kind='lot' mode='list' row_url='inspections:lot_detail' empty_text='No Lots yet. You can submit lots after an FA is approved.' filters=lot_filters form_id='lot-filters-form' target_id='lot-queue-results' sort_prefix='lot_' %}
+    </div>
+</div>

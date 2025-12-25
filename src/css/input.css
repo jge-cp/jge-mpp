@@ -11,11 +11,11 @@
    ============================================ */
 @layer base {
   /* Import Google Fonts */
-  @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;500;600;700&family=Roboto+Mono:wght@300;400;500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;600;700&display=swap');
 
   /* Default body styles */
   body {
-    @apply font-body text-base text-gray-700 bg-white antialiased;
+    @apply font-body text-base text-gray-700 bg-background antialiased;
   }
 
   /* Headings use Roboto Condensed */
@@ -47,9 +47,9 @@
     @apply text-xs font-bold uppercase tracking-wide; /* 9px */
   }
 
-  /* Links */
+  /* Links - orange accent */
   a {
-    @apply text-primary-700 hover:text-primary-900 transition-colors;
+    @apply text-accent-500 hover:text-accent-600 transition-colors;
   }
 
   /* Code elements use Roboto Mono (already default) */
@@ -62,9 +62,10 @@
    COMPONENT LAYER - Custom Components
    ============================================ */
 @layer components {
-  /* Card Component */
+  /* Card Component - cream background, warm border */
   .card {
-    @apply bg-white rounded-2xl border border-gray-200 shadow-sm;
+    @apply bg-cream rounded-2xl shadow-sm border;
+    border-color: #efece8;
   }
 
   .card-body {
@@ -72,12 +73,13 @@
   }
 
   .card-header {
-    @apply px-8 py-5 border-b border-gray-100 font-heading font-semibold text-lg text-gray-900;
+    @apply px-8 py-5 border-b font-heading font-semibold text-lg text-gray-900;
+    border-color: #efece8;
   }
 
-  /* Stat Card */
+  /* Stat Card - cream background, no border */
   .stat-card {
-    @apply bg-white rounded-2xl border border-gray-200 p-8;
+    @apply bg-cream rounded-2xl shadow-sm p-8;
   }
 
   .stat-value {
@@ -88,56 +90,72 @@
     @apply text-sm text-gray-500 uppercase tracking-wide;
   }
 
-  /* Status Badges - pill style matching Flowbite theme */
+  /* Status Badges - filled pill style, uniform size */
   .badge {
-    @apply inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide;
+    @apply flex items-center justify-center w-full max-w-[140px] min-h-[48px] px-4 py-2 rounded-full text-xs font-semibold text-white text-center leading-tight;
+  }
+
+  /* Inline badge variant for mobile cards */
+  .badge.flex-shrink-0 {
+    @apply w-auto max-w-none min-h-0 py-1.5;
+  }
+
+  /* Count badge variant - for "X pending" headers - RED */
+  .badge-count {
+    @apply bg-red-600 w-auto max-w-none min-h-0 py-2 px-6;
   }
 
   .badge-pending {
-    @apply bg-warning-400 text-gray-900;
+    background-color: #e3d39c;
+    @apply text-gray-900;
   }
 
   .badge-pending-final {
-    @apply bg-gray-900 text-white;
+    background-color: #dd8a4e;
   }
 
   .badge-approved {
-    @apply bg-success-500 text-white;
+    @apply bg-green-600;
   }
 
   .badge-rejected {
-    @apply bg-error-500 text-white;
+    @apply bg-red-600;
   }
 
   .badge-active {
-    @apply bg-success-500 text-white;
+    @apply bg-green-600;
   }
 
   .badge-in-progress {
-    @apply bg-info-500 text-white;
+    @apply bg-blue-600;
   }
 
   /* Form Components */
   .form-label {
-    @apply block text-sm font-semibold text-gray-700 mb-2;
+    @apply block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2;
   }
 
   .form-input {
-    @apply w-full px-4 py-3 text-base border-2 border-gray-300 rounded-lg 
+    @apply w-full px-6 py-3.5 text-base rounded-full 
+           bg-white
            focus:ring-2 focus:ring-primary-500 focus:border-primary-500 
            transition-colors;
+    border: 1px solid #efece8;
   }
 
   .form-select {
-    @apply w-full px-4 py-3 text-base border-2 border-gray-300 rounded-lg 
+    @apply w-full px-6 py-3.5 text-base rounded-full 
            focus:ring-2 focus:ring-primary-500 focus:border-primary-500 
            bg-white transition-colors;
+    border: 1px solid #efece8;
   }
 
   .form-textarea {
-    @apply w-full px-4 py-3 text-base border-2 border-gray-300 rounded-lg 
+    @apply w-full px-6 py-3.5 text-base rounded-3xl 
+           bg-white
            focus:ring-2 focus:ring-primary-500 focus:border-primary-500 
            transition-colors resize-y;
+    border: 1px solid #efece8;
   }
 
   /* Button Components */
@@ -149,15 +167,20 @@
   }
 
   .btn-primary {
-    @apply btn bg-gray-900 border-gray-900 text-white 
-           hover:bg-black hover:border-black
-           focus:ring-gray-500;
+    @apply btn bg-accent-500 border-accent-500 text-white 
+           hover:bg-accent-600 hover:border-accent-600
+           focus:ring-accent-500;
   }
 
   .btn-secondary {
-    @apply btn bg-white border-gray-300 text-gray-700 
-           hover:bg-gray-50 hover:border-gray-400
+    @apply btn bg-white text-gray-700 
+           hover:bg-cream-100
            focus:ring-gray-500;
+    border-color: #efece8;
+  }
+
+  .btn-secondary:hover {
+    border-color: #e0dcd7;
   }
 
   .btn-danger {
@@ -174,7 +197,7 @@
 
   .btn-ghost {
     @apply btn bg-transparent border-transparent text-gray-700 
-           hover:bg-gray-100 
+           hover:bg-cream-100 
            focus:ring-gray-500;
   }
 
@@ -201,22 +224,71 @@
     @apply px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider;
   }
 
+  /* Sidebar count badge - red circle like notification badge */
+  .sidebar-badge {
+    @apply inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-semibold text-white bg-red-600 rounded-full;
+  }
+
   /* Table Styles */
   .table-header {
-    @apply bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide;
+    @apply text-xs font-semibold text-gray-500 uppercase tracking-wide;
+    background-color: #efece8;
+  }
+
+  /* Evaluation table styles */
+  .eval-table thead tr {
+    background-color: #efece8;
+  }
+
+  .eval-table:is(.dark *) thead tr,
+  .dark .eval-table thead tr {
+    background-color: #0a0a0a;
+  }
+
+  .eval-table th {
+    @apply text-xs font-semibold text-gray-600 uppercase tracking-wide px-4 py-3;
+  }
+
+  .eval-table:is(.dark *) th,
+  .dark .eval-table th {
+    @apply text-gray-300;
+  }
+
+  .eval-table td {
+    @apply px-4 py-3;
+  }
+
+  .eval-table:is(.dark *) td,
+  .dark .eval-table td {
+    @apply text-gray-300;
   }
 
   .table-row {
-    @apply border-b border-gray-200 hover:bg-gray-50 transition-colors;
+    @apply hover:bg-white transition-colors;
+    border-bottom: 1px solid #efece8;
   }
 
   .table-cell {
-    @apply px-4 py-4 text-sm text-gray-700;
+    @apply px-5 py-5 text-sm text-gray-700;
+  }
+
+  /* Striped table - apply to table element */
+  .table-striped tbody tr {
+    border-bottom: 1px solid #efece8;
+  }
+
+  .table-striped tbody tr:nth-child(even) {
+    background-color: #efece8;
+  }
+
+  .table-striped tbody tr:hover {
+    @apply bg-white;
   }
 
   /* Alert Components */
   .alert {
-    @apply p-4 rounded-lg border-2 flex items-start gap-3;
+    @apply p-4 rounded-lg flex items-start gap-3;
+    border: 2px solid #efece8;
   }
 
   .alert-info {
@@ -251,12 +323,22 @@
 
   /* Background utilities */
   .bg-elevated {
-    @apply bg-gray-50;
+    @apply bg-cream-100;
   }
 
   /* Border utilities */
   .border-theme {
-    @apply border-gray-200;
+    border-color: #efece8;
+  }
+
+  /* Warm background for light mode - dark card for dark mode */
+  .bg-warm {
+    background-color: #efece8;
+  }
+
+  /* Warm border for light mode */
+  .border-warm {
+    border-color: #efece8;
   }
 
   /* Focus ring */
@@ -285,48 +367,88 @@
    ============================================ */
 .dark {
   body {
-    @apply bg-black text-gray-300;
+    @apply text-gray-300;
+    background-color: #000000;
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply text-white;
   }
 
+  a {
+    @apply text-accent-400 hover:text-accent-300;
+  }
+
   .card {
-    @apply bg-gray-950 border-gray-700;
+    background-color: #1f2121;
+    border-color: #2a2d2d;
   }
 
   .card-header {
-    @apply border-gray-700 text-white;
+    @apply text-white;
+    border-color: #2a2d2d;
   }
 
   .stat-card {
-    @apply bg-gray-800 border-gray-700;
+    background-color: #1f2121;
+    border-color: #2a2d2d;
   }
 
   .form-input, .form-select, .form-textarea {
-    @apply bg-gray-800 border-gray-600 text-gray-200 
-           focus:border-primary-500;
+    @apply text-gray-200 focus:border-primary-500;
+    background-color: #000000;
+    border-color: #2a2d2d;
+  }
+
+  /* Native select, input, textarea elements */
+  select, input[type="text"], input[type="email"], input[type="password"], 
+  input[type="date"], input[type="number"], input[type="tel"], input[type="url"],
+  input[type="search"], textarea {
+    background-color: #000000;
+    @apply text-gray-200;
+    border-color: #2a2d2d;
   }
 
   .sidebar-link {
-    @apply text-gray-400 hover:bg-gray-800 hover:text-white;
+    @apply text-gray-400 hover:text-white;
+  }
+
+  .sidebar-link:hover {
+    background-color: #1f2121;
   }
 
   .sidebar-link.active {
-    @apply bg-gray-800 text-primary-400;
+    @apply text-primary-400;
+    background-color: #1f2121;
   }
 
   .table-header {
-    @apply bg-gray-800 text-gray-400;
+    @apply text-gray-300;
+    background-color: #0a0a0a;
   }
 
   .table-row {
-    @apply border-gray-700 hover:bg-gray-800;
+    border-color: #2a2d2d;
+  }
+
+  .table-row:hover {
+    background-color: rgba(31, 33, 33, 0.5);
   }
 
   .table-cell {
     @apply text-gray-300;
+  }
+
+  .table-striped tbody tr {
+    border-color: #2a2d2d;
+  }
+
+  .table-striped tbody tr:nth-child(even) {
+    background-color: #161818;
+  }
+
+  .table-striped tbody tr:hover {
+    background-color: #000000;
   }
 
   .text-muted {
@@ -334,11 +456,25 @@
   }
 
   .bg-elevated {
-    @apply bg-gray-950;
+    background-color: #1f2121;
   }
 
   .border-theme {
-    @apply border-gray-700;
+    border-color: #2a2d2d;
+  }
+
+  .bg-warm {
+    background-color: #0a0a0a;
+  }
+
+  .border-warm {
+    border-color: #2a2d2d;
+  }
+
+  /* Fix placeholder text color in dark mode */
+  input::placeholder,
+  textarea::placeholder {
+    @apply text-gray-500;
   }
 }
 
