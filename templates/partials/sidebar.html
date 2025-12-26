@@ -83,7 +83,8 @@ Optional context for badge counts (from inspector dashboard):
                 </div>
                 <div class="min-w-0 flex-1">
                     <p class="text-sm font-semibold text-gray-900 dark:text-white leading-tight">{{ profile.company_name|default:user.username }}</p>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Partner</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-300 mt-0.5">{{ user.get_full_name|default:user.username }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Partner</p>
                 </div>
             </div>
         {% elif profile.is_any_inspector %}
@@ -111,7 +112,7 @@ Optional context for badge counts (from inspector dashboard):
                 </div>
                 <div class="min-w-0 flex-1">
                     <p class="text-sm font-semibold text-gray-900 dark:text-white leading-tight">{{ user.get_full_name|default:user.username }}</p>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{ profile.get_admin_role_display }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Staff</p>
                 </div>
             </div>
         {% else %}
