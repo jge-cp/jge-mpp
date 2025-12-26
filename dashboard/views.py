@@ -50,20 +50,25 @@ def partner_dashboard(request):
     if profile.user_functionality != 'partner':
         return redirect(profile.get_dashboard_url())
     
-    # Get stats - include pending_final in the "in review" count
+    # Get stats - filter by company so all partners in same company see all data
+    # If partner has a company, filter by company; otherwise fall back to vendor
+    if profile.company:
+        fa_base = FirstArticleInspection.objects.filter(company=profile.company)
+        lot_base = LotAcceptance.objects.filter(company=profile.company)
+    else:
+        fa_base = FirstArticleInspection.objects.filter(vendor=profile)
+        lot_base = LotAcceptance.objects.filter(vendor=profile)
+    
     fa_stats = {
-        'pending': FirstArticleInspection.objects.filter(
-            vendor=profile, 
-            status__in=['pending', 'pending_final']
-        ).count(),
-        'approved': FirstArticleInspection.objects.filter(vendor=profile, status='approved').count(),
-        'rejected': FirstArticleInspection.objects.filter(vendor=profile, status='rejected').count(),
+        'pending': fa_base.filter(status__in=['pending', 'pending_final']).count(),
+        'approved': fa_base.filter(status='approved').count(),
+        'rejected': fa_base.filter(status='rejected').count(),
     }
     
     lot_stats = {
-        'pending': LotAcceptance.objects.filter(vendor=profile, status='pending').count(),
-        'approved': LotAcceptance.objects.filter(vendor=profile, status='approved').count(),
-        'rejected': LotAcceptance.objects.filter(vendor=profile, status='rejected').count(),
+        'pending': lot_base.filter(status='pending').count(),
+        'approved': lot_base.filter(status='approved').count(),
+        'rejected': lot_base.filter(status='rejected').count(),
     }
     
     # Get filter values from request
@@ -90,8 +95,12 @@ def partner_dashboard(request):
         'sort_dir': request.GET.get('lot_sort_dir', ''),
     }
     
-    # Build FA queryset with filters
-    fa_qs = FirstArticleInspection.objects.filter(vendor=profile).select_related('multicam_variant', 'vendor', 'company')
+    # Build FA queryset with filters - filter by company so all partners see company data
+    if profile.company:
+        fa_qs = FirstArticleInspection.objects.filter(company=profile.company)
+    else:
+        fa_qs = FirstArticleInspection.objects.filter(vendor=profile)
+    fa_qs = fa_qs.select_related('multicam_variant', 'vendor', 'company')
     if fa_filters['q']:
         fa_qs = fa_qs.filter(
             Q(fabric_style__icontains=fa_filters['q']) |
@@ -107,8 +116,12 @@ def partner_dashboard(request):
     fa_qs = _apply_sort(fa_qs, fa_filters['sort'], fa_filters['sort_dir'], FA_SORT_FIELDS)
     recent_fas = fa_qs[:10]
     
-    # Build Lot queryset with filters
-    lot_qs = LotAcceptance.objects.filter(vendor=profile).select_related('original_fa', 'original_fa__multicam_variant', 'vendor', 'company')
+    # Build Lot queryset with filters - filter by company so all partners see company data
+    if profile.company:
+        lot_qs = LotAcceptance.objects.filter(company=profile.company)
+    else:
+        lot_qs = LotAcceptance.objects.filter(vendor=profile)
+    lot_qs = lot_qs.select_related('original_fa', 'original_fa__multicam_variant', 'vendor', 'company')
     if lot_filters['q']:
         lot_qs = lot_qs.filter(
             Q(fabric_style__icontains=lot_filters['q']) |
