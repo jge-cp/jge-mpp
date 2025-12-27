@@ -6,6 +6,7 @@ from django.utils import timezone
 from .models import RawMaterialArticle, TechnicalDataSheet, CamouflageType, MarketingOrder
 from .file_validation import validate_upload, FileValidationError
 from accounts.models import UserProfile
+from accounts.decorators import admin_required
 from inspections.models import FirstArticleInspection
 
 
@@ -414,11 +415,9 @@ def fp_marketing_order_detail(request, order_id):
 # Admin Marketing Order Management
 
 @login_required
+@admin_required
 def admin_marketing_queue(request):
     """Admin queue for marketing orders"""
-    if not request.user.is_staff:
-        messages.error(request, 'You do not have permission to access this page.')
-        return redirect('dashboard:dashboard_router')
     
     # Filter by status
     status_filter = request.GET.get('status', 'pending')
@@ -443,11 +442,9 @@ def admin_marketing_queue(request):
 
 
 @login_required
+@admin_required
 def admin_marketing_process(request, order_id):
     """Admin process marketing order"""
-    if not request.user.is_staff:
-        messages.error(request, 'You do not have permission to access this page.')
-        return redirect('dashboard:dashboard_router')
     
     order = get_object_or_404(MarketingOrder, order_id=order_id)
     

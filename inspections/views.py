@@ -32,6 +32,7 @@ from accounts.decorators import (
     inspector_required,
     primary_inspector_required,
     final_inspector_required,
+    admin_required,
 )
 
 
@@ -1114,13 +1115,10 @@ def report_detail(request, report_id):
 # Accounting Views
 
 @login_required
+@admin_required
 def accounting_reports_queue(request):
     """Accounting queue of submitted reports"""
     from .models import MonthlyReport
-    
-    if not request.user.is_staff:
-        messages.error(request, 'You do not have permission to access this page.')
-        return redirect('dashboard:partner_dashboard')
     
     # Filter by status
     status_filter = request.GET.get('status', 'all')
@@ -1151,14 +1149,11 @@ def accounting_reports_queue(request):
 
 
 @login_required
+@admin_required
 def accounting_review(request, report_id):
     """Accounting review interface for a report"""
     from .models import MonthlyReport
     from .forms import AccountingReviewForm
-    
-    if not request.user.is_staff:
-        messages.error(request, 'You do not have permission to access this page.')
-        return redirect('dashboard:partner_dashboard')
     
     report = get_object_or_404(MonthlyReport, report_id=report_id)
     
