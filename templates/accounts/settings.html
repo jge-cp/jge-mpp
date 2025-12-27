@@ -1,0 +1,194 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}User Settings - Multicam Partner Portal{% endblock %}
+
+{% block dashboard_content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Settings Card -->
+    <div class="card p-6">
+        <!-- Card Header -->
+        <div class="mb-6">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white">User Settings</h2>
+            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                Your account information. Contact an administrator if you need to make changes.
+            </p>
+        </div>
+
+        <!-- Account Information Section -->
+        <div class="mb-8">
+            <h3 class="text-md font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-warm dark:border-dark-border">
+                Account Information
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="form-label">First Name</label>
+                    <div class="form-input bg-gray-50 dark:bg-dark-elevated cursor-not-allowed">
+                        {{ user.first_name|default:"—" }}
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label">Last Name</label>
+                    <div class="form-input bg-gray-50 dark:bg-dark-elevated cursor-not-allowed">
+                        {{ user.last_name|default:"—" }}
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label">Email</label>
+                    <div class="form-input bg-gray-50 dark:bg-dark-elevated cursor-not-allowed">
+                        {{ user.email|default:"—" }}
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label">Username</label>
+                    <div class="form-input bg-gray-50 dark:bg-dark-elevated cursor-not-allowed">
+                        {{ user.username }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Role Information Section -->
+        <div class="mb-8">
+            <h3 class="text-md font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-warm dark:border-dark-border">
+                Role Information
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="form-label">User Type</label>
+                    <div class="form-input bg-gray-50 dark:bg-dark-elevated cursor-not-allowed">
+                        {{ profile.get_user_functionality_display }}
+                    </div>
+                </div>
+                {% if profile.user_functionality == 'admin' and profile.admin_role %}
+                <div>
+                    <label class="form-label">Admin Role</label>
+                    <div class="form-input bg-gray-50 dark:bg-dark-elevated cursor-not-allowed">
+                        {{ profile.get_admin_role_display }}
+                    </div>
+                </div>
+                {% endif %}
+                <div>
+                    <label class="form-label">Account Status</label>
+                    <div class="form-input bg-gray-50 dark:bg-dark-elevated cursor-not-allowed">
+                        {{ profile.get_status_display }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if profile.is_partner %}
+        <!-- Company Information Section (Partners Only) -->
+        <div class="mb-8">
+            <h3 class="text-md font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-warm dark:border-dark-border">
+                Company Information
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="form-label">Company Name</label>
+                    <div class="form-input bg-gray-50 dark:bg-dark-elevated cursor-not-allowed">
+                        {{ profile.get_company_display_name }}
+                    </div>
+                </div>
+                {% if profile.company %}
+                <div>
+                    <label class="form-label">Company Code</label>
+                    <div class="form-input bg-gray-50 dark:bg-dark-elevated cursor-not-allowed">
+                        {{ profile.company.code }}
+                    </div>
+                </div>
+                {% endif %}
+                {% if profile.partner_type %}
+                <div>
+                    <label class="form-label">Partner Type</label>
+                    <div class="form-input bg-gray-50 dark:bg-dark-elevated cursor-not-allowed">
+                        {{ profile.get_partner_type_display }}
+                    </div>
+                </div>
+                {% endif %}
+                {% if profile.mpp_level %}
+                <div>
+                    <label class="form-label">Partner Level</label>
+                    <div class="form-input bg-gray-50 dark:bg-dark-elevated cursor-not-allowed">
+                        {{ profile.get_partner_level_display }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Contact Information Section -->
+        <div class="mb-8">
+            <h3 class="text-md font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-warm dark:border-dark-border">
+                Contact Information
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="form-label">Technical Email</label>
+                    <div class="form-input bg-gray-50 dark:bg-dark-elevated cursor-not-allowed">
+                        {{ profile.technical_email|default:"—" }}
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label">Technical Contact</label>
+                    <div class="form-input bg-gray-50 dark:bg-dark-elevated cursor-not-allowed">
+                        {{ profile.technical_contact|default:"—" }}
+                    </div>
+                </div>
+                {% if profile.commercial_email %}
+                <div>
+                    <label class="form-label">Commercial Email</label>
+                    <div class="form-input bg-gray-50 dark:bg-dark-elevated cursor-not-allowed">
+                        {{ profile.commercial_email }}
+                    </div>
+                </div>
+                {% endif %}
+                {% if profile.commercial_contact %}
+                <div>
+                    <label class="form-label">Commercial Contact</label>
+                    <div class="form-input bg-gray-50 dark:bg-dark-elevated cursor-not-allowed">
+                        {{ profile.commercial_contact }}
+                    </div>
+                </div>
+                {% endif %}
+                {% if profile.telephone %}
+                <div>
+                    <label class="form-label">Telephone</label>
+                    <div class="form-input bg-gray-50 dark:bg-dark-elevated cursor-not-allowed">
+                        {{ profile.telephone }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if profile.get_full_address %}
+        <!-- Address Section -->
+        <div class="mb-8">
+            <h3 class="text-md font-semibold text-gray-900 dark:text-white mb-4 pb-2 border-b border-warm dark:border-dark-border">
+                Address
+            </h3>
+            <div class="grid grid-cols-1 gap-4">
+                <div>
+                    <label class="form-label">Full Address</label>
+                    <div class="form-input bg-gray-50 dark:bg-dark-elevated cursor-not-allowed">
+                        {{ profile.get_full_address }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Back Button -->
+        <div class="pt-4 border-t border-warm dark:border-dark-border">
+            <a href="{% url 'dashboard:dashboard_router' %}" class="btn-secondary">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
