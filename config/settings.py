@@ -98,6 +98,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django_htmx.middleware.HtmxMiddleware',  # HTMX middleware
+    'core.middleware.ProfileMiddleware',  # Injects request.profile for authenticated users
     'core.middleware.NoStoreAuthenticatedHtmlMiddleware',
 ]
 

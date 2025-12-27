@@ -26,7 +26,7 @@ from .listing import (
     company_options_for_inspector,
     variant_options,
 )
-from accounts.utils import get_or_create_profile, get_fa_for_user, get_lot_for_user
+from accounts.utils import get_fa_for_user, get_lot_for_user
 from accounts.decorators import (
     partner_required,
     inspector_required,
@@ -87,7 +87,7 @@ def fa_submit(request):
 @login_required
 def fa_list(request):
     """FA list/history view - Partners see their company's FAs, inspectors/staff see all"""
-    profile = get_or_create_profile(request.user)
+    profile = request.profile
     
     filters = parse_list_filters(request.GET)
     fas = build_fa_queryset(profile, filters)
@@ -117,7 +117,7 @@ def fa_list(request):
 @login_required
 def fa_detail(request, fai_id):
     """FA detail view - accessible by company members or any inspector/staff"""
-    profile = get_or_create_profile(request.user)
+    profile = request.profile
     fa = get_fa_for_user(profile, fai_id)
     
     # Get evaluation history
@@ -174,7 +174,7 @@ def fa_resubmit(request, fai_id):
 @login_required
 def fa_evaluation_history(request, fai_id):
     """View full evaluation history for an FA"""
-    profile = get_or_create_profile(request.user)
+    profile = request.profile
     fa = get_fa_for_user(profile, fai_id)
     
     # Get all evaluations with related data
@@ -278,7 +278,7 @@ def get_fa_details(request, fai_id):
     try:
         fa = FirstArticleInspection.objects.get(fai_id=fai_id)
         # Verify user has access to this FA (company-based or legacy vendor-based)
-        profile = get_or_create_profile(request.user)
+        profile = request.profile
         if fa.status == 'approved':
             has_access = False
             if profile.company and fa.company == profile.company:
@@ -300,7 +300,7 @@ def get_fa_details_json(request, fai_id):
     try:
         fa = FirstArticleInspection.objects.get(fai_id=fai_id)
         # Verify user has access to this FA (company-based or legacy vendor-based)
-        profile = get_or_create_profile(request.user)
+        profile = request.profile
         if fa.status == 'approved':
             has_access = False
             if profile.company and fa.company == profile.company:
@@ -325,7 +325,7 @@ def get_fa_details_json(request, fai_id):
 @login_required
 def lot_list(request):
     """Lot list/history view - Partners see their company's Lots, inspectors/staff see all"""
-    profile = get_or_create_profile(request.user)
+    profile = request.profile
     
     filters = parse_list_filters(request.GET)
     lots = build_lot_queryset(profile, filters)
@@ -355,7 +355,7 @@ def lot_list(request):
 @login_required
 def lot_detail(request, lot_id):
     """Lot detail view - Partners see their company's Lots, inspectors/staff see all"""
-    profile = get_or_create_profile(request.user)
+    profile = request.profile
     lot = get_lot_for_user(profile, lot_id)
     
     # Get evaluation with sample evaluations and color evaluations
@@ -843,7 +843,7 @@ def lot_review_queue(request):
 @login_required
 def fa_primary_queue_badge(request):
     """HTMX endpoint for FA primary queue badge count."""
-    profile = get_or_create_profile(request.user)
+    profile = request.profile
     count = 0
     if profile.is_primary_inspector():
         count = FirstArticleInspection.objects.filter(status='pending').count()
@@ -856,7 +856,7 @@ def fa_primary_queue_badge(request):
 @login_required
 def fa_final_queue_badge(request):
     """HTMX endpoint for FA final queue badge count."""
-    profile = get_or_create_profile(request.user)
+    profile = request.profile
     count = 0
     if profile.is_final_inspector():
         count = FirstArticleInspection.objects.filter(status='pending_final').count()
@@ -869,7 +869,7 @@ def fa_final_queue_badge(request):
 @login_required
 def lot_queue_badge(request):
     """HTMX endpoint for lot queue badge count."""
-    profile = get_or_create_profile(request.user)
+    profile = request.profile
     count = 0
     if profile.is_primary_inspector():
         count = LotAcceptance.objects.filter(status='pending').count()
@@ -1052,7 +1052,7 @@ def report_submit(request):
     from .forms import MonthlyReportForm
     from .models import MonthlyReport
     
-    profile = get_or_create_profile(request.user)
+    profile = request.profile
     
     # Check if user has permission to submit reports
     if not profile.can_submit_reports and profile.user_functionality != 'partner':
@@ -1084,7 +1084,7 @@ def report_list(request):
     """List partner's monthly reports"""
     from .models import MonthlyReport
     
-    profile = get_or_create_profile(request.user)
+    profile = request.profile
     
     # Staff can see all reports, partners see their own
     if request.user.is_staff or profile.user_functionality == 'admin':
@@ -1100,7 +1100,7 @@ def report_detail(request, report_id):
     """Monthly report detail view"""
     from .models import MonthlyReport
     
-    profile = get_or_create_profile(request.user)
+    profile = request.profile
     
     # Staff can see any report, partners only their own
     if request.user.is_staff or profile.user_functionality == 'admin':

@@ -6,7 +6,6 @@ from django.db.models import Count, Q, Sum
 from datetime import timedelta
 from inspections.models import FirstArticleInspection, LotAcceptance, MonthlyReport
 from accounts.models import UserProfile
-from accounts.utils import get_or_create_profile
 from inspections.listing import (
     parse_list_filters, build_fa_queryset, build_lot_queryset,
     submitted_by_options_for_inspector, submitted_by_options_for_partner,
@@ -20,7 +19,7 @@ from inspections.listing import (
 @login_required
 def dashboard_router(request):
     """Route to appropriate dashboard based on user type"""
-    profile = get_or_create_profile(request.user)
+    profile = request.profile
     
     # Get dashboard URL from profile
     dashboard_url = profile.get_dashboard_url()
@@ -30,7 +29,7 @@ def dashboard_router(request):
 @login_required
 def partner_dashboard(request):
     """Partner dashboard - for all partners who submit FAs and Lots"""
-    profile = get_or_create_profile(request.user)
+    profile = request.profile
     
     # Redirect to appropriate dashboard if not a partner
     if profile.user_functionality != 'partner':
@@ -189,7 +188,7 @@ def printer_dashboard(request):
 @login_required
 def inspector_dashboard(request):
     """Inspector dashboard - for Primary and Final Inspectors"""
-    profile = get_or_create_profile(request.user)
+    profile = request.profile
     
     # Redirect if not admin/staff
     if profile.user_functionality != 'admin' and not request.user.is_staff:
@@ -412,7 +411,7 @@ def inspector_dashboard(request):
 @login_required
 def staff_dashboard(request):
     """Staff dashboard - for executives, finance, operations with high-level stats and drill-down"""
-    profile = get_or_create_profile(request.user)
+    profile = request.profile
     
     # Redirect if not admin
     if profile.user_functionality != 'admin':
