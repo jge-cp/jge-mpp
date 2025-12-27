@@ -35,25 +35,20 @@ def partner_dashboard(request):
     if profile.user_functionality != 'partner':
         return redirect(profile.get_dashboard_url())
     
-    # Get stats - filter by company so all partners in same company see all data
-    # If partner has a company, filter by company; otherwise fall back to vendor
-    if profile.company:
-        fa_base = FirstArticleInspection.objects.filter(company=profile.company)
-        lot_base = LotAcceptance.objects.filter(company=profile.company)
-    else:
-        fa_base = FirstArticleInspection.objects.filter(vendor=profile)
-        lot_base = LotAcceptance.objects.filter(vendor=profile)
+    # Get stats using model managers (access control built-in)
+    fa_base = FirstArticleInspection.objects.for_user(profile)
+    lot_base = LotAcceptance.objects.for_user(profile)
     
     fa_stats = {
-        'pending': fa_base.filter(status__in=['pending', 'pending_final']).count(),
-        'approved': fa_base.filter(status='approved').count(),
-        'rejected': fa_base.filter(status='rejected').count(),
+        'pending': fa_base.pending_any().count(),
+        'approved': fa_base.approved().count(),
+        'rejected': fa_base.rejected().count(),
     }
     
     lot_stats = {
-        'pending': lot_base.filter(status='pending').count(),
-        'approved': lot_base.filter(status='approved').count(),
-        'rejected': lot_base.filter(status='rejected').count(),
+        'pending': lot_base.pending().count(),
+        'approved': lot_base.approved().count(),
+        'rejected': lot_base.rejected().count(),
     }
     
     # Get filter values from request
@@ -80,12 +75,8 @@ def partner_dashboard(request):
         'sort_dir': request.GET.get('lot_sort_dir', ''),
     }
     
-    # Build FA queryset with filters - filter by company so all partners see company data
-    if profile.company:
-        fa_qs = FirstArticleInspection.objects.filter(company=profile.company)
-    else:
-        fa_qs = FirstArticleInspection.objects.filter(vendor=profile)
-    fa_qs = fa_qs.select_related('multicam_variant', 'vendor', 'company')
+    # Build FA queryset with filters using model manager (access control built-in)
+    fa_qs = FirstArticleInspection.objects.for_user(profile).with_related()
     if fa_filters['q']:
         fa_qs = fa_qs.filter(
             Q(fabric_style__icontains=fa_filters['q']) |
@@ -101,12 +92,8 @@ def partner_dashboard(request):
     fa_qs = _apply_sort(fa_qs, fa_filters['sort'], fa_filters['sort_dir'], FA_SORT_FIELDS)
     recent_fas = fa_qs[:10]
     
-    # Build Lot queryset with filters - filter by company so all partners see company data
-    if profile.company:
-        lot_qs = LotAcceptance.objects.filter(company=profile.company)
-    else:
-        lot_qs = LotAcceptance.objects.filter(vendor=profile)
-    lot_qs = lot_qs.select_related('original_fa', 'original_fa__multicam_variant', 'vendor', 'company')
+    # Build Lot queryset with filters using model manager (access control built-in)
+    lot_qs = LotAcceptance.objects.for_user(profile).with_related()
     if lot_filters['q']:
         lot_qs = lot_qs.filter(
             Q(fabric_style__icontains=lot_filters['q']) |
@@ -215,20 +202,20 @@ def inspector_dashboard(request):
     fa_filters = parse_list_filters(fa_params)
     lot_filters = parse_list_filters(lot_params)
     
-    # Base querysets depending on inspector type
+    # Base querysets depending on inspector type (using model managers)
     if is_primary:
         # Primary Inspector sees pending FAs and all pending lots
-        fa_base = FirstArticleInspection.objects.filter(status='pending').select_related('vendor', 'company', 'multicam_variant')
-        lot_base = LotAcceptance.objects.filter(status='pending').select_related('vendor', 'company', 'original_fa__multicam_variant')
-        fa_pending = FirstArticleInspection.objects.filter(status='pending').count()
-        fa_pending_final = FirstArticleInspection.objects.filter(status='pending_final').count()
-        lot_pending = LotAcceptance.objects.filter(status='pending').count()
+        fa_base = FirstArticleInspection.objects.pending().with_related()
+        lot_base = LotAcceptance.objects.pending().with_related()
+        fa_pending = FirstArticleInspection.objects.pending().count()
+        fa_pending_final = FirstArticleInspection.objects.pending_final().count()
+        lot_pending = LotAcceptance.objects.pending().count()
     else:
         # Final Inspector sees pending_final FAs only
-        fa_base = FirstArticleInspection.objects.filter(status='pending_final').select_related('vendor', 'company', 'multicam_variant')
+        fa_base = FirstArticleInspection.objects.pending_final().with_related()
         lot_base = LotAcceptance.objects.none()
         fa_pending = 0
-        fa_pending_final = FirstArticleInspection.objects.filter(status='pending_final').count()
+        fa_pending_final = FirstArticleInspection.objects.pending_final().count()
         lot_pending = 0
     
     # Apply filters
@@ -257,22 +244,22 @@ def inspector_dashboard(request):
     total_partners = UserProfile.objects.filter(user_functionality='partner').count()
     active_partners = UserProfile.objects.filter(user_functionality='partner', status='active').count()
     
-    # === FA Statistics ===
+    # === FA Statistics (using model managers) ===
     fa_stats = {
         'total': FirstArticleInspection.objects.count(),
-        'approved': FirstArticleInspection.objects.filter(status='approved').count(),
-        'rejected': FirstArticleInspection.objects.filter(status='rejected').count(),
-        'pending': FirstArticleInspection.objects.filter(status='pending').count(),
-        'pending_final': FirstArticleInspection.objects.filter(status='pending_final').count(),
+        'approved': FirstArticleInspection.objects.approved().count(),
+        'rejected': FirstArticleInspection.objects.rejected().count(),
+        'pending': FirstArticleInspection.objects.pending().count(),
+        'pending_final': FirstArticleInspection.objects.pending_final().count(),
         'this_month': FirstArticleInspection.objects.filter(submission_date__gte=thirty_days_ago).count(),
     }
     
-    # === Lot Statistics ===
+    # === Lot Statistics (using model managers) ===
     lot_stats = {
         'total': LotAcceptance.objects.count(),
-        'approved': LotAcceptance.objects.filter(status='approved').count(),
-        'rejected': LotAcceptance.objects.filter(status='rejected').count(),
-        'pending': LotAcceptance.objects.filter(status='pending').count(),
+        'approved': LotAcceptance.objects.approved().count(),
+        'rejected': LotAcceptance.objects.rejected().count(),
+        'pending': LotAcceptance.objects.pending().count(),
         'this_month': LotAcceptance.objects.filter(submission_date__gte=thirty_days_ago).count(),
     }
     
@@ -432,13 +419,13 @@ def staff_dashboard(request):
         'total_reports': MonthlyReport.objects.count(),
     }
     
-    # === FA Statistics ===
+    # === FA Statistics (using model managers) ===
     fa_stats = {
         'total': FirstArticleInspection.objects.count(),
-        'approved': FirstArticleInspection.objects.filter(status='approved').count(),
-        'rejected': FirstArticleInspection.objects.filter(status='rejected').count(),
-        'pending': FirstArticleInspection.objects.filter(status='pending').count(),
-        'pending_final': FirstArticleInspection.objects.filter(status='pending_final').count(),
+        'approved': FirstArticleInspection.objects.approved().count(),
+        'rejected': FirstArticleInspection.objects.rejected().count(),
+        'pending': FirstArticleInspection.objects.pending().count(),
+        'pending_final': FirstArticleInspection.objects.pending_final().count(),
         'this_month': FirstArticleInspection.objects.filter(submission_date__gte=thirty_days_ago).count(),
         'this_quarter': FirstArticleInspection.objects.filter(submission_date__gte=ninety_days_ago).count(),
         'this_year': FirstArticleInspection.objects.filter(submission_date__gte=one_year_ago).count(),
@@ -452,12 +439,12 @@ def staff_dashboard(request):
     else:
         fa_stats['approval_rate'] = 0
     
-    # === Lot Statistics ===
+    # === Lot Statistics (using model managers) ===
     lot_stats = {
         'total': LotAcceptance.objects.count(),
-        'approved': LotAcceptance.objects.filter(status='approved').count(),
-        'rejected': LotAcceptance.objects.filter(status='rejected').count(),
-        'pending': LotAcceptance.objects.filter(status='pending').count(),
+        'approved': LotAcceptance.objects.approved().count(),
+        'rejected': LotAcceptance.objects.rejected().count(),
+        'pending': LotAcceptance.objects.pending().count(),
         'this_month': LotAcceptance.objects.filter(submission_date__gte=thirty_days_ago).count(),
         'this_quarter': LotAcceptance.objects.filter(submission_date__gte=ninety_days_ago).count(),
         'this_year': LotAcceptance.objects.filter(submission_date__gte=one_year_ago).count(),
