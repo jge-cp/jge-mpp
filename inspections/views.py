@@ -26,19 +26,13 @@ from .listing import (
     company_options_for_inspector,
     variant_options,
 )
+from accounts.utils import get_or_create_profile
 
 
 @login_required
 def fa_submit(request):
     """FA submission form"""
-    profile = getattr(request.user, 'profile', None)
-    if not profile:
-        from accounts.models import UserProfile
-        profile = UserProfile.objects.create(
-            user=request.user,
-            company_name=request.user.email.split('@')[0] if '@' in request.user.email else request.user.username,
-            technical_email=request.user.email,
-        )
+    profile = get_or_create_profile(request.user)
     
     if request.method == 'POST':
         form = FirstArticleInspectionForm(request.POST, request.FILES, user=request.user)
@@ -86,14 +80,7 @@ def fa_submit(request):
 @login_required
 def fa_list(request):
     """FA list/history view - Partners see their company's FAs, inspectors/staff see all"""
-    profile = getattr(request.user, 'profile', None)
-    if not profile:
-        from accounts.models import UserProfile
-        profile = UserProfile.objects.create(
-            user=request.user,
-            company_name=request.user.email.split('@')[0] if '@' in request.user.email else request.user.username,
-            technical_email=request.user.email,
-        )
+    profile = get_or_create_profile(request.user)
     
     filters = parse_list_filters(request.GET)
     fas = build_fa_queryset(profile, filters)
@@ -123,14 +110,7 @@ def fa_list(request):
 @login_required
 def fa_detail(request, fai_id):
     """FA detail view - accessible by company members or any inspector/staff"""
-    profile = getattr(request.user, 'profile', None)
-    if not profile:
-        from accounts.models import UserProfile
-        profile = UserProfile.objects.create(
-            user=request.user,
-            company_name=request.user.email.split('@')[0] if '@' in request.user.email else request.user.username,
-            technical_email=request.user.email,
-        )
+    profile = get_or_create_profile(request.user)
     
     # Partners can only see their company's FAs, inspectors/staff can see all
     if profile.is_partner():
@@ -166,8 +146,8 @@ def fa_detail(request, fai_id):
 @login_required
 def fa_resubmit(request, fai_id):
     """Handle FA resubmission after rejection"""
-    profile = getattr(request.user, 'profile', None)
-    if not profile or not profile.is_partner():
+    profile = get_or_create_profile(request.user)
+    if not profile.is_partner():
         messages.error(request, 'Only partners can resubmit First Articles.')
         return redirect('dashboard:partner_dashboard')
     
@@ -203,10 +183,7 @@ def fa_resubmit(request, fai_id):
 @login_required
 def fa_evaluation_history(request, fai_id):
     """View full evaluation history for an FA"""
-    profile = getattr(request.user, 'profile', None)
-    if not profile:
-        messages.error(request, 'User profile not found.')
-        return redirect('dashboard:partner_dashboard')
+    profile = get_or_create_profile(request.user)
     
     # Partners can only see their company's FAs, inspectors/staff can see all
     if profile.is_partner():
@@ -240,14 +217,7 @@ def fa_evaluation_history(request, fai_id):
 @login_required
 def lot_submit(request):
     """Lot submission form"""
-    profile = getattr(request.user, 'profile', None)
-    if not profile:
-        from accounts.models import UserProfile
-        profile = UserProfile.objects.create(
-            user=request.user,
-            company_name=request.user.email.split('@')[0] if '@' in request.user.email else request.user.username,
-            technical_email=request.user.email,
-        )
+    profile = get_or_create_profile(request.user)
     
     if request.method == 'POST':
         form = LotAcceptanceForm(request.POST, request.FILES, user=request.user)
@@ -324,8 +294,8 @@ def get_fa_details(request, fai_id):
     try:
         fa = FirstArticleInspection.objects.get(fai_id=fai_id)
         # Verify user has access to this FA (company-based or legacy vendor-based)
-        profile = getattr(request.user, 'profile', None)
-        if profile and fa.status == 'approved':
+        profile = get_or_create_profile(request.user)
+        if fa.status == 'approved':
             has_access = False
             if profile.company and fa.company == profile.company:
                 has_access = True
@@ -346,8 +316,8 @@ def get_fa_details_json(request, fai_id):
     try:
         fa = FirstArticleInspection.objects.get(fai_id=fai_id)
         # Verify user has access to this FA (company-based or legacy vendor-based)
-        profile = getattr(request.user, 'profile', None)
-        if profile and fa.status == 'approved':
+        profile = get_or_create_profile(request.user)
+        if fa.status == 'approved':
             has_access = False
             if profile.company and fa.company == profile.company:
                 has_access = True
@@ -371,14 +341,7 @@ def get_fa_details_json(request, fai_id):
 @login_required
 def lot_list(request):
     """Lot list/history view - Partners see their company's Lots, inspectors/staff see all"""
-    profile = getattr(request.user, 'profile', None)
-    if not profile:
-        from accounts.models import UserProfile
-        profile = UserProfile.objects.create(
-            user=request.user,
-            company_name=request.user.email.split('@')[0] if '@' in request.user.email else request.user.username,
-            technical_email=request.user.email,
-        )
+    profile = get_or_create_profile(request.user)
     
     filters = parse_list_filters(request.GET)
     lots = build_lot_queryset(profile, filters)
@@ -408,14 +371,7 @@ def lot_list(request):
 @login_required
 def lot_detail(request, lot_id):
     """Lot detail view - Partners see their company's Lots, inspectors/staff see all"""
-    profile = getattr(request.user, 'profile', None)
-    if not profile:
-        from accounts.models import UserProfile
-        profile = UserProfile.objects.create(
-            user=request.user,
-            company_name=request.user.email.split('@')[0] if '@' in request.user.email else request.user.username,
-            technical_email=request.user.email,
-        )
+    profile = get_or_create_profile(request.user)
     
     # Partners can only see their company's lots, inspectors/staff can see all
     if profile.is_partner():
@@ -450,8 +406,8 @@ def lot_detail(request, lot_id):
 @login_required
 def fa_review_queue(request):
     """Legacy FA review queue - redirects to appropriate queue based on role"""
-    profile = getattr(request.user, 'profile', None)
-    if not profile or not profile.is_any_inspector():
+    profile = get_or_create_profile(request.user)
+    if not profile.is_any_inspector():
         messages.error(request, 'You do not have permission to access this page.')
         return redirect('dashboard:partner_dashboard')
     
@@ -468,8 +424,8 @@ def fa_review_queue(request):
 @login_required
 def fa_review_queue_primary(request):
     """Primary Inspector FA review queue - shows pending FAs"""
-    profile = getattr(request.user, 'profile', None)
-    if not profile or not (profile.is_primary_inspector() or profile.admin_role == 'full_admin'):
+    profile = get_or_create_profile(request.user)
+    if not (profile.is_primary_inspector() or profile.admin_role == 'full_admin'):
         messages.error(request, 'You do not have permission to access this page.')
         return redirect('dashboard:partner_dashboard')
 
@@ -503,8 +459,8 @@ def fa_review_queue_primary(request):
 @login_required
 def fa_review_queue_final(request):
     """Final Inspector FA review queue - shows pending_final FAs"""
-    profile = getattr(request.user, 'profile', None)
-    if not profile or not (profile.is_final_inspector() or profile.admin_role == 'full_admin'):
+    profile = get_or_create_profile(request.user)
+    if not (profile.is_final_inspector() or profile.admin_role == 'full_admin'):
         messages.error(request, 'You do not have permission to access this page.')
         return redirect('dashboard:partner_dashboard')
 
@@ -554,8 +510,8 @@ def fa_review(request, fai_id):
     
     For Final Inspector: Pre-loads Primary Inspector's ratings.
     """
-    profile = getattr(request.user, 'profile', None)
-    if not profile or not profile.is_any_inspector():
+    profile = get_or_create_profile(request.user)
+    if not profile.is_any_inspector():
         messages.error(request, 'You do not have permission to access this page.')
         return redirect('dashboard:partner_dashboard')
     
@@ -885,8 +841,8 @@ def fa_review(request, fai_id):
 @login_required
 def lot_review_queue(request):
     """Lot review queue - Primary Inspector only"""
-    profile = getattr(request.user, 'profile', None)
-    if not profile or not profile.is_primary_inspector():
+    profile = get_or_create_profile(request.user)
+    if not profile.is_primary_inspector():
         messages.error(request, 'Only Primary Inspectors can review lots.')
         return redirect('dashboard:partner_dashboard')
 
@@ -915,6 +871,49 @@ def lot_review_queue(request):
     return render(request, 'inspections/lot_review_queue.html', context)
 
 
+# ============================================================================
+# HTMX Badge Endpoints - for sidebar queue count badges
+# ============================================================================
+
+@login_required
+def fa_primary_queue_badge(request):
+    """HTMX endpoint for FA primary queue badge count."""
+    profile = get_or_create_profile(request.user)
+    count = 0
+    if profile.is_primary_inspector():
+        count = FirstArticleInspection.objects.filter(status='pending').count()
+    return render(request, 'inspections/_queue_badge.html', {
+        'count': count,
+        'badge_id': 'fa-primary-queue-badge',
+    })
+
+
+@login_required
+def fa_final_queue_badge(request):
+    """HTMX endpoint for FA final queue badge count."""
+    profile = get_or_create_profile(request.user)
+    count = 0
+    if profile.is_final_inspector():
+        count = FirstArticleInspection.objects.filter(status='pending_final').count()
+    return render(request, 'inspections/_queue_badge.html', {
+        'count': count,
+        'badge_id': 'fa-final-queue-badge',
+    })
+
+
+@login_required
+def lot_queue_badge(request):
+    """HTMX endpoint for lot queue badge count."""
+    profile = get_or_create_profile(request.user)
+    count = 0
+    if profile.is_primary_inspector():
+        count = LotAcceptance.objects.filter(status='pending').count()
+    return render(request, 'inspections/_queue_badge.html', {
+        'count': count,
+        'badge_id': 'lot-queue-badge',
+    })
+
+
 @login_required
 def lot_review(request, lot_id):
     """
@@ -926,8 +925,8 @@ def lot_review(request, lot_id):
     - Pattern Execution, Scale, Spectral Reflectance (Pass/Fail)
     - Visual red/green indicators
     """
-    profile = getattr(request.user, 'profile', None)
-    if not profile or not (profile.is_primary_inspector() or profile.admin_role == 'full_admin'):
+    profile = get_or_create_profile(request.user)
+    if not (profile.is_primary_inspector() or profile.admin_role == 'full_admin'):
         messages.error(request, 'Only Primary Inspectors can review lots.')
         return redirect('dashboard:partner_dashboard')
     
@@ -1090,10 +1089,7 @@ def report_submit(request):
     from .forms import MonthlyReportForm
     from .models import MonthlyReport
     
-    profile = getattr(request.user, 'profile', None)
-    if not profile:
-        messages.error(request, 'User profile not found.')
-        return redirect('dashboard:partner_dashboard')
+    profile = get_or_create_profile(request.user)
     
     # Check if user has permission to submit reports
     if not profile.can_submit_reports and profile.user_functionality != 'partner':
@@ -1125,10 +1121,7 @@ def report_list(request):
     """List partner's monthly reports"""
     from .models import MonthlyReport
     
-    profile = getattr(request.user, 'profile', None)
-    if not profile:
-        messages.error(request, 'User profile not found.')
-        return redirect('dashboard:partner_dashboard')
+    profile = get_or_create_profile(request.user)
     
     # Staff can see all reports, partners see their own
     if request.user.is_staff or profile.user_functionality == 'admin':
@@ -1144,10 +1137,7 @@ def report_detail(request, report_id):
     """Monthly report detail view"""
     from .models import MonthlyReport
     
-    profile = getattr(request.user, 'profile', None)
-    if not profile:
-        messages.error(request, 'User profile not found.')
-        return redirect('dashboard:partner_dashboard')
+    profile = get_or_create_profile(request.user)
     
     # Staff can see any report, partners only their own
     if request.user.is_staff or profile.user_functionality == 'admin':

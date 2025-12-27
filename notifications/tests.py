@@ -152,7 +152,8 @@ class NotificationViewTest(TestCase):
         )
         response = self.client.get(reverse('notifications:badge'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'bg-red-500')
+        # Badge uses sidebar-badge class with red background
+        self.assertContains(response, 'sidebar-badge')
     
     def test_mark_all_read_view(self):
         """Test the mark all read view."""

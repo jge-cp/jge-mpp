@@ -283,9 +283,9 @@ class AuthenticationTests(TestCase):
         self.assertEqual(response.status_code, 200)  # Stay on login page
     
     def test_logout(self):
-        """Logout should clear session and redirect"""
+        """Logout should clear session and redirect (POST required for CSRF protection)"""
         self.client.login(username='testuser', password='testpass123')
-        response = self.client.get(reverse('accounts:logout'))
+        response = self.client.post(reverse('accounts:logout'))
         self.assertEqual(response.status_code, 302)
         # User should no longer be authenticated
         response = self.client.get(reverse('dashboard:dashboard_router'))

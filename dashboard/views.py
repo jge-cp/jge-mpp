@@ -6,6 +6,7 @@ from django.db.models import Count, Q, Sum
 from datetime import timedelta
 from inspections.models import FirstArticleInspection, LotAcceptance, MonthlyReport
 from accounts.models import UserProfile
+from accounts.utils import get_or_create_profile
 from inspections.listing import (
     parse_list_filters, build_fa_queryset, build_lot_queryset,
     submitted_by_options_for_inspector, submitted_by_options_for_partner,
@@ -14,21 +15,6 @@ from inspections.listing import (
     FA_SORT_FIELDS, LOT_SORT_FIELDS, _apply_sort, _apply_date_range,
     _apply_variant_fa, _apply_variant_lot, _apply_company,
 )
-
-
-def get_or_create_profile(user):
-    """Helper to get or create user profile"""
-    profile = getattr(user, 'profile', None)
-    if not profile:
-        profile = UserProfile.objects.create(
-            user=user,
-            company_name=user.email.split('@')[0] if '@' in user.email else user.username,
-            technical_email=user.email or f"{user.username}@example.com",
-            user_functionality='admin' if user.is_staff else 'partner',
-        )
-        profile.set_default_permissions()
-        profile.save()
-    return profile
 
 
 @login_required

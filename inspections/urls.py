@@ -37,6 +37,11 @@ urlpatterns = [
     path('admin/lot/queue/', views.lot_review_queue, name='lot_review_queue'),
     path('admin/lot/review/<str:lot_id>/', views.lot_review, name='lot_review'),
     
+    # HTMX Badge Endpoints - for sidebar queue counts
+    path('badge/fa-primary/', views.fa_primary_queue_badge, name='fa_primary_queue_badge'),
+    path('badge/fa-final/', views.fa_final_queue_badge, name='fa_final_queue_badge'),
+    path('badge/lot/', views.lot_queue_badge, name='lot_queue_badge'),
+    
     # Accounting URLs - Staff facing
     path('admin/reports/', views.accounting_reports_queue, name='accounting_reports_queue'),
     path('admin/reports/review/<int:report_id>/', views.accounting_review, name='accounting_review'),

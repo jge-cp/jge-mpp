@@ -4,12 +4,13 @@ Full-height sidebar with branding, user info, navigation, and dark mode toggle.
 
 Required context:
 - user: The authenticated user
-- profile: The user's profile (user.profile)
+- profile: The user's profile (from context processor)
 
-Optional context for badge counts (from inspector dashboard):
-- fa_pending: Number of FAs pending primary review
-- fa_pending_final: Number of FAs pending final review
-- lot_pending: Number of lots pending review
+Queue badge counts are loaded via HTMX endpoints:
+- inspections:fa_primary_queue_badge - FA primary queue count
+- inspections:fa_final_queue_badge - FA final queue count  
+- inspections:lot_queue_badge - Lot queue count
+These load on page load and refresh every 30 seconds.
 {% endcomment %}
 
 <!-- Mobile sidebar backdrop -->
@@ -243,7 +244,11 @@ Optional context for badge counts (from inspector dashboard):
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                     </svg>
                     <span class="flex-1">FA Queue</span>
-                    {% if fa_pending %}<span class="sidebar-badge">{{ fa_pending }}</span>{% endif %}
+                    <span id="fa-primary-queue-badge"
+                          hx-get="{% url 'inspections:fa_primary_queue_badge' %}"
+                          hx-trigger="load, every 30s"
+                          hx-swap="outerHTML">
+                    </span>
                 </a>
             </li>
             {% endif %}
@@ -254,7 +259,11 @@ Optional context for badge counts (from inspector dashboard):
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                     </svg>
                     <span class="flex-1">FA Queue</span>
-                    {% if fa_pending_final %}<span class="sidebar-badge">{{ fa_pending_final }}</span>{% endif %}
+                    <span id="fa-final-queue-badge"
+                          hx-get="{% url 'inspections:fa_final_queue_badge' %}"
+                          hx-trigger="load, every 30s"
+                          hx-swap="outerHTML">
+                    </span>
                 </a>
             </li>
             {% endif %}
@@ -277,7 +286,11 @@ Optional context for badge counts (from inspector dashboard):
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7.99999 10.8571 12 13.1428m-4.00001-2.2857L4 13.1428m3.99999-2.2857.00004-4.57139M12 13.1428v4.5715m0-4.5715-4.00001 2.2857M12 13.1428l4-2.2857m-4 2.2857V8.57143m0 4.57137 4 2.2858m-4 2.2857L7.99999 20M12 17.7143 16 20m-8.00001 0L4 17.7143v-4.5715M7.99999 20v-4.5715M4 13.1428l3.99999 2.2857M16 6.28571 12 4 8.00003 6.28571m7.99997 0v4.57139m0-4.57139-4 2.28572m4 2.28567 4 2.2858M8.00003 6.28571 12 8.57143m8 4.57147v4.5714L16 20m4-6.8571-4 2.2857M16 20v-4.5714"></path>
                     </svg>
                     <span class="flex-1">Lot Queue</span>
-                    {% if lot_pending %}<span class="sidebar-badge">{{ lot_pending }}</span>{% endif %}
+                    <span id="lot-queue-badge"
+                          hx-get="{% url 'inspections:lot_queue_badge' %}"
+                          hx-trigger="load, every 30s"
+                          hx-swap="outerHTML">
+                    </span>
                 </a>
             </li>
             <li>

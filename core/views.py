@@ -6,6 +6,7 @@ from django.utils import timezone
 from .models import RawMaterialArticle, TechnicalDataSheet, CamouflageType, MarketingOrder
 from .file_validation import validate_upload, FileValidationError
 from accounts.models import UserProfile
+from accounts.utils import get_or_create_profile
 from inspections.models import FirstArticleInspection
 
 
@@ -49,10 +50,7 @@ def contact(request):
 @login_required
 def rm_new_article(request):
     """Register a new raw material article"""
-    profile = getattr(request.user, 'profile', None)
-    if not profile:
-        messages.error(request, 'User profile not found.')
-        return redirect('dashboard:rm_supplier_dashboard')
+    profile = get_or_create_profile(request.user)
     
     # Check permission
     if not (profile.can_register_articles or profile.user_functionality in ['rm_supplier', 'admin']):
@@ -131,10 +129,7 @@ def rm_new_article(request):
 @login_required
 def rm_article_list(request):
     """List RM supplier's articles"""
-    profile = getattr(request.user, 'profile', None)
-    if not profile:
-        messages.error(request, 'User profile not found.')
-        return redirect('dashboard:rm_supplier_dashboard')
+    profile = get_or_create_profile(request.user)
     
     # Staff/admin see all, RM suppliers see their own
     if request.user.is_staff or profile.user_functionality == 'admin':
@@ -148,10 +143,7 @@ def rm_article_list(request):
 @login_required
 def rm_upload_tds(request):
     """Upload TDS for an article"""
-    profile = getattr(request.user, 'profile', None)
-    if not profile:
-        messages.error(request, 'User profile not found.')
-        return redirect('dashboard:rm_supplier_dashboard')
+    profile = get_or_create_profile(request.user)
     
     # Check permission
     if not (profile.can_upload_tds or profile.user_functionality in ['rm_supplier', 'admin']):
@@ -207,10 +199,7 @@ def rm_upload_tds(request):
 @login_required
 def rm_printer_list(request):
     """View list of MC printers"""
-    profile = getattr(request.user, 'profile', None)
-    if not profile:
-        messages.error(request, 'User profile not found.')
-        return redirect('dashboard:dashboard_router')
+    profile = get_or_create_profile(request.user)
     
     # Check permission
     if not (profile.can_view_printer_list or profile.user_functionality in ['rm_supplier', 'fp_supplier', 'government', 'admin']):
@@ -231,10 +220,7 @@ def rm_printer_list(request):
 @login_required
 def rm_finished_products(request):
     """View finished products that passed FAI"""
-    profile = getattr(request.user, 'profile', None)
-    if not profile:
-        messages.error(request, 'User profile not found.')
-        return redirect('dashboard:rm_supplier_dashboard')
+    profile = get_or_create_profile(request.user)
     
     # Get approved FAs
     # For RM suppliers, show FAs that used their materials (once we have that link)
@@ -253,10 +239,7 @@ def rm_finished_products(request):
 @login_required
 def fp_rm_library(request):
     """Browse raw materials library"""
-    profile = getattr(request.user, 'profile', None)
-    if not profile:
-        messages.error(request, 'User profile not found.')
-        return redirect('dashboard:fp_supplier_dashboard')
+    profile = get_or_create_profile(request.user)
     
     # Check permission
     if not (profile.can_browse_rm_library or profile.user_functionality in ['fp_supplier', 'government', 'admin']):
@@ -298,10 +281,7 @@ def fp_rm_library(request):
 @login_required
 def fp_rm_suppliers_list(request):
     """View RM suppliers list"""
-    profile = getattr(request.user, 'profile', None)
-    if not profile:
-        messages.error(request, 'User profile not found.')
-        return redirect('dashboard:fp_supplier_dashboard')
+    profile = get_or_create_profile(request.user)
     
     # Check permission
     if not (profile.can_browse_rm_library or profile.user_functionality in ['fp_supplier', 'government', 'admin']):
@@ -322,10 +302,7 @@ def fp_rm_suppliers_list(request):
 @login_required
 def fp_rm_supplier_detail(request, supplier_id):
     """View RM supplier details and products"""
-    profile = getattr(request.user, 'profile', None)
-    if not profile:
-        messages.error(request, 'User profile not found.')
-        return redirect('dashboard:fp_supplier_dashboard')
+    profile = get_or_create_profile(request.user)
     
     supplier = get_object_or_404(UserProfile, pk=supplier_id, user_functionality='rm_supplier')
     articles = RawMaterialArticle.objects.filter(supplier=supplier, status='active')
@@ -341,10 +318,7 @@ def fp_rm_supplier_detail(request, supplier_id):
 @login_required
 def fp_marketing_order(request):
     """Create marketing package order"""
-    profile = getattr(request.user, 'profile', None)
-    if not profile:
-        messages.error(request, 'User profile not found.')
-        return redirect('dashboard:fp_supplier_dashboard')
+    profile = get_or_create_profile(request.user)
     
     # Check permission
     if not (profile.can_order_marketing or profile.user_functionality in ['fp_supplier', 'admin']):
@@ -413,10 +387,7 @@ def fp_marketing_order(request):
 @login_required
 def fp_marketing_orders_list(request):
     """List FP supplier's marketing orders"""
-    profile = getattr(request.user, 'profile', None)
-    if not profile:
-        messages.error(request, 'User profile not found.')
-        return redirect('dashboard:fp_supplier_dashboard')
+    profile = get_or_create_profile(request.user)
     
     # Staff see all orders, FP suppliers see their own
     if request.user.is_staff or profile.user_functionality == 'admin':
@@ -430,10 +401,7 @@ def fp_marketing_orders_list(request):
 @login_required
 def fp_marketing_order_detail(request, order_id):
     """Marketing order detail view"""
-    profile = getattr(request.user, 'profile', None)
-    if not profile:
-        messages.error(request, 'User profile not found.')
-        return redirect('dashboard:fp_supplier_dashboard')
+    profile = get_or_create_profile(request.user)
     
     # Staff can see any order, FP suppliers only their own
     if request.user.is_staff or profile.user_functionality == 'admin':

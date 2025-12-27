@@ -1,0 +1,10 @@
+{# HTMX fragment: queue count badge #}
+{# Takes: count (int), badge_id (string) #}
+{% if count %}
+<span id="{{ badge_id }}" class="sidebar-badge">
+  {{ count }}
+</span>
+{% else %}
+<span id="{{ badge_id }}" class="hidden"></span>
+{% endif %}
+

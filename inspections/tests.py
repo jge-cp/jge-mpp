@@ -701,7 +701,8 @@ class LotAcceptanceTests(TestCase):
             HTTP_HX_REQUEST='true'
         )
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'badge-warning')
+        # HTMX fragment shows "Awaiting Review" status card with yellow background
+        self.assertContains(response, 'Awaiting Review')
 
 
 class FASubmissionViewTests(TestCase):

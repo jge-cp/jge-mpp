@@ -106,7 +106,7 @@
   }
 
   .badge-pending {
-    background-color: #e3d39c;
+    background-color: #fffbeb;
     @apply text-gray-900;
   }
 
