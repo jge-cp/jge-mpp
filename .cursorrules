@@ -85,13 +85,37 @@ Always use `fa.display_name` or `lot.display_name` in templates for headers and 
 
 ### Checking User Roles
 ```python
-profile = request.user.profile
+# Use request.profile (injected by ProfileMiddleware)
+profile = request.profile
 profile.is_partner()           # Partner user
 profile.is_primary_inspector() # Primary Inspector
 profile.is_final_inspector()   # Final Inspector
 profile.is_any_inspector()     # Any inspector type
 profile.is_staff()             # Staff (executive/finance/operations)
 ```
+
+### Permission Decorators
+```python
+from accounts.decorators import partner_required, inspector_required, admin_required
+
+@login_required
+@partner_required
+def my_partner_view(request):
+    profile = request.profile  # Injected by decorator
+```
+
+### Model Managers
+```python
+# Access-controlled queries
+fas = FirstArticleInspection.objects.for_user(profile)
+fas = FirstArticleInspection.objects.pending().with_related()
+
+# Access control helpers
+from accounts.utils import get_fa_for_user, get_lot_for_user
+fa = get_fa_for_user(profile, fai_id)  # Raises 404 if no access
+```
+
+See `Docs/ARCHITECTURE_PATTERNS.md` for complete documentation.
 
 ### FA Status Choices
 ```python
@@ -107,7 +131,7 @@ STATUS_CHOICES = [
 The `UserProfile.get_dashboard_url()` method returns the correct dashboard based on user type/role.
 
 ## File Organization
-- Documentation: `Docs/` (PROJECT_OVERVIEW.md, DEVELOPMENT.md, DEPLOYMENT.md)
+- Documentation: `Docs/` (PROJECT_OVERVIEW.md, DEVELOPMENT.md, DEPLOYMENT.md, ARCHITECTURE_PATTERNS.md)
 - Templates: `templates/{app_name}/{template}.html`
 - Static files: `staticfiles/` (gitignored, generated)
 - User uploads: `media/` (gitignored)

@@ -97,6 +97,34 @@ python manage.py import_printers partners_import.csv
 
 ---
 
+## Architecture Patterns (DRY Code)
+
+The codebase uses several patterns to reduce repetition and ensure consistent access control. See `Docs/ARCHITECTURE_PATTERNS.md` for complete documentation.
+
+### Quick Reference
+
+```python
+# 1. Use request.profile (injected by middleware)
+profile = request.profile
+
+# 2. Use decorators for route protection
+from accounts.decorators import partner_required, inspector_required
+
+@login_required
+@partner_required
+def my_view(request):
+    profile = request.profile  # Guaranteed to exist
+
+# 3. Use model managers for access-controlled queries
+fas = FirstArticleInspection.objects.for_user(profile).pending()
+
+# 4. Use helpers for single-object retrieval
+from accounts.utils import get_fa_for_user
+fa = get_fa_for_user(profile, fai_id)  # Raises 404 if no access
+```
+
+---
+
 ## Real-Time UI & Caching (HTMX Conventions)
 
 This project uses **HTMX** for “real-time-ish” updates via fragment polling and event triggers.
@@ -135,11 +163,17 @@ This is implemented in:
 Run all tests:
 
 ```bash
-# Run all tests
-python manage.py test inspections.tests inspections.tests_workflow notifications.tests
+# Run all tests (194 tests)
+python manage.py test inspections.tests inspections.tests_workflow inspections.tests_managers \
+    accounts.tests accounts.tests_utils accounts.tests_decorators \
+    notifications.tests core.tests_middleware dashboard.tests
 
 # Run workflow tests only (FA, Lot, notifications)
 python manage.py test inspections.tests_workflow --verbosity=2
+
+# Run architecture tests only (DRY patterns)
+python manage.py test accounts.tests_utils accounts.tests_decorators \
+    core.tests_middleware inspections.tests_managers --verbosity=2
 
 # Run with coverage (if installed)
 coverage run manage.py test && coverage report
@@ -152,6 +186,11 @@ The automated test suite covers:
 - Email notifications (7 types)
 - In-app notifications
 - Dashboard access by role
+- **Architecture patterns:**
+  - Profile management (`accounts.tests_utils`)
+  - Permission decorators (`accounts.tests_decorators`)
+  - ProfileMiddleware (`core.tests_middleware`)
+  - Model managers (`inspections.tests_managers`)
 
 ### Quick Test Checklist
 
