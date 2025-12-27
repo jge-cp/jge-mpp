@@ -27,12 +27,19 @@ from .listing import (
     variant_options,
 )
 from accounts.utils import get_or_create_profile, get_fa_for_user, get_lot_for_user
+from accounts.decorators import (
+    partner_required,
+    inspector_required,
+    primary_inspector_required,
+    final_inspector_required,
+)
 
 
 @login_required
+@partner_required
 def fa_submit(request):
     """FA submission form"""
-    profile = get_or_create_profile(request.user)
+    profile = request.profile
     
     if request.method == 'POST':
         form = FirstArticleInspectionForm(request.POST, request.FILES, user=request.user)
@@ -135,13 +142,10 @@ def fa_detail(request, fai_id):
 
 
 @login_required
+@partner_required
 def fa_resubmit(request, fai_id):
     """Handle FA resubmission after rejection"""
-    profile = get_or_create_profile(request.user)
-    if not profile.is_partner():
-        messages.error(request, 'Only partners can resubmit First Articles.')
-        return redirect('dashboard:partner_dashboard')
-    
+    profile = request.profile
     fa = get_fa_for_user(profile, fai_id)
     
     if not fa.can_resubmit():
@@ -194,9 +198,10 @@ def fa_evaluation_history(request, fai_id):
 
 
 @login_required
+@partner_required
 def lot_submit(request):
     """Lot submission form"""
-    profile = get_or_create_profile(request.user)
+    profile = request.profile
     
     if request.method == 'POST':
         form = LotAcceptanceForm(request.POST, request.FILES, user=request.user)
@@ -374,12 +379,10 @@ def lot_detail(request, lot_id):
 
 
 @login_required
+@inspector_required
 def fa_review_queue(request):
     """Legacy FA review queue - redirects to appropriate queue based on role"""
-    profile = get_or_create_profile(request.user)
-    if not profile.is_any_inspector():
-        messages.error(request, 'You do not have permission to access this page.')
-        return redirect('dashboard:partner_dashboard')
+    profile = request.profile
     
     # Redirect based on inspector type
     if profile.is_primary_inspector():
@@ -392,12 +395,10 @@ def fa_review_queue(request):
 
 
 @login_required
+@primary_inspector_required
 def fa_review_queue_primary(request):
     """Primary Inspector FA review queue - shows pending FAs"""
-    profile = get_or_create_profile(request.user)
-    if not (profile.is_primary_inspector() or profile.admin_role == 'full_admin'):
-        messages.error(request, 'You do not have permission to access this page.')
-        return redirect('dashboard:partner_dashboard')
+    profile = request.profile
 
     filters = parse_list_filters(request.GET)
     base_qs = FirstArticleInspection.objects.filter(status='pending')
@@ -427,12 +428,10 @@ def fa_review_queue_primary(request):
 
 
 @login_required
+@final_inspector_required
 def fa_review_queue_final(request):
     """Final Inspector FA review queue - shows pending_final FAs"""
-    profile = get_or_create_profile(request.user)
-    if not (profile.is_final_inspector() or profile.admin_role == 'full_admin'):
-        messages.error(request, 'You do not have permission to access this page.')
-        return redirect('dashboard:partner_dashboard')
+    profile = request.profile
 
     filters = parse_list_filters(request.GET)
     base_qs = FirstArticleInspection.objects.filter(status='pending_final')
@@ -468,6 +467,7 @@ def fa_review_queue_final(request):
 
 
 @login_required
+@inspector_required
 def fa_review(request, fai_id):
     """
     FA Evaluation interface using the new shade rating system.
@@ -480,10 +480,7 @@ def fa_review(request, fai_id):
     
     For Final Inspector: Pre-loads Primary Inspector's ratings.
     """
-    profile = get_or_create_profile(request.user)
-    if not profile.is_any_inspector():
-        messages.error(request, 'You do not have permission to access this page.')
-        return redirect('dashboard:partner_dashboard')
+    profile = request.profile
     
     fa = get_object_or_404(FirstArticleInspection, fai_id=fai_id)
     
@@ -809,12 +806,10 @@ def fa_review(request, fai_id):
 
 
 @login_required
+@primary_inspector_required
 def lot_review_queue(request):
     """Lot review queue - Primary Inspector only"""
-    profile = get_or_create_profile(request.user)
-    if not profile.is_primary_inspector():
-        messages.error(request, 'Only Primary Inspectors can review lots.')
-        return redirect('dashboard:partner_dashboard')
+    profile = request.profile
 
     filters = parse_list_filters(request.GET)
     base_qs = LotAcceptance.objects.filter(status='pending')
@@ -885,6 +880,7 @@ def lot_queue_badge(request):
 
 
 @login_required
+@primary_inspector_required
 def lot_review(request, lot_id):
     """
     Lot Evaluation interface using the new multi-sample rating system.
@@ -895,10 +891,7 @@ def lot_review(request, lot_id):
     - Pattern Execution, Scale, Spectral Reflectance (Pass/Fail)
     - Visual red/green indicators
     """
-    profile = get_or_create_profile(request.user)
-    if not (profile.is_primary_inspector() or profile.admin_role == 'full_admin'):
-        messages.error(request, 'Only Primary Inspectors can review lots.')
-        return redirect('dashboard:partner_dashboard')
+    profile = request.profile
     
     lot = get_object_or_404(LotAcceptance, lot_id=lot_id)
     
