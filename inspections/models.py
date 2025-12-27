@@ -4,6 +4,8 @@ from django.core.validators import MinValueValidator
 from django.utils import timezone
 import re
 
+from .managers import FAManager, LotManager
+
 
 # =============================================================================
 # SHADE MATCHING RATING SYSTEM
@@ -290,6 +292,9 @@ class FirstArticleInspection(models.Model):
     # Audit
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    # Custom manager with access control and status filters
+    objects = FAManager()
     
     class Meta:
         ordering = ['-submission_date']
@@ -623,6 +628,9 @@ class LotAcceptance(models.Model):
     # Audit
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    # Custom manager with access control and status filters
+    objects = LotManager()
     
     class Meta:
         ordering = ['-submission_date']
