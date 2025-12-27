@@ -82,11 +82,15 @@ def notification_detail(request, notification_id):
 def mark_notification_read(request, notification_id):
     """
     HTMX endpoint to mark a single notification as read.
+    Returns HX-Trigger header to refresh notification badge.
     """
     success = NotificationService.mark_as_read(notification_id, request.user)
     
     if request.headers.get('HX-Request'):
-        return HttpResponse(status=204)  # No content
+        response = HttpResponse(status=204)
+        # Trigger event to refresh badge
+        response['HX-Trigger'] = 'notifications-changed'
+        return response
     
     return JsonResponse({'success': success})
 
@@ -96,10 +100,14 @@ def mark_notification_read(request, notification_id):
 def mark_all_read(request):
     """
     Mark all notifications as read for the current user.
+    Returns HX-Trigger header to refresh notification badge.
     """
     count = NotificationService.mark_all_as_read(request.user)
     
     if request.headers.get('HX-Request'):
-        return HttpResponse(status=204)  # No content
+        response = HttpResponse(status=204)
+        # Trigger event to refresh badge and dropdown
+        response['HX-Trigger'] = 'notifications-changed'
+        return response
     
     return redirect('notifications:list')
