@@ -26,7 +26,7 @@ from .listing import (
     company_options_for_inspector,
     variant_options,
 )
-from accounts.utils import get_or_create_profile
+from accounts.utils import get_or_create_profile, get_fa_for_user, get_lot_for_user
 
 
 @login_required
@@ -111,16 +111,7 @@ def fa_list(request):
 def fa_detail(request, fai_id):
     """FA detail view - accessible by company members or any inspector/staff"""
     profile = get_or_create_profile(request.user)
-    
-    # Partners can only see their company's FAs, inspectors/staff can see all
-    if profile.is_partner():
-        if profile.company:
-            fa = get_object_or_404(FirstArticleInspection, fai_id=fai_id, company=profile.company)
-        else:
-            # Fallback for legacy users without company FK
-            fa = get_object_or_404(FirstArticleInspection, fai_id=fai_id, vendor=profile)
-    else:
-        fa = get_object_or_404(FirstArticleInspection, fai_id=fai_id)
+    fa = get_fa_for_user(profile, fai_id)
     
     # Get evaluation history
     evaluation_history = fa.get_evaluation_history()
@@ -151,11 +142,7 @@ def fa_resubmit(request, fai_id):
         messages.error(request, 'Only partners can resubmit First Articles.')
         return redirect('dashboard:partner_dashboard')
     
-    # Partner can resubmit FAs belonging to their company
-    if profile.company:
-        fa = get_object_or_404(FirstArticleInspection, fai_id=fai_id, company=profile.company)
-    else:
-        fa = get_object_or_404(FirstArticleInspection, fai_id=fai_id, vendor=profile)
+    fa = get_fa_for_user(profile, fai_id)
     
     if not fa.can_resubmit():
         messages.error(request, 'This First Article cannot be resubmitted. Only rejected FAs can be resubmitted.')
@@ -184,15 +171,7 @@ def fa_resubmit(request, fai_id):
 def fa_evaluation_history(request, fai_id):
     """View full evaluation history for an FA"""
     profile = get_or_create_profile(request.user)
-    
-    # Partners can only see their company's FAs, inspectors/staff can see all
-    if profile.is_partner():
-        if profile.company:
-            fa = get_object_or_404(FirstArticleInspection, fai_id=fai_id, company=profile.company)
-        else:
-            fa = get_object_or_404(FirstArticleInspection, fai_id=fai_id, vendor=profile)
-    else:
-        fa = get_object_or_404(FirstArticleInspection, fai_id=fai_id)
+    fa = get_fa_for_user(profile, fai_id)
     
     # Get all evaluations with related data
     evaluations = fa.evaluations.select_related('inspector').prefetch_related(
@@ -372,16 +351,7 @@ def lot_list(request):
 def lot_detail(request, lot_id):
     """Lot detail view - Partners see their company's Lots, inspectors/staff see all"""
     profile = get_or_create_profile(request.user)
-    
-    # Partners can only see their company's lots, inspectors/staff can see all
-    if profile.is_partner():
-        if profile.company:
-            lot = get_object_or_404(LotAcceptance, lot_id=lot_id, company=profile.company)
-        else:
-            # Fallback for legacy users without company FK
-            lot = get_object_or_404(LotAcceptance, lot_id=lot_id, vendor=profile)
-    else:
-        lot = get_object_or_404(LotAcceptance, lot_id=lot_id)
+    lot = get_lot_for_user(profile, lot_id)
     
     # Get evaluation with sample evaluations and color evaluations
     evaluation = lot.evaluations.filter(is_submitted=True).first()
