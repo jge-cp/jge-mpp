@@ -23,15 +23,17 @@
 
 {% block dashboard_content %}
 <div class="max-w-5xl mx-auto">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold text-primary">First Article: {{ fa.display_name }}</h1>
+    <div class="flex justify-between items-start mb-6">
+        <div>
+            <h1 class="text-3xl font-bold font-heading text-gray-900 dark:text-white">First Article</h1>
+            <h2 class="text-xl text-muted mt-1">{{ fa.display_name }}</h2>
+        </div>
         <div class="flex space-x-3">
-            <a href="{% url 'inspections:fa_evaluation_history' fa.fai_id %}" class="btn-secondary">
+            <a href="{% url 'inspections:fa_evaluation_history' fa.fai_id %}" class="btn-primary">
                 View Evaluation History
             </a>
             {% if can_resubmit %}
-            <a href="{% url 'inspections:fa_resubmit' fa.fai_id %}" 
-               class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded border border-blue-700">
+            <a href="{% url 'inspections:fa_resubmit' fa.fai_id %}" class="btn-primary">
                 Resubmit for Review
             </a>
             {% endif %}

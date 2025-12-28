@@ -151,9 +151,10 @@
 {% block dashboard_content %}
 <div class="max-w-6xl mx-auto">
     <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex justify-between items-start mb-6">
         <div>
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white">First Article Evaluation</h2>
+            <h1 class="text-3xl font-bold font-heading text-gray-900 dark:text-white">First Article Evaluation</h1>
+            <h2 class="text-xl text-muted mt-1">{{ fa.display_name }}</h2>
         </div>
         <div class="flex items-center space-x-3">
             <!-- Attempt Number Badge - neutral warm color -->
@@ -329,8 +330,8 @@
         </div>
         {% endif %}
     {% elif is_read_only %}
-    <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded">
-        <p class="text-blue-800 dark:text-blue-200">
+    <div class="mb-6 p-4 bg-cream-100 dark:bg-warm-gray-800 border border-cream-200 dark:border-warm-gray-700 rounded">
+        <p class="text-warm-gray-700 dark:text-warm-gray-200">
             <strong>View Only:</strong> This FA has been {{ fa.status }}. 
             {% if fa.status == 'rejected' %}
             <a href="{% url 'inspections:fa_detail' fa.fai_id %}" class="underline">Go to FA Detail</a> to resubmit.

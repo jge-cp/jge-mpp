@@ -69,12 +69,12 @@
 
 {% block dashboard_content %}
 <div class="max-w-6xl mx-auto">
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex justify-between items-start mb-6">
         <div>
-            <h1 class="text-3xl font-bold text-primary">Evaluation History</h1>
-            <p class="text-lg text-muted mt-1">{{ fa.display_name }}</p>
+            <h1 class="text-3xl font-bold font-heading text-gray-900 dark:text-white">Evaluation History</h1>
+            <h2 class="text-xl text-muted mt-1">{{ fa.display_name }}</h2>
         </div>
-        <a href="{% url 'inspections:fa_detail' fa.fai_id %}" class="btn-secondary">
+        <a href="{% url 'inspections:fa_detail' fa.fai_id %}" class="btn-primary">
             ← Back to FA Detail
         </a>
     </div>

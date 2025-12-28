@@ -4,10 +4,10 @@
 
 {% block dashboard_content %}
 <div class="max-w-2xl mx-auto">
-        <h1 class="text-3xl font-bold mb-6 text-primary">Resubmit First Article</h1>
+        <h1 class="text-3xl font-bold font-heading text-gray-900 dark:text-white mb-2">Resubmit First Article</h1>
+        <h2 class="text-xl text-muted mb-6">{{ fa.display_name }}</h2>
         
         <div class="card p-6 mb-6">
-            <h2 class="text-xl font-bold mb-4">{{ fa.display_name }}</h2>
             
             <div class="mb-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded">
                 <p class="text-yellow-800 dark:text-yellow-200">
@@ -44,8 +44,7 @@
                     <a href="{% url 'inspections:fa_detail' fa.fai_id %}" class="btn-secondary">
                         ← Cancel
                     </a>
-                    <button type="submit" 
-                            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded border border-blue-700">
+                    <button type="submit" class="btn-primary">
                         Confirm Resubmission
                     </button>
                 </div>

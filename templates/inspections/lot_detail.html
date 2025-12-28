@@ -6,8 +6,8 @@
 <div class="max-w-5xl mx-auto">
     <div class="flex justify-between items-start mb-6">
         <div>
-            <h1 class="text-3xl font-bold">Lot: {{ lot.display_name }}</h1>
-            <p class="text-muted mt-1">Lot ID: {{ lot.lot_id }}</p>
+            <h1 class="text-3xl font-bold font-heading text-gray-900 dark:text-white">Lot</h1>
+            <h2 class="text-xl text-muted mt-1">{{ lot.display_name }}</h2>
         </div>
         {% if can_review %}
         <a href="{% url 'inspections:lot_review' lot.lot_id %}" class="btn-primary">
@@ -44,7 +44,7 @@
             <div>
                 <dt class="text-sm font-medium text-muted">Original First Article</dt>
                 <dd class="mt-1 text-sm">
-                    <a href="{% url 'inspections:fa_detail' lot.original_fa.fai_id %}" class="text-blue-600 hover:underline">
+                    <a href="{% url 'inspections:fa_detail' lot.original_fa.fai_id %}" class="text-accent-600 hover:underline dark:text-accent-400">
                         {{ lot.original_fa.display_name }}
                     </a>
                 </dd>

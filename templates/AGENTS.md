@@ -20,7 +20,11 @@ npm run build:css   # Compile Tailwind CSS
 npm run watch:css   # Watch mode for development
 ```
 
-After changing `tailwind.config.js` or `src/css/input.css`, run build.
+**IMPORTANT: Run `npm run build:css` after:**
+- Changing `tailwind.config.js` or `src/css/input.css`
+- Adding NEW Tailwind classes that weren't used before (e.g., `ml-80` if only `ml-64` existed)
+
+Tailwind JIT only generates CSS for classes it finds in templates. New classes won't work until CSS is rebuilt.
 
 ## Design System
 

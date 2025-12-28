@@ -1350,10 +1350,10 @@ code, pre, kbd {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 24px;
+  border-radius: 20px;
   border-width: 2px;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
   font-family: "Roboto Condensed", Arial Narrow, sans-serif;
@@ -1401,10 +1401,10 @@ code, pre, kbd {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 24px;
+  border-radius: 20px;
   border-width: 2px;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
   font-family: "Roboto Condensed", Arial Narrow, sans-serif;
@@ -1999,10 +1999,6 @@ code, pre, kbd {
   height: 24rem;
 }
 
-.h-auto {
-  height: auto;
-}
-
 .h-full {
   height: 100%;
 }
@@ -2127,6 +2123,10 @@ code, pre, kbd {
   width: 2rem;
 }
 
+.w-80 {
+  width: 20rem;
+}
+
 .w-96 {
   width: 24rem;
 }
@@ -2145,6 +2145,10 @@ code, pre, kbd {
 
 .w-\[160px\] {
   width: 160px;
+}
+
+.w-auto {
+  width: auto;
 }
 
 .w-fit {
@@ -2643,11 +2647,6 @@ code, pre, kbd {
 .\!border-primary-700 {
   --tw-border-opacity: 1 !important;
   border-color: rgb(117 97 72 / var(--tw-border-opacity, 1)) !important;
-}
-
-.border-blue-200 {
-  --tw-border-opacity: 1;
-  border-color: rgb(195 221 253 / var(--tw-border-opacity, 1));
 }
 
 .border-blue-300 {
@@ -3681,6 +3680,11 @@ code, pre, kbd {
   color: rgb(21 94 117 / var(--tw-text-opacity, 1));
 }
 
+.text-emerald-600 {
+  --tw-text-opacity: 1;
+  color: rgb(5 150 105 / var(--tw-text-opacity, 1));
+}
+
 .text-gray-100 {
   --tw-text-opacity: 1;
   color: rgb(243 244 246 / var(--tw-text-opacity, 1));
@@ -4574,11 +4578,6 @@ code, pre, kbd {
   border-color: rgb(26 86 219 / var(--tw-border-opacity, 1));
 }
 
-.dark\:border-blue-800:is(.dark *) {
-  --tw-border-opacity: 1;
-  border-color: rgb(30 66 159 / var(--tw-border-opacity, 1));
-}
-
 .dark\:border-dark-border:is(.dark *) {
   --tw-border-opacity: 1;
   border-color: rgb(42 45 45 / var(--tw-border-opacity, 1));
@@ -4739,11 +4738,6 @@ code, pre, kbd {
 .dark\:text-accent-400:is(.dark *) {
   --tw-text-opacity: 1;
   color: rgb(240 115 71 / var(--tw-text-opacity, 1));
-}
-
-.dark\:text-blue-200:is(.dark *) {
-  --tw-text-opacity: 1;
-  color: rgb(195 221 253 / var(--tw-text-opacity, 1));
 }
 
 .dark\:text-blue-300:is(.dark *) {
@@ -4991,8 +4985,8 @@ code, pre, kbd {
     margin-left: 0.5rem;
   }
 
-  .md\:ml-64 {
-    margin-left: 16rem;
+  .md\:ml-80 {
+    margin-left: 20rem;
   }
 
   .md\:flex {
@@ -5050,8 +5044,8 @@ code, pre, kbd {
     background-color: transparent;
   }
 
-  .md\:p-8 {
-    padding: 2rem;
+  .md\:p-32 {
+    padding: 8rem;
   }
 
   .md\:pt-6 {

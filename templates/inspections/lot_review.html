@@ -99,9 +99,10 @@
 {% block dashboard_content %}
 <div class="max-w-6xl mx-auto">
     <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex justify-between items-start mb-6">
         <div>
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white">Lot Evaluation</h2>
+            <h1 class="text-3xl font-bold font-heading text-gray-900 dark:text-white">Lot Evaluation</h1>
+            <h2 class="text-xl text-muted mt-1">{{ lot.display_name }}</h2>
         </div>
         <div>
             <span class="text-sm px-3 py-1 rounded-full font-semibold" style="background-color: #d9d4cc; color: #594936;">{{ num_samples }} Samples</span>
@@ -119,7 +120,7 @@
             <div>
                 <dt class="text-sm font-medium text-muted">Original FA</dt>
                 <dd class="mt-1">
-                    <a href="{% url 'inspections:fa_detail' lot.original_fa.fai_id %}" class="text-blue-600 hover:underline">
+                    <a href="{% url 'inspections:fa_detail' lot.original_fa.fai_id %}" class="text-accent-600 hover:underline dark:text-accent-400">
                         {{ lot.original_fa.display_name }}
                     </a>
                 </dd>

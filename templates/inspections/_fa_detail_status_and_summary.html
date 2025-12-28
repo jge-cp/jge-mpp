@@ -34,7 +34,7 @@
           </p>
         {% elif fa.status == 'pending_final' %}
           <span class="badge-info">Awaiting Final Review</span>
-          <p class="text-xs text-blue-600 mt-1">✓ Passed Primary Review{% if fa.primary_inspector %} by {{ fa.primary_inspector.get_full_name|default:fa.primary_inspector.username }}{% endif %}</p>
+          <p class="text-xs text-emerald-600 mt-1">✓ Passed Primary Review{% if fa.primary_inspector %} by {{ fa.primary_inspector.get_full_name|default:fa.primary_inspector.username }}{% endif %}</p>
         {% else %}
           <span class="badge-warning">Awaiting Primary Review</span>
           <p class="text-xs text-yellow-600 mt-1">Submitted {{ fa.submission_date|timesince }} ago</p>
