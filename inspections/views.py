@@ -48,6 +48,9 @@ def fa_submit(request):
             fa = form.save(commit=False)
             fa.vendor = profile
             fa.submitted = True
+            # Auto-populate submitter name from user profile
+            fa.submitter_first_name = request.user.first_name or request.user.username
+            fa.submitter_last_name = request.user.last_name or ''
             fa.save()
             
             # Handle file uploads if any (with server-side validation)
@@ -218,6 +221,10 @@ def lot_submit(request):
         if form.is_valid():
             lot = form.save(commit=False)
             lot.vendor = profile
+            
+            # Auto-populate submitter name from user profile
+            lot.submitter_first_name = request.user.first_name or request.user.username
+            lot.submitter_last_name = request.user.last_name or ''
             
             # Get individual sample numbers from hidden field
             lot.individual_sample_numbers = request.POST.get('individual_sample_numbers', '')

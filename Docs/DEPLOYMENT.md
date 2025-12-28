@@ -168,7 +168,7 @@ This command:
 | partner1b | partner1b123 | Partner (ACME) |
 | partner2a | partner2a123 | Partner (GLOBEX) |
 | partner2b | partner2b123 | Partner (GLOBEX) |
-| primary_inspector | primary123 | Primary Inspector |
+| primary_inspector | primary_inspector123 | Primary Inspector |
 | final_inspector | final123 | Final Inspector |
 | staff | staff123 | Executive Staff |
 

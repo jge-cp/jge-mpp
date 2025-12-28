@@ -32,8 +32,6 @@ class FirstArticleInspectionForm(forms.ModelForm):
             'date_of_printing',
             'first_article_ship_date',
             'tracking_number',
-            'submitter_first_name',
-            'submitter_last_name',
         ]
         widgets = {
             'fabric_style': forms.TextInput(attrs={
@@ -63,14 +61,6 @@ class FirstArticleInspectionForm(forms.ModelForm):
                 'class': FORM_INPUT,
                 'placeholder': 'Optional tracking number'
             }),
-            'submitter_first_name': forms.TextInput(attrs={
-                'class': FORM_INPUT,
-                'placeholder': 'First name'
-            }),
-            'submitter_last_name': forms.TextInput(attrs={
-                'class': FORM_INPUT,
-                'placeholder': 'Last name'
-            }),
         }
     
     def __init__(self, *args, **kwargs):
@@ -92,8 +82,6 @@ class LotAcceptanceForm(forms.ModelForm):
             'date_of_printing',
             'date_shipped',
             'tracking_number',
-            'submitter_first_name',
-            'submitter_last_name',
         ]
         widgets = {
             'original_fa': forms.Select(attrs={
@@ -123,14 +111,6 @@ class LotAcceptanceForm(forms.ModelForm):
             'tracking_number': forms.TextInput(attrs={
                 'class': FORM_INPUT,
                 'placeholder': 'Optional tracking number'
-            }),
-            'submitter_first_name': forms.TextInput(attrs={
-                'class': FORM_INPUT,
-                'placeholder': 'First name'
-            }),
-            'submitter_last_name': forms.TextInput(attrs={
-                'class': FORM_INPUT,
-                'placeholder': 'Last name'
             }),
         }
     

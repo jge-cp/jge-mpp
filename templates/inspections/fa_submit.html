@@ -102,28 +102,6 @@
                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">When the First Article sample will be/was shipped</p>
                 </div>
                 
-                <!-- Submitter First Name -->
-                <div>
-                    <label for="{{ form.submitter_first_name.id_for_label }}" class="form-label">
-                        Submitter First Name <span class="text-red-500">*</span>
-                    </label>
-                    {{ form.submitter_first_name }}
-                    {% if form.submitter_first_name.errors %}
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.submitter_first_name.errors.0 }}</p>
-                    {% endif %}
-                </div>
-                
-                <!-- Submitter Last Name -->
-                <div>
-                    <label for="{{ form.submitter_last_name.id_for_label }}" class="form-label">
-                        Submitter Last Name <span class="text-red-500">*</span>
-                    </label>
-                    {{ form.submitter_last_name }}
-                    {% if form.submitter_last_name.errors %}
-                        <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.submitter_last_name.errors.0 }}</p>
-                    {% endif %}
-                </div>
-                
                 <!-- Tracking Number -->
                 <div>
                     <label for="{{ form.tracking_number.id_for_label }}" class="form-label">

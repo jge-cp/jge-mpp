@@ -141,28 +141,6 @@
                 </div>
             </div>
 
-            <!-- First Name + Last Name -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                    <label class="form-label" for="{{ form.submitter_first_name.id_for_label }}">
-                        Submitter First Name *
-                    </label>
-                    {{ form.submitter_first_name }}
-                    {% if form.submitter_first_name.errors %}
-                        <p class="text-red-500 text-xs mt-1">{{ form.submitter_first_name.errors.0 }}</p>
-                    {% endif %}
-                </div>
-                <div>
-                    <label class="form-label" for="{{ form.submitter_last_name.id_for_label }}">
-                        Submitter Last Name *
-                    </label>
-                    {{ form.submitter_last_name }}
-                    {% if form.submitter_last_name.errors %}
-                        <p class="text-red-500 text-xs mt-1">{{ form.submitter_last_name.errors.0 }}</p>
-                    {% endif %}
-                </div>
-            </div>
-
             <!-- Tracking Number - full width -->
             <div class="mb-6">
                 <label class="form-label" for="{{ form.tracking_number.id_for_label }}">
