@@ -191,12 +191,13 @@ class Command(BaseCommand):
         )
         self.stdout.write(f'  ✓ Company: {company2.name} ({company2.code})')
 
-        # Test users
+        # Test users - using Resend test emails (delivered+username@resend.dev)
+        # These emails always succeed in Resend for testing purposes
         test_users = [
             # ACME Partners
             {
                 'username': 'partner1a',
-                'email': 'alice@acmecorp.com',
+                'email': 'delivered+partner1a@resend.dev',
                 'password': 'partner1a123',
                 'first_name': 'Alice',
                 'last_name': 'Anderson',
@@ -205,12 +206,12 @@ class Command(BaseCommand):
                     'user_functionality': 'partner',
                     'company': company1,
                     'company_name': 'ACME Corp',
-                    'technical_email': 'alice@acmecorp.com',
+                    'technical_email': 'delivered+partner1a@resend.dev',
                 }
             },
             {
                 'username': 'partner1b',
-                'email': 'bob@acmecorp.com',
+                'email': 'delivered+partner1b@resend.dev',
                 'password': 'partner1b123',
                 'first_name': 'Bob',
                 'last_name': 'Baker',
@@ -219,13 +220,13 @@ class Command(BaseCommand):
                     'user_functionality': 'partner',
                     'company': company1,
                     'company_name': 'ACME Corp',
-                    'technical_email': 'bob@acmecorp.com',
+                    'technical_email': 'delivered+partner1b@resend.dev',
                 }
             },
             # GLOBEX Partners
             {
                 'username': 'partner2a',
-                'email': 'charlie@globex.com',
+                'email': 'delivered+partner2a@resend.dev',
                 'password': 'partner2a123',
                 'first_name': 'Charlie',
                 'last_name': 'Chen',
@@ -234,12 +235,12 @@ class Command(BaseCommand):
                     'user_functionality': 'partner',
                     'company': company2,
                     'company_name': 'Globex Industries',
-                    'technical_email': 'charlie@globex.com',
+                    'technical_email': 'delivered+partner2a@resend.dev',
                 }
             },
             {
                 'username': 'partner2b',
-                'email': 'diana@globex.com',
+                'email': 'delivered+partner2b@resend.dev',
                 'password': 'partner2b123',
                 'first_name': 'Diana',
                 'last_name': 'Davis',
@@ -248,13 +249,13 @@ class Command(BaseCommand):
                     'user_functionality': 'partner',
                     'company': company2,
                     'company_name': 'Globex Industries',
-                    'technical_email': 'diana@globex.com',
+                    'technical_email': 'delivered+partner2b@resend.dev',
                 }
             },
             # Inspectors
             {
                 'username': 'primary_inspector',
-                'email': 'primary@multicampattern.com',
+                'email': 'delivered+primary_inspector@resend.dev',
                 'password': 'primary123',
                 'first_name': 'Primary',
                 'last_name': 'Inspector',
@@ -263,12 +264,12 @@ class Command(BaseCommand):
                     'user_functionality': 'admin',
                     'admin_role': 'primary_inspector',
                     'company_name': 'Multicam QC',
-                    'technical_email': 'primary@multicampattern.com',
+                    'technical_email': 'delivered+primary_inspector@resend.dev',
                 }
             },
             {
                 'username': 'final_inspector',
-                'email': 'final@multicampattern.com',
+                'email': 'delivered+final_inspector@resend.dev',
                 'password': 'final123',
                 'first_name': 'Final',
                 'last_name': 'Inspector',
@@ -277,13 +278,13 @@ class Command(BaseCommand):
                     'user_functionality': 'admin',
                     'admin_role': 'final_inspector',
                     'company_name': 'Multicam QC',
-                    'technical_email': 'final@multicampattern.com',
+                    'technical_email': 'delivered+final_inspector@resend.dev',
                 }
             },
             # Staff
             {
                 'username': 'staff',
-                'email': 'staff@multicampattern.com',
+                'email': 'delivered+staff@resend.dev',
                 'password': 'staff123',
                 'first_name': 'Executive',
                 'last_name': 'Staff',
@@ -292,7 +293,7 @@ class Command(BaseCommand):
                     'user_functionality': 'admin',
                     'admin_role': 'staff_executive',
                     'company_name': 'Multicam Executive',
-                    'technical_email': 'staff@multicampattern.com',
+                    'technical_email': 'delivered+staff@resend.dev',
                 }
             },
         ]

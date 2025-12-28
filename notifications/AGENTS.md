@@ -77,3 +77,47 @@ Template listens for this trigger:
 | Production | Resend SMTP API |
 | Testing | In-memory (`mail.outbox`) |
 
+## Testing Notifications
+
+### Resend Test Emails
+
+Test users use Resend's test email format that always succeeds:
+- `delivered+username@resend.dev`
+
+Example: `delivered+partner1a@resend.dev`, `delivered+primary_inspector@resend.dev`
+
+These show as "Delivered" in Resend dashboard even without real mailboxes.
+
+### Test All Notifications Command
+
+```bash
+# List available notification types
+python manage.py test_notifications --list
+
+# Test all notifications
+python manage.py test_notifications
+
+# Test specific notification
+python manage.py test_notifications fa_submitted
+
+# Dry run (show what would be sent)
+python manage.py test_notifications --dry-run
+
+# On production
+./scripts/prod_run.sh test_notifications
+```
+
+### Verify in Resend Dashboard
+
+After running tests, check: https://resend.com/emails
+
+All test emails should show "Delivered" status.
+
+## Management Commands
+
+| Command | Purpose |
+|---------|---------|
+| `test_notifications` | Test all notification types |
+| `test_notifications --list` | List notification types |
+| `test_notifications <type>` | Test specific notification |
+

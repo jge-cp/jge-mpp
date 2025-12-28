@@ -163,7 +163,7 @@ This command:
 **Test Credentials:**
 | Username | Password | Role |
 |----------|----------|------|
-| mcadmin | Multicam2024! | Full Admin |
+| mcadmin | mcadmin123 | Full Admin |
 | partner1a | partner1a123 | Partner (ACME) |
 | partner1b | partner1b123 | Partner (ACME) |
 | partner2a | partner2a123 | Partner (GLOBEX) |
