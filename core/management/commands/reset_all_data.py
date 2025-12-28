@@ -57,6 +57,7 @@ class Command(BaseCommand):
         # Step 2: Load reference data
         self.stdout.write(self.style.HTTP_INFO('\n[Step 2] Loading reference data...'))
         call_command('load_initial_data')
+        call_command('load_variant_colors')
 
         # Step 3: Create superuser
         if not options['skip_superuser']:

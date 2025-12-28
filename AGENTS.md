@@ -94,3 +94,76 @@ python manage.py test
 npm run build:css
 ```
 
+## Railway Deployment
+
+### Run Commands on Production
+```bash
+# Use the prod_run.sh script (sets DATABASE_URL)
+./scripts/prod_run.sh shell
+./scripts/prod_run.sh migrate
+./scripts/prod_run.sh reset_all_data
+./scripts/prod_run.sh load_variant_colors
+./scripts/prod_run.sh test_notifications
+```
+
+### Checking Logs
+```bash
+# Railway logs stream continuously - use timeout
+railway logs 2>&1 &
+sleep 15
+kill %1 2>/dev/null
+
+# Or get snapshot of recent logs
+railway logs --num 50
+```
+
+### Important: railway run vs Railway Container
+- `railway run <cmd>` runs LOCALLY with Railway env vars injected
+- The actual Railway container runs INSIDE Railway's infrastructure
+- Network connectivity can differ between the two!
+
+### Get/Set Railway Environment Variables
+```bash
+railway variables                    # Show all
+railway variables | grep EMAIL       # Filter
+railway variables --set "KEY=value"  # Set new value
+```
+
+## Email Configuration (Resend HTTP API)
+
+### Backend
+Uses Resend HTTP API (not SMTP) for reliability in containers:
+- Backend: `notifications.backends.ResendEmailBackend`
+- API Key: `RESEND_API_KEY` (or `EMAIL_HOST_PASSWORD`)
+
+### Local Development
+Override to console backend in `.env`:
+```
+EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+```
+
+### Test Email Format (Resend)
+All test users use Resend's test email format - always shows "Delivered":
+```
+delivered+<username>@resend.dev
+```
+
+Examples:
+- `delivered+partner1a@resend.dev`
+- `delivered+primary_inspector@resend.dev`
+- `delivered+mcadmin@resend.dev`
+
+### Test Notifications
+```bash
+# Trigger all notification types (uses test data)
+./scripts/prod_run.sh test_notifications
+
+# Check Resend dashboard
+https://resend.com/emails
+```
+
+### Production (future)
+- Verify `multicampattern.com` domain in Resend
+- Or switch to MS Exchange Graph API
+- Change is just environment variable
+

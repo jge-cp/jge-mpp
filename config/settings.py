@@ -203,14 +203,22 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email Configuration
-EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+# Default to Resend HTTP API (more reliable than SMTP in containers)
+# For local dev, override with EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'notifications.backends.ResendEmailBackend')
+
+# Resend API key (used by ResendEmailBackend)
+RESEND_API_KEY = os.getenv('RESEND_API_KEY', '') or os.getenv('EMAIL_HOST_PASSWORD', '')
+
+# SMTP settings (kept for fallback/compatibility if needed)
 EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.resend.com')
 EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'resend')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 EMAIL_TIMEOUT = 10  # Timeout in seconds for SMTP operations (prevents worker hangs)
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@multicampattern.com')
+
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'onboarding@resend.dev')
 
 # Django Unfold Configuration
 UNFOLD = {
