@@ -300,6 +300,27 @@ Error handling request /portal/fa/submit/
 
 3. Consider switching to Resend HTTP API (faster than SMTP)
 
+### Email Domain Not Authorized (SMTPDataError 450)
+
+If logs show:
+```
+SMTPDataError: (450, b'Not authorized to send emails from example.com')
+```
+
+**Cause:** The domain in `DEFAULT_FROM_EMAIL` isn't verified in Resend.
+
+**Solution:**
+1. Verify your domain in Resend dashboard: https://resend.com/domains
+2. OR temporarily use Resend's onboarding domain:
+   ```bash
+   railway variables --set "DEFAULT_FROM_EMAIL=Multicam Partner Portal <onboarding@resend.dev>"
+   ```
+
+**Current production FROM email:**
+```bash
+railway variables | grep DEFAULT_FROM_EMAIL
+```
+
 ## Cost Estimate
 
 **Railway Free Tier:**
