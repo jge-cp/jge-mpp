@@ -75,7 +75,21 @@ These load on page load and refresh every 30 seconds.
     
     <!-- User Info Section -->
     <div class="px-4 py-5">
-        {% if profile.is_partner %}
+        {% if profile.admin_role == 'full_admin' %}
+            <!-- Full Admin Badge + Info -->
+            <div class="flex items-start space-x-3">
+                <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl flex flex-col items-center justify-center text-white">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    </svg>
+                    <span class="text-[7px] font-medium">FULL ADMIN</span>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <p class="text-sm font-semibold text-gray-900 dark:text-white leading-tight">{{ user.get_full_name|default:user.username }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Full Admin</p>
+                </div>
+            </div>
+        {% elif profile.is_partner %}
             <!-- Partner Badge + Info -->
             <div class="flex items-start space-x-3">
                 <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-multicam-olive to-multicam-green rounded-xl flex flex-col items-center justify-center text-white text-center border border-multicam-olive/50">
@@ -190,7 +204,84 @@ These load on page load and refresh every 30 seconds.
             </li>
         </ul>
 
-        {% if profile.is_partner %}
+        {% if profile.admin_role == 'full_admin' %}
+        <!-- Full Admin Navigation - Combined view -->
+        <div class="sidebar-section-title mt-6">First Articles</div>
+        <ul class="space-y-1">
+            <li>
+                <a href="{% url 'inspections:fa_review_queue_primary' %}" class="sidebar-link {% if request.resolver_match.url_name == 'fa_review_queue_primary' %}active{% endif %}">
+                    <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    </svg>
+                    <span class="flex-1">FA Queue (Primary)</span>
+                    <span id="fa-primary-queue-badge"
+                          hx-get="{% url 'inspections:fa_primary_queue_badge' %}"
+                          hx-trigger="load, every 30s"
+                          hx-swap="outerHTML">
+                    </span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'inspections:fa_review_queue_final' %}" class="sidebar-link {% if request.resolver_match.url_name == 'fa_review_queue_final' %}active{% endif %}">
+                    <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    </svg>
+                    <span class="flex-1">FA Queue (Final)</span>
+                    <span id="fa-final-queue-badge"
+                          hx-get="{% url 'inspections:fa_final_queue_badge' %}"
+                          hx-trigger="load, every 30s"
+                          hx-swap="outerHTML">
+                    </span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'inspections:fa_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'fa_list' %}active{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                    </svg>
+                    All First Articles
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-section-title mt-6">Lots</div>
+        <ul class="space-y-1">
+            <li>
+                <a href="{% url 'inspections:lot_review_queue' %}" class="sidebar-link {% if request.resolver_match.url_name == 'lot_review_queue' %}active{% endif %}">
+                    <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7.99999 10.8571 12 13.1428m-4.00001-2.2857L4 13.1428m3.99999-2.2857.00004-4.57139M12 13.1428v4.5715m0-4.5715-4.00001 2.2857M12 13.1428l4-2.2857m-4 2.2857V8.57143m0 4.57137 4 2.2858m-4 2.2857L7.99999 20M12 17.7143 16 20m-8.00001 0L4 17.7143v-4.5715M7.99999 20v-4.5715M4 13.1428l3.99999 2.2857M16 6.28571 12 4 8.00003 6.28571m7.99997 0v4.57139m0-4.57139-4 2.28572m4 2.28567 4 2.2858M8.00003 6.28571 12 8.57143m8 4.57147v4.5714L16 20m4-6.8571-4 2.2857M16 20v-4.5714"></path>
+                    </svg>
+                    <span class="flex-1">Lot Queue</span>
+                    <span id="lot-queue-badge"
+                          hx-get="{% url 'inspections:lot_queue_badge' %}"
+                          hx-trigger="load, every 30s"
+                          hx-swap="outerHTML">
+                    </span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'inspections:lot_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'lot_list' %}active{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                    </svg>
+                    All Lots
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-section-title mt-6">Analytics</div>
+        <ul class="space-y-1">
+            <li>
+                <a href="{% url 'dashboard:staff_dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'staff_dashboard' %}active{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    Program Stats
+                </a>
+            </li>
+        </ul>
+
+        {% elif profile.is_partner %}
         <!-- Partner Navigation -->
         <div class="sidebar-section-title mt-6">First Articles</div>
         <ul class="space-y-1">
@@ -233,8 +324,8 @@ These load on page load and refresh every 30 seconds.
         </ul>
         {% endif %}
 
-        {% if profile.is_any_inspector %}
-        <!-- Inspector Navigation -->
+        {% if profile.is_any_inspector and profile.admin_role != 'full_admin' %}
+        <!-- Inspector Navigation (not full_admin - they have their own section) -->
         <div class="sidebar-section-title mt-6">First Articles</div>
         <ul class="space-y-1">
             {% if profile.is_primary_inspector %}
@@ -305,8 +396,8 @@ These load on page load and refresh every 30 seconds.
         {% endif %}
         {% endif %}
 
-        {% if profile.is_staff %}
-        <!-- Staff Navigation -->
+        {% if profile.is_staff and profile.admin_role != 'full_admin' %}
+        <!-- Staff Navigation (not full_admin - they have their own section) -->
         <div class="sidebar-section-title mt-6">Analytics</div>
         <ul class="space-y-1">
             <li>

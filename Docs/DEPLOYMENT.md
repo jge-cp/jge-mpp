@@ -124,10 +124,58 @@ railway run python manage.py createsuperuser
 
 ## Post-Deployment
 
+### Running Commands on Production
+
+Use the helper script to run Django commands against the production database:
+
+```bash
+# Run any management command on production
+./scripts/prod_run.sh <command> [args...]
+
+# Examples:
+./scripts/prod_run.sh shell                    # Django shell
+./scripts/prod_run.sh migrate                  # Run migrations
+./scripts/prod_run.sh reset_all_data           # Reset all data (see below)
+./scripts/prod_run.sh createsuperuser          # Create superuser
+```
+
+> **Note:** The `prod_run.sh` script sets `DATABASE_URL` to the production PostgreSQL. Never commit this script with credentials.
+
+### Reset All Data (Local & Production)
+
+To reset both environments with identical test data:
+
+```bash
+# Reset LOCAL
+python manage.py reset_all_data
+
+# Reset PRODUCTION
+./scripts/prod_run.sh reset_all_data
+```
+
+This command:
+1. Clears all FAs, Lots, Evaluations, Notifications
+2. Loads camouflage types (reference data)
+3. Creates/updates `mcadmin` superuser
+4. Creates test users (4 partners, 2 inspectors, 1 staff)
+5. Creates test FAs and Lots
+
+**Test Credentials:**
+| Username | Password | Role |
+|----------|----------|------|
+| mcadmin | Multicam2024! | Full Admin |
+| partner1a | partner1a123 | Partner (ACME) |
+| partner1b | partner1b123 | Partner (ACME) |
+| partner2a | partner2a123 | Partner (GLOBEX) |
+| partner2b | partner2b123 | Partner (GLOBEX) |
+| primary_inspector | primary123 | Primary Inspector |
+| final_inspector | final123 | Final Inspector |
+| staff | staff123 | Executive Staff |
+
 ### Import Partners
 
 ```bash
-railway run python manage.py import_printers partners_import.csv
+./scripts/prod_run.sh import_printers partners_import.csv
 ```
 
 > Note: the management command is named `import_printers` for legacy reasons, but it imports **Partners**.
@@ -135,9 +183,9 @@ railway run python manage.py import_printers partners_import.csv
 ### Import Historical Data (After Export from Google Sheets)
 
 ```bash
-railway run python manage.py import_historical_fas fa_export.csv
-railway run python manage.py import_historical_lots lot_export.csv
-railway run python manage.py verify_migration
+./scripts/prod_run.sh import_historical_fas fa_export.csv
+./scripts/prod_run.sh import_historical_lots lot_export.csv
+./scripts/prod_run.sh verify_migration
 ```
 
 ## Monitoring
