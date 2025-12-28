@@ -102,7 +102,6 @@ npm run build:css
 ./scripts/prod_run.sh shell
 ./scripts/prod_run.sh migrate
 ./scripts/prod_run.sh reset_all_data
-./scripts/prod_run.sh load_variant_colors
 ./scripts/prod_run.sh test_notifications
 ```
 

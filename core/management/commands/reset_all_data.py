@@ -54,10 +54,9 @@ class Command(BaseCommand):
         # Step 1: Clear all transactional data
         self.clear_all_data()
 
-        # Step 2: Load reference data
+        # Step 2: Load reference data (camouflage types + variant colors)
         self.stdout.write(self.style.HTTP_INFO('\n[Step 2] Loading reference data...'))
         call_command('load_initial_data')
-        call_command('load_variant_colors')
 
         # Step 3: Create superuser
         if not options['skip_superuser']:
@@ -255,11 +254,11 @@ class Command(BaseCommand):
                     'technical_email': 'delivered+partner2b@resend.dev',
                 }
             },
-            # Inspectors
+            # Inspectors (password = username + "123")
             {
                 'username': 'primary_inspector',
                 'email': 'delivered+primary_inspector@resend.dev',
-                'password': 'primary123',
+                'password': 'primary_inspector123',
                 'first_name': 'Primary',
                 'last_name': 'Inspector',
                 'is_staff': True,
@@ -273,7 +272,7 @@ class Command(BaseCommand):
             {
                 'username': 'final_inspector',
                 'email': 'delivered+final_inspector@resend.dev',
-                'password': 'final123',
+                'password': 'final_inspector123',
                 'first_name': 'Final',
                 'last_name': 'Inspector',
                 'is_staff': True,
@@ -347,8 +346,8 @@ class Command(BaseCommand):
         self.stdout.write('    partner2b / partner2b123  (Diana Davis)')
         self.stdout.write('')
         self.stdout.write('INSPECTORS:')
-        self.stdout.write('  primary_inspector / primary123  (Primary Inspector)')
-        self.stdout.write('  final_inspector / final123      (Final Inspector)')
+        self.stdout.write('  primary_inspector / primary_inspector123  (Primary Inspector)')
+        self.stdout.write('  final_inspector / final_inspector123      (Final Inspector)')
         self.stdout.write('')
         self.stdout.write('STAFF:')
         self.stdout.write('  staff / staff123  (Executive Staff)')
