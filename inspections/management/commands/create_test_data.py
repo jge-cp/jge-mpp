@@ -396,20 +396,23 @@ class Command(BaseCommand):
         evaluation = LotEvaluation.objects.create(
             lot=lot,
             inspector=inspector,
-            pattern_execution='pass' if passing else 'fail',
-            scale='pass' if passing else 'fail',
-            spectral_reflectance='pass' if passing else 'fail',
             comments=f'{"Passed" if passing else "Failed"} lot review.',
             is_submitted=True,
             submitted_at=timezone.now() - timedelta(days=days_ago),
         )
         
         # Create sample evaluations (based on number_of_samples)
+        sample_ids = lot.individual_sample_numbers.split(', ') if lot.individual_sample_numbers else []
         for i in range(lot.number_of_samples):
+            sample_id = sample_ids[i] if i < len(sample_ids) else f'Sample-{i+1}'
             sample_eval = LotSampleEvaluation.objects.create(
-                evaluation=evaluation,
+                lot_evaluation=evaluation,
                 sample_number=i + 1,
-                overall_result='pass' if passing else 'fail',
+                sample_id=sample_id,
+                pattern_execution='pass' if passing else 'fail',
+                scale='pass' if passing else 'fail',
+                spectral_reflectance='pass' if passing else 'fail',
+                comments='Within tolerance' if passing else 'Failed inspection',
             )
             
             # Create color evaluations for each sample
