@@ -23,17 +23,18 @@ module.exports = {
   ],
   darkMode: 'class',
   theme: {
-    // Golden Ratio (1.618) Typography Scale with 18px base
+    // Typography Scale with 18px base - readable minimum sizes
     fontSize: {
-      'xs': ['10px', { lineHeight: '1.5' }],
-      'sm': ['14px', { lineHeight: '1.5' }],
-      'base': ['18px', { lineHeight: '1.6' }],
-      'lg': ['29px', { lineHeight: '1.3' }],
-      'xl': ['47px', { lineHeight: '1.15' }],
-      '2xl': ['76px', { lineHeight: '1.05' }],
-      // Additional sizes for flexibility
-      '2xs': ['11px', { lineHeight: '1.5' }],
-      'md': ['23px', { lineHeight: '1.4' }],
+      'xs': ['14px', { lineHeight: '1.5' }],   // Was 10px - now readable
+      'sm': ['16px', { lineHeight: '1.5' }],   // Was 14px
+      'base': ['18px', { lineHeight: '1.6' }], // Base size
+      'lg': ['24px', { lineHeight: '1.35' }],  // Section headers
+      'xl': ['32px', { lineHeight: '1.2' }],   // Page headers
+      '2xl': ['48px', { lineHeight: '1.1' }],  // Hero text
+      '3xl': ['64px', { lineHeight: '1.05' }], // Large display
+      // Additional sizes
+      '2xs': ['12px', { lineHeight: '1.5' }],  // Tiny labels only
+      'md': ['20px', { lineHeight: '1.4' }],   // Between base and lg
     },
     extend: {
       fontFamily: {
