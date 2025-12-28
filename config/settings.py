@@ -145,8 +145,10 @@ else:
     }
 
 
-# Authentication backends - using Django default (username-based)
-# AUTHENTICATION_BACKENDS defaults to ['django.contrib.auth.backends.ModelBackend']
+# Authentication backends - allow login with username OR email
+AUTHENTICATION_BACKENDS = [
+    'accounts.backends.EmailOrUsernameBackend',
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
