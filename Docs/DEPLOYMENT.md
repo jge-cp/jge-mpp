@@ -194,6 +194,64 @@ This command:
 - **Metrics**: Railway dashboard → Metrics tab
 - **Database**: Railway dashboard → PostgreSQL → Query tab
 
+## Debugging Railway (CLI)
+
+### View Railway Logs
+
+The `railway logs` command **streams logs in real-time** (never exits). To capture a snapshot:
+
+```bash
+# Stream logs for 15 seconds then stop
+railway logs 2>&1 &
+sleep 15
+kill %1 2>/dev/null
+```
+
+Or view in Railway Dashboard → Deployments → Logs.
+
+### View Railway Environment Variables
+
+To see the **actual production environment variables** (not local):
+
+```bash
+# Show all variables for the web service
+railway variables
+
+# Filter for specific variable
+railway variables | grep SITE_URL
+railway variables | grep DEBUG
+
+# Set a variable
+railway variables --set "SITE_URL=https://web-production-748b3.up.railway.app"
+```
+
+### Important: `prod_run.sh` vs Railway CLI
+
+| Tool | What it does | Use for |
+|------|--------------|---------|
+| `./scripts/prod_run.sh` | Runs local Python with prod `DATABASE_URL` only | DB queries, data scripts |
+| `railway variables` | Shows/sets Railway's actual env vars | Checking production config |
+| `railway logs` | Streams production application logs | Debugging errors |
+| `railway run <cmd>` | Runs command inside Railway container | Full production env |
+
+**⚠️ Warning:** `prod_run.sh` only sets `DATABASE_URL`. Other env vars (DEBUG, EMAIL_*, etc.) come from your **local** environment, not Railway. Always use `railway variables` to verify production config.
+
+### Common Debugging Workflow
+
+```bash
+# 1. Check production environment variables
+railway variables | grep -E "DEBUG|EMAIL|SITE_URL"
+
+# 2. View recent logs (captures 15 seconds of logs)
+railway logs 2>&1 & sleep 15; kill %1 2>/dev/null
+
+# 3. If needed, set missing variable
+railway variables --set "SITE_URL=https://your-app.up.railway.app"
+
+# 4. Check deployment triggered
+# Railway auto-deploys when env vars change
+```
+
 ## Troubleshooting
 
 ### Deployment Fails
@@ -219,6 +277,28 @@ This command:
    >>> from django.core.mail import send_mail
    >>> send_mail('Test', 'Test message', 'noreply@multicampattern.com', ['your-email@example.com'])
    ```
+
+### SMTP Timeout / 500 Errors on Submit
+
+If FA/Lot submissions fail with 500 errors and logs show:
+```
+WORKER TIMEOUT (pid:X)
+Error handling request /portal/fa/submit/
+...socket.create_connection...
+```
+
+**Cause:** SMTP connection to Resend is hanging, causing gunicorn worker timeout.
+
+**Solution:** We have `EMAIL_TIMEOUT = 10` in settings.py to limit SMTP wait time. If still failing:
+
+1. Check Railway can reach Resend:
+   ```bash
+   railway run python -c "import socket; socket.create_connection(('smtp.resend.com', 587), timeout=5)"
+   ```
+
+2. Verify Resend API key is valid at https://resend.com/api-keys
+
+3. Consider switching to Resend HTTP API (faster than SMTP)
 
 ## Cost Estimate
 

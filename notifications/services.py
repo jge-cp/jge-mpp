@@ -177,19 +177,23 @@ class NotificationService:
             return False
         
         try:
+            # Use short timeout to prevent blocking
+            from django.conf import settings as django_settings
+            timeout = getattr(django_settings, 'EMAIL_TIMEOUT', 5)
+            
             send_mail(
                 subject=notification.email_subject or notification.title,
                 message=notification.message,
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[notification.email_to],
-                fail_silently=False,
+                fail_silently=True,  # Don't raise exceptions - log failures instead
             )
             notification.mark_as_sent()
             return True
         except Exception as e:
             import logging
             logger = logging.getLogger(__name__)
-            logger.error(f"Email send failed to {notification.email_to}: {e}", exc_info=True)
+            logger.error(f"Email send failed to {notification.email_to}: {e}")
             notification.mark_as_failed(str(e))
             return False
     

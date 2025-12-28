@@ -73,9 +73,14 @@ def fa_submit(request):
                     )
                     fa.submission_documents.add(file_upload)
             
-            # Send email notification to inspector
-            from .emails import send_fa_submitted_email
-            send_fa_submitted_email(fa)
+            # Send email notification to inspector (non-blocking)
+            try:
+                from .emails import send_fa_submitted_email
+                send_fa_submitted_email(fa)
+            except Exception as e:
+                # Log but don't block the submission
+                import logging
+                logging.getLogger(__name__).error(f"Failed to send FA notification email: {e}")
             
             messages.success(request, f'FA submitted successfully! FA ID: {fa.fai_id}')
             return redirect('inspections:fa_detail', fai_id=fa.fai_id)
@@ -161,9 +166,13 @@ def fa_resubmit(request, fai_id):
             messages.error(request, str(e))
             return redirect('inspections:fa_detail', fai_id=fai_id)
         
-        # Send notification email to Primary Inspector
-        from .emails import send_fa_submitted_email
-        send_fa_submitted_email(fa)
+        # Send notification email to Primary Inspector (non-blocking)
+        try:
+            from .emails import send_fa_submitted_email
+            send_fa_submitted_email(fa)
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).error(f"Failed to send FA resubmit notification: {e}")
         
         messages.success(request, f'First Article {fa.display_name} has been resubmitted for review (Attempt #{new_attempt}).')
         return redirect('inspections:fa_detail', fai_id=fai_id)
@@ -242,9 +251,13 @@ def lot_submit(request):
                     )
                     lot.submission_documents.add(file_upload)
             
-            # Send email notification to inspector
-            from .emails import send_lot_submitted_email
-            send_lot_submitted_email(lot)
+            # Send email notification to inspector (non-blocking)
+            try:
+                from .emails import send_lot_submitted_email
+                send_lot_submitted_email(lot)
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).error(f"Failed to send Lot notification: {e}")
             
             messages.success(request, f'Lot submitted successfully! Lot ID: {lot.lot_id}')
             return redirect('inspections:lot_detail', lot_id=lot.lot_id)
@@ -710,19 +723,29 @@ def fa_review(request, fai_id):
                         messages.error(request, str(e))
                         return redirect('inspections:fa_review', fai_id=fa.fai_id)
                     
-                    # Send appropriate emails
+                    # Send appropriate emails (non-blocking)
+                    try:
+                        if evaluation.all_pass:
+                            if stage == 'primary':
+                                from .emails import send_fa_pending_final_email
+                                send_fa_pending_final_email(fa)
+                            else:
+                                from .emails import send_fa_approved_email
+                                send_fa_approved_email(fa)
+                        else:
+                            from .emails import send_fa_rejected_email
+                            send_fa_rejected_email(fa, evaluation=evaluation)
+                    except Exception as e:
+                        import logging
+                        logging.getLogger(__name__).error(f"Failed to send FA review notification: {e}")
+                    
+                    # Show success message
                     if evaluation.all_pass:
                         if stage == 'primary':
-                            from .emails import send_fa_pending_final_email
-                            send_fa_pending_final_email(fa)
                             messages.success(request, f'FA {fa.display_name} passed primary review and sent to final inspector.')
                         else:
-                            from .emails import send_fa_approved_email
-                            send_fa_approved_email(fa)
                             messages.success(request, f'FA {fa.display_name} fully approved! Partner can now submit lots.')
                     else:
-                        from .emails import send_fa_rejected_email
-                        send_fa_rejected_email(fa, evaluation=evaluation)
                         messages.warning(request, f'FA {fa.display_name} rejected due to failing criteria.')
                     
                     # Redirect to appropriate queue
@@ -999,14 +1022,22 @@ def lot_review(request, lot_id):
                         messages.error(request, str(e))
                         return redirect('inspections:lot_review', lot_id=lot.lot_id)
                     
-                    # Send appropriate emails
+                    # Send appropriate emails (non-blocking)
+                    try:
+                        if evaluation.all_pass:
+                            from .emails import send_lot_approved_email
+                            send_lot_approved_email(lot)
+                        else:
+                            from .emails import send_lot_rejected_email
+                            send_lot_rejected_email(lot)
+                    except Exception as e:
+                        import logging
+                        logging.getLogger(__name__).error(f"Failed to send Lot review notification: {e}")
+                    
+                    # Show success message
                     if evaluation.all_pass:
-                        from .emails import send_lot_approved_email
-                        send_lot_approved_email(lot)
                         messages.success(request, f'Lot {lot.display_name} approved!')
                     else:
-                        from .emails import send_lot_rejected_email
-                        send_lot_rejected_email(lot)
                         messages.warning(request, f'Lot {lot.display_name} rejected due to failing criteria.')
                     
                     return redirect('inspections:lot_review_queue')
@@ -1068,9 +1099,13 @@ def report_submit(request):
             report.report_date = timezone.now().date()
             report.save()
             
-            # Send email notification to accounting
-            from .emails import send_report_submitted_email
-            send_report_submitted_email(report)
+            # Send email notification to accounting (non-blocking)
+            try:
+                from .emails import send_report_submitted_email
+                send_report_submitted_email(report)
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).error(f"Failed to send report notification: {e}")
             
             messages.success(request, f'Monthly report submitted successfully!')
             return redirect('inspections:report_list')
