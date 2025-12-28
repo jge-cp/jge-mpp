@@ -90,28 +90,28 @@
             <div class="flex-1 space-y-3">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                        <span class="w-3 h-3 rounded-full" style="background-color: #e3d39c;"></span>
                         <span class="text-sm">Pending Primary</span>
                     </div>
                     <span class="font-bold">{{ fa_stats.pending }}</span>
                 </div>
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-orange-500"></span>
+                        <span class="w-3 h-3 rounded-full" style="background-color: #dd8a4e;"></span>
                         <span class="text-sm">Pending Final</span>
                     </div>
                     <span class="font-bold">{{ fa_stats.pending_final }}</span>
                 </div>
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                        <span class="w-3 h-3 rounded-full bg-green-600"></span>
                         <span class="text-sm">Approved</span>
                     </div>
                     <span class="font-bold">{{ fa_stats.approved }}</span>
                 </div>
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                        <span class="w-3 h-3 rounded-full bg-red-600"></span>
                         <span class="text-sm">Rejected</span>
                     </div>
                     <span class="font-bold">{{ fa_stats.rejected|default:0 }}</span>
@@ -142,21 +142,21 @@
             <div class="flex-1 space-y-3">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                        <span class="w-3 h-3 rounded-full" style="background-color: #e3d39c;"></span>
                         <span class="text-sm">Pending Review</span>
                     </div>
                     <span class="font-bold">{{ lot_stats.pending }}</span>
                 </div>
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                        <span class="w-3 h-3 rounded-full bg-green-600"></span>
                         <span class="text-sm">Approved</span>
                     </div>
                     <span class="font-bold">{{ lot_stats.approved }}</span>
                 </div>
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                        <span class="w-3 h-3 rounded-full bg-red-600"></span>
                         <span class="text-sm">Rejected</span>
                     </div>
                     <span class="font-bold">{{ lot_stats.rejected }}</span>
@@ -244,16 +244,31 @@
 <!-- ApexCharts Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+// Store chart instances for cleanup
+window.dashboardCharts = window.dashboardCharts || {};
+
+// Initialize charts function - called on load and after HTMX swaps
+function initDashboardCharts() {
+    // Destroy existing charts first to prevent duplicates
+    Object.keys(window.dashboardCharts).forEach(key => {
+        if (window.dashboardCharts[key]) {
+            window.dashboardCharts[key].destroy();
+            delete window.dashboardCharts[key];
+        }
+    });
+    
     // Check if dark mode is enabled
     const isDark = document.documentElement.classList.contains('dark') || 
                    localStorage.getItem('color-theme') === 'dark';
     
+    // Use app design system colors (same as badges)
     const chartColors = {
-        pending: '#eab308',      // yellow-500
-        pendingFinal: '#f97316', // orange-500
-        approved: '#22c55e',     // green-500
-        rejected: '#ef4444',     // red-500
+        pending: '#e3d39c',      // Awaiting Primary yellow (matches badge-pending filled)
+        pendingFinal: '#dd8a4e', // Awaiting Final orange (matches badge-pending-final)
+        approved: '#16a34a',     // green-600 (matches badge-approved)
+        rejected: '#dc2626',     // red-600 (matches badge-rejected)
+        accent: '#E84D1C',       // accent-500 (for trends chart)
+        brand: '#756148',        // brand-700 (for trends chart)
         text: isDark ? '#d1d5db' : '#374151',
         background: isDark ? '#1f2121' : '#F5F3EF'
     };
@@ -267,7 +282,8 @@ document.addEventListener('DOMContentLoaded', function() {
             chart: {
                 type: 'donut',
                 height: 192,
-                background: 'transparent'
+                background: 'transparent',
+                animations: { enabled: false }
             },
             plotOptions: {
                 pie: {
@@ -300,7 +316,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         };
-        new ApexCharts(faChartEl, faOptions).render();
+        window.dashboardCharts.fa = new ApexCharts(faChartEl, faOptions);
+        window.dashboardCharts.fa.render();
     }
     
     // Lot Donut Chart
@@ -312,7 +329,8 @@ document.addEventListener('DOMContentLoaded', function() {
             chart: {
                 type: 'donut',
                 height: 192,
-                background: 'transparent'
+                background: 'transparent',
+                animations: { enabled: false }
             },
             plotOptions: {
                 pie: {
@@ -345,7 +363,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         };
-        new ApexCharts(lotChartEl, lotOptions).render();
+        window.dashboardCharts.lot = new ApexCharts(lotChartEl, lotOptions);
+        window.dashboardCharts.lot.render();
     }
     
     // Monthly Trends Bar Chart
@@ -371,9 +390,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 height: 280,
                 background: 'transparent',
                 toolbar: { show: false },
-                fontFamily: 'Roboto, sans-serif'
+                fontFamily: 'Roboto, sans-serif',
+                animations: { enabled: false }
             },
-            colors: ['#E84D1C', '#756148', '#22c55e'],
+            colors: [chartColors.accent, chartColors.brand, chartColors.approved],
             plotOptions: {
                 bar: {
                     horizontal: false,
@@ -415,7 +435,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 theme: isDark ? 'dark' : 'light'
             }
         };
-        new ApexCharts(trendsChartEl, trendsOptions).render();
+        window.dashboardCharts.trends = new ApexCharts(trendsChartEl, trendsOptions);
+        window.dashboardCharts.trends.render();
+    }
+}
+
+// Initialize on first load
+if (typeof ApexCharts !== 'undefined') {
+    initDashboardCharts();
+} else {
+    // Wait for ApexCharts to load
+    document.addEventListener('DOMContentLoaded', initDashboardCharts);
+}
+
+// Re-initialize after HTMX swaps (when polling refreshes the content)
+document.body.addEventListener('htmx:afterSwap', function(event) {
+    if (event.detail.target.id === 'staff-dashboard-live') {
+        // Small delay to ensure DOM is ready
+        setTimeout(initDashboardCharts, 50);
     }
 });
 </script>
