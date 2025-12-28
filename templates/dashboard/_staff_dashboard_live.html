@@ -1,26 +1,26 @@
 {# HTMX fragment: staff dashboard dynamic content #}
 
-<!-- High-Level Summary Stats Cards -->
+<!-- High-Level Summary Stats Cards - Flat, warm colors, large text -->
 <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-    <div class="bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl shadow-lg p-5 text-white">
-        <p class="text-3xl font-bold">{{ summary.active_partners }}</p>
-        <p class="text-sm opacity-80 mt-1">Active Partners</p>
+    <div class="card p-6 text-center">
+        <p class="text-5xl font-heading font-bold text-foreground">{{ summary.active_partners }}</p>
+        <p class="text-base font-medium text-muted mt-2">Active Partners</p>
     </div>
-    <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-5 text-white">
-        <p class="text-3xl font-bold">{{ fa_stats.approved }}</p>
-        <p class="text-sm opacity-80 mt-1">Approved FAs</p>
+    <div class="card p-6 text-center">
+        <p class="text-5xl font-heading font-bold text-green-600 dark:text-green-400">{{ fa_stats.approved }}</p>
+        <p class="text-base font-medium text-muted mt-2">Approved FAs</p>
     </div>
-    <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-5 text-white">
-        <p class="text-3xl font-bold">{{ lot_stats.approved }}</p>
-        <p class="text-sm opacity-80 mt-1">Approved Lots</p>
+    <div class="card p-6 text-center">
+        <p class="text-5xl font-heading font-bold text-green-600 dark:text-green-400">{{ lot_stats.approved }}</p>
+        <p class="text-base font-medium text-muted mt-2">Approved Lots</p>
     </div>
-    <div class="bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl shadow-lg p-5 text-white">
-        <p class="text-3xl font-bold">{{ total_yardage|floatformat:0 }}</p>
-        <p class="text-sm opacity-80 mt-1">Total Yardage</p>
+    <div class="card p-6 text-center">
+        <p class="text-5xl font-heading font-bold text-accent-600 dark:text-accent-400">{{ total_yardage|floatformat:0 }}</p>
+        <p class="text-base font-medium text-muted mt-2">Total Yardage</p>
     </div>
-    <div class="bg-gradient-to-br from-teal-500 to-cyan-500 rounded-xl shadow-lg p-5 text-white">
-        <p class="text-3xl font-bold">{{ fa_stats.approval_rate }}%</p>
-        <p class="text-sm opacity-80 mt-1">FA Approval Rate</p>
+    <div class="card p-6 text-center">
+        <p class="text-5xl font-heading font-bold text-foreground">{{ fa_stats.approval_rate }}%</p>
+        <p class="text-base font-medium text-muted mt-2">FA Approval Rate</p>
     </div>
 </div>
 
@@ -29,17 +29,17 @@
     <!-- Recent First Article Submissions -->
     <div class="card p-5">
         <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-bold">Recent First Articles</h2>
-            <a href="{% url 'inspections:fa_list' %}" class="text-sm text-primary-600 hover:text-primary-700">View all →</a>
+            <h2 class="text-lg font-bold font-heading">Recent First Articles</h2>
+            <a href="{% url 'inspections:fa_list' %}" class="text-sm text-accent-600 hover:text-accent-700">View all →</a>
         </div>
         <div class="space-y-3">
             {% for fa in recent_fas %}
                 {% load inspections_ui %}
                 {% fa_status_meta fa "dashboard" as meta %}
                 <a href="{% url 'inspections:fa_detail' fa.fai_id %}" class="block group">
-                    <div class="flex items-center justify-between p-3 rounded-lg border hover:shadow-sm transition-all" class="bg-cream-100 dark:bg-dark-card border-warm-gray-200 dark:border-dark-border">
+                    <div class="flex items-center justify-between p-3 rounded-lg border border-theme bg-cream-100 dark:bg-dark-card hover:shadow-sm transition-all">
                         <div class="min-w-0 flex-1 mr-2">
-                            <p class="font-medium truncate group-hover:text-primary-600">{{ fa.display_name }}</p>
+                            <p class="font-medium truncate group-hover:text-accent-600">{{ fa.display_name }}</p>
                             <p class="text-sm text-muted">{{ fa.company.name|default:fa.vendor.company_name }}</p>
                         </div>
                         <div class="text-right">
@@ -60,16 +60,16 @@
 
     <!-- Top Partners -->
     <div class="card p-5">
-        <h2 class="text-lg font-bold mb-4">Top Partners by Volume</h2>
+        <h2 class="text-lg font-bold font-heading mb-4">Top Partners by Volume</h2>
         <div class="space-y-3">
             {% for partner in top_partners %}
-                <div class="flex items-center justify-between p-3 rounded-lg" class="bg-cream-100 dark:bg-dark-card">
+                <div class="flex items-center justify-between p-3 rounded-lg bg-cream-100 dark:bg-dark-card">
                     <div>
                         <p class="font-medium">{{ partner.company_name }}</p>
                         <p class="text-sm text-muted">{{ partner.approved_fas }} approved FAs</p>
                     </div>
                     <div class="text-right">
-                        <p class="text-lg font-bold text-primary-600">{{ partner.lot_count }}</p>
+                        <p class="text-lg font-bold text-accent-600">{{ partner.lot_count }}</p>
                         <p class="text-xs text-muted">total lots</p>
                     </div>
                 </div>
@@ -80,30 +80,45 @@
     </div>
 </div>
 
-<!-- Detailed Stats Row -->
+<!-- Charts Row - FA and Lot Statistics -->
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-    <!-- First Article Statistics -->
+    <!-- First Article Statistics Chart -->
     <div class="card p-5">
-        <h2 class="text-lg font-bold mb-4">First Article Statistics</h2>
-        <div class="grid grid-cols-2 gap-4 mb-4">
-            <div class="stat-card">
-                <div class="stat-number">{{ fa_stats.total }}</div>
-                <div class="stat-label">Total</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number text-yellow-500">{{ fa_stats.pending }}</div>
-                <div class="stat-label">Pending Primary</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number text-blue-500">{{ fa_stats.pending_final }}</div>
-                <div class="stat-label">Pending Final</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number text-green-500">{{ fa_stats.approved }}</div>
-                <div class="stat-label">Approved</div>
+        <h2 class="text-lg font-bold font-heading mb-4">First Article Statistics</h2>
+        <div class="flex items-center gap-6">
+            <div id="fa-chart" class="w-48 h-48"></div>
+            <div class="flex-1 space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                        <span class="text-sm">Pending Primary</span>
+                    </div>
+                    <span class="font-bold">{{ fa_stats.pending }}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-orange-500"></span>
+                        <span class="text-sm">Pending Final</span>
+                    </div>
+                    <span class="font-bold">{{ fa_stats.pending_final }}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                        <span class="text-sm">Approved</span>
+                    </div>
+                    <span class="font-bold">{{ fa_stats.approved }}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                        <span class="text-sm">Rejected</span>
+                    </div>
+                    <span class="font-bold">{{ fa_stats.rejected|default:0 }}</span>
+                </div>
             </div>
         </div>
-        <div class="pt-4 border-t space-y-2" class="border-warm-gray-200 dark:border-dark-border">
+        <div class="pt-4 mt-4 border-t border-theme space-y-2">
             <div class="flex justify-between text-sm">
                 <span class="text-muted">This Month:</span>
                 <span class="font-medium">{{ fa_stats.this_month }} submitted</span>
@@ -119,28 +134,36 @@
         </div>
     </div>
 
-    <!-- Lot Statistics -->
+    <!-- Lot Statistics Chart -->
     <div class="card p-5">
-        <h2 class="text-lg font-bold mb-4">Lot Statistics</h2>
-        <div class="grid grid-cols-2 gap-4 mb-4">
-            <div class="stat-card">
-                <div class="stat-number">{{ lot_stats.total }}</div>
-                <div class="stat-label">Total Lots</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number text-yellow-500">{{ lot_stats.pending }}</div>
-                <div class="stat-label">Pending Review</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number text-green-500">{{ lot_stats.approved }}</div>
-                <div class="stat-label">Approved</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number text-red-500">{{ lot_stats.rejected }}</div>
-                <div class="stat-label">Rejected</div>
+        <h2 class="text-lg font-bold font-heading mb-4">Lot Statistics</h2>
+        <div class="flex items-center gap-6">
+            <div id="lot-chart" class="w-48 h-48"></div>
+            <div class="flex-1 space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                        <span class="text-sm">Pending Review</span>
+                    </div>
+                    <span class="font-bold">{{ lot_stats.pending }}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                        <span class="text-sm">Approved</span>
+                    </div>
+                    <span class="font-bold">{{ lot_stats.approved }}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                        <span class="text-sm">Rejected</span>
+                    </div>
+                    <span class="font-bold">{{ lot_stats.rejected }}</span>
+                </div>
             </div>
         </div>
-        <div class="pt-4 border-t space-y-2" class="border-warm-gray-200 dark:border-dark-border">
+        <div class="pt-4 mt-4 border-t border-theme space-y-2">
             <div class="flex justify-between text-sm">
                 <span class="text-muted">This Month:</span>
                 <span class="font-medium">{{ lot_stats.this_month }} submitted</span>
@@ -153,60 +176,35 @@
     </div>
 </div>
 
-<!-- Production Volume -->
+<!-- Production Volume - Clean, no gradients -->
 <div class="card p-5 mb-6">
-    <h2 class="text-lg font-bold mb-4">Production Volume</h2>
+    <h2 class="text-lg font-bold font-heading mb-4">Production Volume</h2>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="text-center p-5 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-xl">
-            <p class="text-3xl font-bold text-indigo-600 dark:text-indigo-400">{{ total_yardage|floatformat:0 }}</p>
-            <p class="text-sm text-muted mt-1">Total Yardage (All Time)</p>
+        <div class="text-center p-5 bg-cream-100 dark:bg-dark-card rounded-xl border border-theme">
+            <p class="text-4xl font-heading font-bold text-foreground">{{ total_yardage|floatformat:0 }}</p>
+            <p class="text-sm text-muted mt-2">Total Yardage (All Time)</p>
         </div>
-        <div class="text-center p-5 bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-900/30 dark:to-teal-900/30 rounded-xl">
-            <p class="text-3xl font-bold text-green-600 dark:text-green-400">{{ yardage_this_month|floatformat:0 }}</p>
-            <p class="text-sm text-muted mt-1">This Month</p>
+        <div class="text-center p-5 bg-cream-100 dark:bg-dark-card rounded-xl border border-theme">
+            <p class="text-4xl font-heading font-bold text-foreground">{{ yardage_this_month|floatformat:0 }}</p>
+            <p class="text-sm text-muted mt-2">This Month</p>
         </div>
-        <div class="text-center p-5 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/30 dark:to-cyan-900/30 rounded-xl">
-            <p class="text-3xl font-bold text-blue-600 dark:text-blue-400">{{ yardage_this_year|floatformat:0 }}</p>
-            <p class="text-sm text-muted mt-1">This Year</p>
+        <div class="text-center p-5 bg-cream-100 dark:bg-dark-card rounded-xl border border-theme">
+            <p class="text-4xl font-heading font-bold text-foreground">{{ yardage_this_year|floatformat:0 }}</p>
+            <p class="text-sm text-muted mt-2">This Year</p>
         </div>
     </div>
 </div>
 
-<!-- Monthly Trends -->
+<!-- Monthly Trends Chart -->
 <div class="card p-5 mb-6">
-    <h2 class="text-lg font-bold mb-4">Monthly Trends (Last 6 Months)</h2>
-    <div class="overflow-x-auto">
-        <table class="min-w-full">
-            <thead>
-                <tr>
-                    <th class="text-left py-3 px-4">Month</th>
-                    <th class="text-center py-3 px-4">FAs Submitted</th>
-                    <th class="text-center py-3 px-4">Lots Submitted</th>
-                    <th class="text-center py-3 px-4">FAs Approved</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for trend in monthly_trends %}
-                    <tr>
-                        <td class="py-3 px-4 font-medium">{{ trend.month }}</td>
-                        <td class="text-center py-3 px-4">{{ trend.fa_submitted }}</td>
-                        <td class="text-center py-3 px-4">{{ trend.lots_submitted }}</td>
-                        <td class="text-center py-3 px-4">{{ trend.fa_approved }}</td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="4" class="text-center py-8 text-muted">No data available</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    <h2 class="text-lg font-bold font-heading mb-4">Monthly Trends (Last 6 Months)</h2>
+    <div id="trends-chart" class="w-full h-72"></div>
 </div>
 
 <!-- All Partners List -->
 <div class="card p-5">
     <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-bold">All Partners</h2>
+        <h2 class="text-lg font-bold font-heading">All Partners</h2>
     </div>
     <div class="overflow-x-auto">
         <table class="min-w-full">
@@ -243,4 +241,181 @@
     </div>
 </div>
 
-
+<!-- ApexCharts Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if dark mode is enabled
+    const isDark = document.documentElement.classList.contains('dark') || 
+                   localStorage.getItem('color-theme') === 'dark';
+    
+    const chartColors = {
+        pending: '#eab308',      // yellow-500
+        pendingFinal: '#f97316', // orange-500
+        approved: '#22c55e',     // green-500
+        rejected: '#ef4444',     // red-500
+        text: isDark ? '#d1d5db' : '#374151',
+        background: isDark ? '#1f2121' : '#F5F3EF'
+    };
+    
+    // FA Donut Chart
+    const faChartEl = document.querySelector("#fa-chart");
+    if (faChartEl) {
+        const faOptions = {
+            series: [{{ fa_stats.pending }}, {{ fa_stats.pending_final }}, {{ fa_stats.approved }}, {{ fa_stats.rejected|default:0 }}],
+            colors: [chartColors.pending, chartColors.pendingFinal, chartColors.approved, chartColors.rejected],
+            chart: {
+                type: 'donut',
+                height: 192,
+                background: 'transparent'
+            },
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '65%',
+                        labels: {
+                            show: true,
+                            total: {
+                                show: true,
+                                label: 'Total',
+                                fontSize: '14px',
+                                fontFamily: 'Roboto Condensed, sans-serif',
+                                fontWeight: 700,
+                                color: chartColors.text,
+                                formatter: function (w) {
+                                    return w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            legend: { show: false },
+            dataLabels: { enabled: false },
+            stroke: { width: 0 },
+            tooltip: {
+                theme: isDark ? 'dark' : 'light',
+                y: {
+                    formatter: function(val) { return val + ' FAs'; }
+                }
+            }
+        };
+        new ApexCharts(faChartEl, faOptions).render();
+    }
+    
+    // Lot Donut Chart
+    const lotChartEl = document.querySelector("#lot-chart");
+    if (lotChartEl) {
+        const lotOptions = {
+            series: [{{ lot_stats.pending }}, {{ lot_stats.approved }}, {{ lot_stats.rejected }}],
+            colors: [chartColors.pending, chartColors.approved, chartColors.rejected],
+            chart: {
+                type: 'donut',
+                height: 192,
+                background: 'transparent'
+            },
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '65%',
+                        labels: {
+                            show: true,
+                            total: {
+                                show: true,
+                                label: 'Total',
+                                fontSize: '14px',
+                                fontFamily: 'Roboto Condensed, sans-serif',
+                                fontWeight: 700,
+                                color: chartColors.text,
+                                formatter: function (w) {
+                                    return w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            legend: { show: false },
+            dataLabels: { enabled: false },
+            stroke: { width: 0 },
+            tooltip: {
+                theme: isDark ? 'dark' : 'light',
+                y: {
+                    formatter: function(val) { return val + ' Lots'; }
+                }
+            }
+        };
+        new ApexCharts(lotChartEl, lotOptions).render();
+    }
+    
+    // Monthly Trends Bar Chart
+    const trendsChartEl = document.querySelector("#trends-chart");
+    if (trendsChartEl) {
+        const trendsOptions = {
+            series: [
+                {
+                    name: 'FAs Submitted',
+                    data: [{% for trend in monthly_trends %}{{ trend.fa_submitted }}{% if not forloop.last %}, {% endif %}{% endfor %}]
+                },
+                {
+                    name: 'Lots Submitted',
+                    data: [{% for trend in monthly_trends %}{{ trend.lots_submitted }}{% if not forloop.last %}, {% endif %}{% endfor %}]
+                },
+                {
+                    name: 'FAs Approved',
+                    data: [{% for trend in monthly_trends %}{{ trend.fa_approved }}{% if not forloop.last %}, {% endif %}{% endfor %}]
+                }
+            ],
+            chart: {
+                type: 'bar',
+                height: 280,
+                background: 'transparent',
+                toolbar: { show: false },
+                fontFamily: 'Roboto, sans-serif'
+            },
+            colors: ['#E84D1C', '#756148', '#22c55e'],
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                    columnWidth: '55%',
+                    borderRadius: 4
+                }
+            },
+            dataLabels: { enabled: false },
+            stroke: { show: true, width: 2, colors: ['transparent'] },
+            xaxis: {
+                categories: [{% for trend in monthly_trends %}'{{ trend.month }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+                labels: {
+                    style: {
+                        colors: chartColors.text,
+                        fontSize: '12px'
+                    }
+                },
+                axisBorder: { color: isDark ? '#2a2d2d' : '#efece8' },
+                axisTicks: { color: isDark ? '#2a2d2d' : '#efece8' }
+            },
+            yaxis: {
+                labels: {
+                    style: {
+                        colors: chartColors.text,
+                        fontSize: '12px'
+                    }
+                }
+            },
+            grid: {
+                borderColor: isDark ? '#2a2d2d' : '#efece8',
+                strokeDashArray: 4
+            },
+            legend: {
+                position: 'top',
+                horizontalAlign: 'right',
+                labels: { colors: chartColors.text }
+            },
+            tooltip: {
+                theme: isDark ? 'dark' : 'light'
+            }
+        };
+        new ApexCharts(trendsChartEl, trendsOptions).render();
+    }
+});
+</script>

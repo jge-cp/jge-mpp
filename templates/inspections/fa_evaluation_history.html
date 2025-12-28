@@ -39,9 +39,11 @@
         border: 2px solid #efece8;
         border-radius: 8px;
         margin-bottom: 1.5rem;
+        background-color: #F5F3EF;
     }
     .dark .attempt-section {
         border-color: #2a2d2d;
+        background-color: #1f2121;
     }
     .attempt-header {
         background-color: #efece8;
@@ -53,6 +55,14 @@
         background-color: #0a0a0a;
         border-bottom-color: #2a2d2d;
         color: #d1d5db;
+    }
+    .attempt-body {
+        padding: 1rem;
+        background-color: #F5F3EF;
+        border-radius: 0 0 6px 6px;
+    }
+    .dark .attempt-body {
+        background-color: #1f2121;
     }
 </style>
 {% endblock %}
@@ -125,7 +135,7 @@
             </div>
         </div>
         
-        <div class="p-4">
+        <div class="attempt-body">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Primary Inspector Evaluation -->
                 <div>
