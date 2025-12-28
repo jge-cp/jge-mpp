@@ -187,6 +187,9 @@ class NotificationService:
             notification.mark_as_sent()
             return True
         except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Email send failed to {notification.email_to}: {e}", exc_info=True)
             notification.mark_as_failed(str(e))
             return False
     
