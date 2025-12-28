@@ -132,10 +132,11 @@ class Command(BaseCommand):
         """Create or update mcadmin superuser"""
         self.stdout.write(self.style.HTTP_INFO('\n[Step 3] Creating superuser...'))
 
+        # mcadmin also uses Resend test email for dev/testing
         user, created = User.objects.get_or_create(
             username='mcadmin',
             defaults={
-                'email': 'admin@multicampattern.com',
+                'email': 'delivered+mcadmin@resend.dev',
                 'first_name': 'Multicam',
                 'last_name': 'Admin',
                 'is_staff': True,
@@ -144,14 +145,15 @@ class Command(BaseCommand):
         )
 
         if created:
-            user.set_password('Multicam2024!')
+            user.set_password('mcadmin123')
             user.save()
             self.stdout.write(self.style.SUCCESS('  ✓ Created superuser: mcadmin'))
         else:
-            # Ensure superuser status
+            # Ensure superuser status and update email
             user.is_staff = True
             user.is_superuser = True
-            user.set_password('Multicam2024!')
+            user.email = 'delivered+mcadmin@resend.dev'
+            user.set_password('mcadmin123')
             user.save()
             self.stdout.write(self.style.WARNING('  ↻ Updated superuser: mcadmin'))
 
@@ -160,7 +162,7 @@ class Command(BaseCommand):
         profile.user_functionality = 'admin'
         profile.admin_role = 'full_admin'
         profile.company_name = 'Multicam'
-        profile.technical_email = 'admin@multicampattern.com'
+        profile.technical_email = 'delivered+mcadmin@resend.dev'
         profile.save()
         self.stdout.write('  → Profile: Full Admin')
 
@@ -333,7 +335,7 @@ class Command(BaseCommand):
         self.stdout.write('-' * 70)
         self.stdout.write('')
         self.stdout.write('SUPERUSER:')
-        self.stdout.write('  mcadmin / Multicam2024!  (Full Admin)')
+        self.stdout.write('  mcadmin / mcadmin123  (Full Admin)')
         self.stdout.write('')
         self.stdout.write('PARTNERS:')
         self.stdout.write('  ACME Corp:')
