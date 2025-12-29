@@ -169,7 +169,7 @@ This command:
 | partner2a | partner2a123 | Partner (GLOBEX) |
 | partner2b | partner2b123 | Partner (GLOBEX) |
 | primary_inspector | primary_inspector123 | Primary Inspector |
-| final_inspector | final123 | Final Inspector |
+| final_inspector | final_inspector123 | Final Inspector |
 | staff | staff123 | Executive Staff |
 
 ### Import Partners
