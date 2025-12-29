@@ -21,6 +21,7 @@
         <a href="{% if notification.action_url %}{{ notification.action_url }}{% else %}#{% endif %}"
            hx-post="{% url 'notifications:mark_read' notification.id %}"
            hx-swap="none"
+           hx-on::after-request="if(this.getAttribute('href') && this.getAttribute('href') !== '#') window.location.href = this.getAttribute('href');"
            class="block hover:bg-elevated rounded -m-2 p-2 transition-colors">
             <div class="flex items-start space-x-4">
                 <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center
