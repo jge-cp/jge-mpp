@@ -1,30 +1,26 @@
 {# HTMX fragment: staff dashboard dynamic content #}
 
-<!-- High-Level Summary Stats Cards - Flat, warm colors, large text -->
-<div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-    <div class="card p-6 text-center">
-        <p class="text-5xl font-heading font-bold text-foreground">{{ summary.active_partners }}</p>
-        <p class="text-base font-medium text-muted mt-2">Active Partners</p>
+<!-- High-Level Summary Stats Cards -->
+<div class="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+    <div class="rounded-2xl p-5 text-center" style="background-color: #fffbeb;">
+        <p class="font-heading font-bold text-gray-900" style="font-size: 3rem;">{{ fa_stats.approved }}</p>
+        <p class="text-base font-heading font-medium text-gray-700 mt-1">Approved FAs</p>
     </div>
-    <div class="card p-6 text-center">
-        <p class="text-5xl font-heading font-bold text-green-600 dark:text-green-400">{{ fa_stats.approved }}</p>
-        <p class="text-base font-medium text-muted mt-2">Approved FAs</p>
+    <div class="rounded-2xl p-5 text-center" style="background-color: #fffbeb;">
+        <p class="font-heading font-bold text-gray-900" style="font-size: 3rem;">{{ lot_stats.approved }}</p>
+        <p class="text-base font-heading font-medium text-gray-700 mt-1">Approved Lots</p>
     </div>
-    <div class="card p-6 text-center">
-        <p class="text-5xl font-heading font-bold text-green-600 dark:text-green-400">{{ lot_stats.approved }}</p>
-        <p class="text-base font-medium text-muted mt-2">Approved Lots</p>
+    <div class="bg-accent-500 rounded-2xl p-5 text-center">
+        <p class="font-heading font-bold text-white" style="font-size: 3rem;">{{ summary.active_partners }}</p>
+        <p class="text-base font-heading font-medium text-white/90 mt-1">Active Partners</p>
     </div>
-    <div class="card p-6 text-center">
-        <p class="text-5xl font-heading font-bold text-accent-600 dark:text-accent-400">{{ total_yardage|floatformat:0 }}</p>
-        <p class="text-base font-medium text-muted mt-2">Total Yardage</p>
-    </div>
-    <div class="card p-6 text-center">
-        <p class="text-5xl font-heading font-bold text-foreground">{{ fa_stats.approval_rate }}%</p>
-        <p class="text-base font-medium text-muted mt-2">FA Approval Rate</p>
+    <div class="bg-accent-500 rounded-2xl p-5 text-center">
+        <p class="font-heading font-bold text-white" style="font-size: 3rem;">{{ total_yardage|floatformat:0 }}</p>
+        <p class="text-base font-heading font-medium text-white/90 mt-1">Total Yardage</p>
     </div>
 </div>
 
-<!-- Recent Activity - At the Top -->
+<!-- Recent Activity - FAs and Lots side by side -->
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
     <!-- Recent First Article Submissions -->
     <div class="card p-5">
@@ -38,11 +34,11 @@
                 {% fa_status_meta fa "dashboard" as meta %}
                 <a href="{% url 'inspections:fa_detail' fa.fai_id %}" class="block group">
                     <div class="flex items-center justify-between p-3 rounded-lg border border-theme bg-cream-100 dark:bg-dark-card hover:shadow-sm transition-all">
-                        <div class="min-w-0 flex-1 mr-2">
+                        <div class="min-w-0 flex-1 mr-4">
                             <p class="font-medium truncate group-hover:text-accent-600">{{ fa.display_name }}</p>
                             <p class="text-sm text-muted">{{ fa.company.name|default:fa.vendor.company_name }}</p>
                         </div>
-                        <div class="text-right">
+                        <div class="text-right flex-shrink-0">
                             <span class="badge {{ meta.badge_variant }}">{{ meta.badge_label }}</span>
                             {% if meta.subtext %}
                                 <p class="text-xs {{ meta.subtext_class }} mt-1">{{ meta.subtext }}</p>
@@ -58,23 +54,30 @@
         </div>
     </div>
 
-    <!-- Top Partners -->
+    <!-- Recent Lot Submissions -->
     <div class="card p-5">
-        <h2 class="text-lg font-bold font-heading mb-4">Top Partners by Volume</h2>
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold font-heading">Recent Lots</h2>
+            <a href="{% url 'inspections:lot_list' %}" class="text-sm text-accent-600 hover:text-accent-700">View all →</a>
+        </div>
         <div class="space-y-3">
-            {% for partner in top_partners %}
-                <div class="flex items-center justify-between p-3 rounded-lg bg-cream-100 dark:bg-dark-card">
-                    <div>
-                        <p class="font-medium">{{ partner.company_name }}</p>
-                        <p class="text-sm text-muted">{{ partner.approved_fas }} approved FAs</p>
+            {% for lot in recent_lots %}
+                {% load inspections_ui %}
+                {% lot_status_meta lot "dashboard" as meta %}
+                <a href="{% url 'inspections:lot_detail' lot.lot_id %}" class="block group">
+                    <div class="flex items-center justify-between p-3 rounded-lg border border-theme bg-cream-100 dark:bg-dark-card hover:shadow-sm transition-all">
+                        <div class="min-w-0 flex-1 mr-4">
+                            <p class="font-medium truncate group-hover:text-accent-600">{{ lot.display_name }}</p>
+                            <p class="text-sm text-muted">{{ lot.vendor.company_name }}</p>
+                        </div>
+                        <div class="text-right flex-shrink-0">
+                            <span class="badge {{ meta.badge_variant }}">{{ meta.badge_label }}</span>
+                            <p class="text-xs text-muted mt-1">{{ lot.submission_date|date:"M d" }}</p>
+                        </div>
                     </div>
-                    <div class="text-right">
-                        <p class="text-lg font-bold text-accent-600">{{ partner.lot_count }}</p>
-                        <p class="text-xs text-muted">total lots</p>
-                    </div>
-                </div>
+                </a>
             {% empty %}
-                <p class="text-muted text-center py-4">No partners yet</p>
+                <p class="text-muted text-center py-4">No recent activity</p>
             {% endfor %}
         </div>
     </div>
@@ -131,6 +134,10 @@
                 <span class="text-muted">This Year:</span>
                 <span class="font-medium">{{ fa_stats.this_year }} submitted</span>
             </div>
+            <div class="flex justify-between text-sm">
+                <span class="text-muted">Approval Rate:</span>
+                <span class="font-medium">{{ fa_stats.approval_rate }}%</span>
+            </div>
         </div>
     </div>
 
@@ -169,6 +176,14 @@
                 <span class="font-medium">{{ lot_stats.this_month }} submitted</span>
             </div>
             <div class="flex justify-between text-sm">
+                <span class="text-muted">This Quarter:</span>
+                <span class="font-medium">{{ lot_stats.this_quarter }} submitted</span>
+            </div>
+            <div class="flex justify-between text-sm">
+                <span class="text-muted">This Year:</span>
+                <span class="font-medium">{{ lot_stats.this_year }} submitted</span>
+            </div>
+            <div class="flex justify-between text-sm">
                 <span class="text-muted">Approval Rate:</span>
                 <span class="font-medium">{{ lot_stats.approval_rate }}%</span>
             </div>
@@ -199,6 +214,27 @@
 <div class="card p-5 mb-6">
     <h2 class="text-lg font-bold font-heading mb-4">Monthly Trends (Last 6 Months)</h2>
     <div id="trends-chart" class="w-full h-72"></div>
+</div>
+
+<!-- Top Partners by Volume - Full Width -->
+<div class="card p-5 mb-6">
+    <h2 class="text-lg font-bold font-heading mb-4">Top Partners by Volume</h2>
+    <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
+        {% for partner in top_partners %}
+            <div class="flex items-center justify-between p-4 rounded-xl bg-cream-100 dark:bg-dark-card border border-theme">
+                <div>
+                    <p class="font-medium">{{ partner.company_name }}</p>
+                    <p class="text-sm text-muted">{{ partner.approved_fas }} approved FAs</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-2xl font-bold text-accent-600">{{ partner.lot_count }}</p>
+                    <p class="text-xs text-muted">total lots</p>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-muted text-center py-4 col-span-4">No partners yet</p>
+        {% endfor %}
+    </div>
 </div>
 
 <!-- All Partners List -->
@@ -383,6 +419,10 @@ function initDashboardCharts() {
                 {
                     name: 'FAs Approved',
                     data: [{% for trend in monthly_trends %}{{ trend.fa_approved }}{% if not forloop.last %}, {% endif %}{% endfor %}]
+                },
+                {
+                    name: 'Lots Approved',
+                    data: [{% for trend in monthly_trends %}{{ trend.lot_approved }}{% if not forloop.last %}, {% endif %}{% endfor %}]
                 }
             ],
             chart: {
@@ -393,7 +433,7 @@ function initDashboardCharts() {
                 fontFamily: 'Roboto, sans-serif',
                 animations: { enabled: false }
             },
-            colors: [chartColors.accent, chartColors.brand, chartColors.approved],
+            colors: [chartColors.accent, chartColors.brand, chartColors.approved, '#0d9488'],
             plotOptions: {
                 bar: {
                     horizontal: false,

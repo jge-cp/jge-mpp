@@ -515,6 +515,11 @@ def staff_dashboard(request):
                 final_review_date__gte=month_start,
                 final_review_date__lt=month_end
             ).count(),
+            'lot_approved': LotAcceptance.objects.filter(
+                status='approved',
+                review_date__gte=month_start,
+                review_date__lt=month_end
+            ).count(),
         })
     monthly_trends.reverse()  # Oldest first
     
