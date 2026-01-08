@@ -66,6 +66,9 @@ if not DEBUG:
     # Prevent MIME type sniffing
     SECURE_CONTENT_TYPE_NOSNIFF = True
 
+# CSRF trusted origins (for Railway and other deployments)
+CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if os.getenv('CSRF_TRUSTED_ORIGINS') else []
+
 
 # Application definition
 
