@@ -51,6 +51,12 @@ def fa_submit(request):
             # Auto-populate submitter name from user profile
             fa.submitter_first_name = request.user.first_name or request.user.username
             fa.submitter_last_name = request.user.last_name or ''
+            
+            # Check if this FA should skip primary review (IMTP, SWIR, or BDCS)
+            if fa.skip_primary_review:
+                fa.status = 'pending_final'  # Skip directly to final inspector
+            # else: status defaults to 'pending' for normal flow
+            
             fa.save()
             
             # Handle file uploads if any (with server-side validation)
@@ -76,10 +82,16 @@ def fa_submit(request):
                     )
                     fa.submission_documents.add(file_upload)
             
-            # Send email notification to inspector (non-blocking)
+            # Send email notification to appropriate inspector (non-blocking)
             try:
-                from .emails import send_fa_submitted_email
-                send_fa_submitted_email(fa)
+                if fa.skip_primary_review:
+                    # Notify Final Inspectors directly (skipped primary)
+                    from .emails import send_fa_pending_final_email
+                    send_fa_pending_final_email(fa)
+                else:
+                    # Normal flow: notify Primary Inspectors
+                    from .emails import send_fa_submitted_email
+                    send_fa_submitted_email(fa)
             except Exception as e:
                 # Log but don't block the submission
                 import logging

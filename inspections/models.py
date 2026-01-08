@@ -75,6 +75,7 @@ class FirstArticleInspection(models.Model):
     SPECTRAL_REFLECTANCE_CHOICES = [
         ('alpha', 'Alpha'),
         ('beta', 'Beta'),
+        ('swir', 'SWIR'),  # Short-Wave Infrared - skips primary review
     ]
     
     EVALUATION_CHOICES = [
@@ -133,6 +134,13 @@ class FirstArticleInspection(models.Model):
         help_text='Historic FAs are imported legacy data. Some fields may be N/A. Only admins can set this.'
     )
     
+    # BDCS inspection flag - if checked, skips primary review
+    is_bdcs = models.BooleanField(
+        default=False,
+        verbose_name='BDCS',
+        help_text='Check if this is a BDCS inspection. BDCS submissions skip primary review.'
+    )
+    
     # FREE FORM fields (from FA Main)
     fabric_style = models.CharField(max_length=200)
     
@@ -171,6 +179,25 @@ class FirstArticleInspection(models.Model):
     def submitter_full_name(self):
         """Return full name as 'Last, First' format"""
         return f"{self.submitter_last_name}, {self.submitter_first_name}".strip(', ')
+    
+    @property
+    def skip_primary_review(self):
+        """
+        Returns True if this FA should skip primary inspector and go directly to final.
+        
+        Triggers:
+        - IMTP selected as multicam variant
+        - SWIR selected as spectral reflectance requirement
+        - BDCS checkbox is checked
+        """
+        # Check IMTP variant
+        is_imtp = self.multicam_variant and self.multicam_variant.camouflage_name == 'IMTP'
+        # Check SWIR spectral requirement
+        is_swir = self.spectral_reflectance_requirement == 'swir'
+        # Check BDCS checkbox
+        is_bdcs_checked = self.is_bdcs
+        
+        return is_imtp or is_swir or is_bdcs_checked
     
     # BOOLEAN (from FA Main)
     submitted = models.BooleanField(default=False)

@@ -32,6 +32,7 @@ class FirstArticleInspectionForm(forms.ModelForm):
             'date_of_printing',
             'first_article_ship_date',
             'tracking_number',
+            'is_bdcs',  # BDCS checkbox - if checked, skips primary review
         ]
         widgets = {
             'fabric_style': forms.TextInput(attrs={
@@ -60,6 +61,9 @@ class FirstArticleInspectionForm(forms.ModelForm):
             'tracking_number': forms.TextInput(attrs={
                 'class': FORM_INPUT,
                 'placeholder': 'Optional tracking number'
+            }),
+            'is_bdcs': forms.CheckboxInput(attrs={
+                'class': FORM_CHECKBOX,
             }),
         }
     

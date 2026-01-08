@@ -111,6 +111,23 @@
                 </div>
             </div>
             
+            <!-- BDCS Checkbox - Special Inspection Type -->
+            <div class="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl">
+                <div class="flex items-start gap-3">
+                    <div class="flex items-center h-5 mt-1">
+                        {{ form.is_bdcs }}
+                    </div>
+                    <div>
+                        <label for="{{ form.is_bdcs.id_for_label }}" class="font-medium text-gray-900 dark:text-white cursor-pointer">
+                            BDCS Inspection
+                        </label>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                            Check this box if this is a BDCS inspection. BDCS, IMTP, and SWIR submissions skip primary review and go directly to the Final Inspector.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Supporting Documents -->
             <div class="mb-8">
                 <label class="form-label">Supporting Documents</label>
