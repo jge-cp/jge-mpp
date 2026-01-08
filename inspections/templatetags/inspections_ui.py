@@ -56,12 +56,14 @@ def fa_status_meta(fa, mode: str = "list") -> dict:
             subtext = "Rejected"
     elif status == "pending_final":
         badge_variant = "badge-pending-final"
+        # Check if FA skipped primary review (IMTP, SWIR, or BDCS)
+        skipped_primary = getattr(fa, "skip_primary_review", False)
         if mode == "queue":
             label = "Ready for Final Review"
-            subtext = "✓ Passed Primary Review"
+            subtext = "⏭ Skipped Primary Review" if skipped_primary else "✓ Passed Primary Review"
         else:
             label = "Awaiting Final"
-            subtext = "✓ Passed Primary"
+            subtext = "⏭ Skipped Primary" if skipped_primary else "✓ Passed Primary"
     else:
         badge_variant = "badge-pending"
         if mode == "queue":

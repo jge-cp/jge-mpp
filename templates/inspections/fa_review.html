@@ -191,7 +191,7 @@
         <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Current Attempt: #{{ current_attempt }}</p>
         <div class="grid md:grid-cols-2 gap-4">
             <!-- Primary Review Status -->
-            <div class="p-4 rounded-2xl border-2 border-warm {% if primary_eval_for_display and primary_eval_for_display.is_submitted %}{% if primary_eval_for_display.all_pass %}bg-green-50 dark:bg-green-900/20{% else %}bg-red-50 dark:bg-red-900/20{% endif %}{% else %}bg-cream-50 dark:bg-dark-card{% endif %}">
+            <div class="p-4 rounded-2xl border-2 border-warm {% if primary_eval_for_display and primary_eval_for_display.is_submitted %}{% if primary_eval_for_display.all_pass %}bg-green-50 dark:bg-green-900/20{% else %}bg-red-50 dark:bg-red-900/20{% endif %}{% elif fa.skip_primary_review %}bg-blue-50 dark:bg-blue-900/20{% else %}bg-cream-50 dark:bg-dark-card{% endif %}">
                 <div class="flex items-center justify-between mb-2">
                     <span class="font-bold text-primary">Primary Review</span>
                     {% if primary_eval_for_display and primary_eval_for_display.is_submitted %}
@@ -200,6 +200,8 @@
                         {% else %}
                             <span class="result-fail">✗ FAILED</span>
                         {% endif %}
+                    {% elif fa.skip_primary_review %}
+                        <span class="bg-blue-500 text-white font-bold px-3 py-1 rounded">⏭ SKIPPED</span>
                     {% else %}
                         <span class="result-pending">PENDING</span>
                     {% endif %}
@@ -217,6 +219,9 @@
                     {% if primary_eval_for_display.comments %}
                         <p class="text-sm mt-2 italic">"{{ primary_eval_for_display.comments }}"</p>
                     {% endif %}
+                {% elif fa.skip_primary_review %}
+                    <p class="text-sm text-blue-600 dark:text-blue-400">Direct to Final Inspector</p>
+                    <p class="text-xs text-muted mt-1">IMTP, SWIR, or BDCS submission</p>
                 {% else %}
                     <p class="text-sm text-muted">Awaiting primary inspector review</p>
                 {% endif %}
@@ -252,6 +257,8 @@
                         <p class="text-sm mt-2 italic">"{{ final_eval_for_display.comments }}"</p>
                     {% endif %}
                 {% elif fa.status == 'pending_final' %}
+                    <p class="text-sm text-muted">Awaiting final inspector review</p>
+                {% elif fa.skip_primary_review %}
                     <p class="text-sm text-muted">Awaiting final inspector review</p>
                 {% else %}
                     <p class="text-sm text-muted">Requires primary approval first</p>
