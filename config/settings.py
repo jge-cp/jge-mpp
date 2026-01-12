@@ -206,11 +206,19 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email Configuration
-# Default to Resend HTTP API (more reliable than SMTP in containers)
-# For local dev, override with EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
-EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'notifications.backends.ResendEmailBackend')
+# Options:
+#   - notifications.backends.MicrosoftGraphBackend (Microsoft 365 - recommended)
+#   - notifications.backends.ResendEmailBackend (Resend HTTP API)
+#   - django.core.mail.backends.console.EmailBackend (local dev)
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'notifications.backends.MicrosoftGraphBackend')
 
-# Resend API key (used by ResendEmailBackend)
+# Microsoft Graph API Settings (for MicrosoftGraphBackend)
+MS_GRAPH_TENANT_ID = os.getenv('MS_GRAPH_TENANT_ID', '')
+MS_GRAPH_CLIENT_ID = os.getenv('MS_GRAPH_CLIENT_ID', '')
+MS_GRAPH_CLIENT_SECRET = os.getenv('MS_GRAPH_CLIENT_SECRET', '')
+MS_GRAPH_SENDER_EMAIL = os.getenv('MS_GRAPH_SENDER_EMAIL', '')  # e.g., noreply@multicampattern.com
+
+# Resend API key (used by ResendEmailBackend - fallback option)
 RESEND_API_KEY = os.getenv('RESEND_API_KEY', '') or os.getenv('EMAIL_HOST_PASSWORD', '')
 
 # SMTP settings (kept for fallback/compatibility if needed)
@@ -221,7 +229,8 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'resend')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 EMAIL_TIMEOUT = 10  # Timeout in seconds for SMTP operations (prevents worker hangs)
 
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'onboarding@resend.dev')
+# Default from email (used as fallback if MS_GRAPH_SENDER_EMAIL not set)
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', os.getenv('MS_GRAPH_SENDER_EMAIL', 'onboarding@resend.dev'))
 
 # Django Unfold Configuration
 UNFOLD = {
