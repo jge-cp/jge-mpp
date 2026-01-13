@@ -18,8 +18,27 @@ from notifications.services import (
 
 def send_fa_submitted_notification(fa):
     """
-    Send notification to Primary Inspectors when FA is submitted.
+    Send notification when FA is submitted.
+    
+    If FA requires final-only review (BDCS, SWIR, or IMTP):
+        → Notify Final Inspectors only (skips Primary)
+    Otherwise:
+        → Notify Primary Inspectors
+    
     Sends both email and in-app notifications.
+    """
+    # Check if this FA skips primary review
+    if fa.requires_final_only_review:
+        # BDCS, SWIR, or IMTP - goes directly to Final Inspectors
+        _send_fa_submitted_to_final(fa)
+    else:
+        # Standard flow - goes to Primary Inspectors
+        _send_fa_submitted_to_primary(fa)
+
+
+def _send_fa_submitted_to_primary(fa):
+    """
+    Send FA submitted notification to Primary Inspectors (standard flow).
     """
     title = f'New First Article - {fa.vendor.company_name}'
     
@@ -45,6 +64,50 @@ Please review the submission at: {settings.SITE_URL}/portal/admin/fa/review/{fa.
         action_url=f'/portal/admin/fa/review/{fa.fai_id}/',
         channels=['email', 'in_app'],
         email_subject=f'[TO: PRIMARY INSPECTOR] New First Article Submitted - {fa.vendor.company_name}'
+    )
+
+
+def _send_fa_submitted_to_final(fa):
+    """
+    Send FA submitted notification directly to Final Inspectors.
+    Used when FA has BDCS, SWIR, or IMTP which skips primary review.
+    """
+    # Build reason string for why this skipped primary
+    skip_reasons = []
+    if fa.is_bdcs:
+        skip_reasons.append('BDCS')
+    if fa.spectral_reflectance_requirement == 'swir':
+        skip_reasons.append('SWIR')
+    if fa.multicam_variant and fa.multicam_variant.camouflage_name == 'IMTP':
+        skip_reasons.append('IMTP')
+    skip_reason_str = ', '.join(skip_reasons)
+    
+    title = f'New First Article (Direct to Final) - {fa.vendor.company_name}'
+    
+    message = f"""A new First Article has been submitted and requires your direct review.
+
+⚠️ This FA skipped primary review because: {skip_reason_str}
+
+FA ID: {fa.fai_id}
+Partner: {fa.vendor.company_name}
+Fabric Style: {fa.fabric_style}
+Variant: {fa.multicam_variant.camouflage_name}
+Lot: {fa.fa_lot_number}
+Submitted: {fa.submission_date.strftime('%B %d, %Y at %I:%M %p')}
+
+Please review the submission at: {settings.SITE_URL}/portal/admin/fa/review/{fa.fai_id}/"""
+    
+    recipients = get_final_inspectors()
+    
+    NotificationService.notify(
+        recipients=recipients,
+        notification_type='fa_submitted',
+        title=title,
+        message=message,
+        related_object=fa,
+        action_url=f'/portal/admin/fa/review/{fa.fai_id}/',
+        channels=['email', 'in_app'],
+        email_subject=f'[TO: FINAL INSPECTOR] New First Article (Direct Review) - {fa.vendor.company_name}'
     )
 
 
