@@ -28,7 +28,7 @@ def send_fa_submitted_notification(fa):
     Sends both email and in-app notifications.
     """
     # Check if this FA skips primary review
-    if fa.requires_final_only_review:
+    if fa.skip_primary_review:
         # BDCS, SWIR, or IMTP - goes directly to Final Inspectors
         _send_fa_submitted_to_final(fa)
     else:

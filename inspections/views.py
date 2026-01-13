@@ -83,15 +83,10 @@ def fa_submit(request):
                     fa.submission_documents.add(file_upload)
             
             # Send email notification to appropriate inspector (non-blocking)
+            # send_fa_submitted_email handles routing: BDCS/SWIR/IMTP → Final, otherwise → Primary
             try:
-                if fa.skip_primary_review:
-                    # Notify Final Inspectors directly (skipped primary)
-                    from .emails import send_fa_pending_final_email
-                    send_fa_pending_final_email(fa)
-                else:
-                    # Normal flow: notify Primary Inspectors
-                    from .emails import send_fa_submitted_email
-                    send_fa_submitted_email(fa)
+                from .emails import send_fa_submitted_email
+                send_fa_submitted_email(fa)
             except Exception as e:
                 # Log but don't block the submission
                 import logging
