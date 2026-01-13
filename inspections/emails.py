@@ -219,8 +219,9 @@ View details and resubmit: {settings.SITE_URL}/portal/fa/{fa.fai_id}/"""
         email_subject=f'[TO: PARTNER] First Article Requires Revision - {fa.fai_id}'
     )
     
-    # If rejected at final review, also notify Primary Inspector
-    if rejection_stage == 'final review':
+    # If rejected at final review, notify Primary Inspector
+    # BUT only if this FA went through primary review (not BDCS/SWIR/IMTP)
+    if rejection_stage == 'final review' and not fa.skip_primary_review:
         _send_fa_final_rejection_to_primary(fa, comments)
 
 
