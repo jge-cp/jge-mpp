@@ -84,9 +84,7 @@ def _send_fa_submitted_to_final(fa):
     
     title = f'New First Article (Direct to Final) - {fa.vendor.company_name}'
     
-    message = f"""A new First Article has been submitted and requires your direct review.
-
-⚠️ This FA skipped primary review because: {skip_reason_str}
+    message = f"""A First Article has been submitted and has skipped the primary inspection due to {skip_reason_str}. It is awaiting final approval.
 
 FA ID: {fa.fai_id}
 Partner: {fa.vendor.company_name}
