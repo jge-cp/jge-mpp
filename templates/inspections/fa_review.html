@@ -550,9 +550,11 @@
         <div class="card p-6 mb-6">
             <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Comments</h2>
             <textarea name="comments" 
-                      class="form-textarea w-full"
-                      rows="4"
-                      placeholder="Overall evaluation comments...">{{ evaluation.comments|default:'' }}</textarea>
+                      class="form-textarea w-full auto-expand"
+                      rows="3"
+                      style="min-height: 80px; max-height: 400px; overflow-y: auto;"
+                      placeholder="Overall evaluation comments..."
+                      {% if is_read_only %}disabled{% endif %}>{{ evaluation.comments|default:'' }}</textarea>
         </div>
         
         <!-- File Upload Section - drag/drop style -->

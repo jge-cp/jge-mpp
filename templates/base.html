@@ -131,6 +131,21 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
     
+    <!-- Auto-expanding textareas -->
+    <script>
+        function autoExpand(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.auto-expand').forEach(function(el) {
+                el.addEventListener('input', function() { autoExpand(this); });
+                autoExpand(el); // Initial sizing
+            });
+        });
+    </script>
+    
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>

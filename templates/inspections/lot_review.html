@@ -273,10 +273,11 @@
                 <!-- Sample Comments -->
                 <div>
                     <label class="form-label text-sm">Sample Comments (optional)</label>
-                    <input type="text" name="sample_{{ sample.sample_number }}_comments" 
-                           class="form-input w-full"
-                           placeholder="Comments for this sample"
-                           value="{{ sample.sample_eval.comments|default:'' }}">
+                    <textarea name="sample_{{ sample.sample_number }}_comments" 
+                              class="form-textarea w-full auto-expand"
+                              rows="2"
+                              style="min-height: 48px; max-height: 200px; overflow-y: auto;"
+                              placeholder="Comments for this sample">{{ sample.sample_eval.comments|default:'' }}</textarea>
                 </div>
             </div>
         </div>
@@ -286,8 +287,9 @@
         <div class="card p-6 mb-6">
             <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Overall Comments</h2>
             <textarea name="comments" 
-                      class="form-textarea w-full"
+                      class="form-textarea w-full auto-expand"
                       rows="3"
+                      style="min-height: 80px; max-height: 400px; overflow-y: auto;"
                       placeholder="Overall lot evaluation comments...">{{ evaluation.comments|default:'' }}</textarea>
         </div>
         
