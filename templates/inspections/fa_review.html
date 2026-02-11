@@ -37,9 +37,10 @@
         border-bottom: none;
     }
     
-    /* Override input/select padding within tables for tighter fit */
+    /* Override input/select/textarea padding within tables for tighter fit */
     .eval-table select,
-    .eval-table input[type="text"] {
+    .eval-table input[type="text"],
+    .eval-table textarea {
         padding: 0.5rem 0.75rem;
         font-size: 0.875rem;
     }
@@ -432,11 +433,12 @@
                             </select>
                         </td>
                         <td>
-                            <input type="text" name="color_{{ color.id }}-comment" 
-                                   class="form-input w-full"
-                                   placeholder="Comment (optional)"
-                                   value="{{ color_eval.comment|default:'' }}"
-                                   {% if is_read_only %}disabled{% endif %}>
+                            <textarea name="color_{{ color.id }}-comment" 
+                                      class="form-textarea w-full auto-expand"
+                                      rows="1"
+                                      style="min-height: 38px; max-height: 200px; overflow-y: auto;"
+                                      placeholder="Comment (optional)"
+                                      {% if is_read_only %}disabled{% endif %}>{{ color_eval.comment|default:'' }}</textarea>
                         </td>
                         <td class="text-center">
                             <span class="color-result result-pending"
