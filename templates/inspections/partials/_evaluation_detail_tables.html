@@ -1,0 +1,73 @@
+{# Reusable evaluation detail tables - expects 'eval' context variable (FAEvaluation instance) #}
+
+<!-- Overall Criteria -->
+<div>
+  <h4 class="text-xs font-semibold text-muted uppercase tracking-wide mb-2">Overall Criteria</h4>
+  <table class="eval-table">
+    <thead>
+      <tr>
+        <th class="text-left">Criterion</th>
+        <th class="text-center">Result</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Pattern Execution</td>
+        <td class="text-center">
+          {% if eval.pattern_execution == 'pass' %}<span class="text-green-600 font-medium">Pass</span>{% elif eval.pattern_execution == 'fail' %}<span class="text-red-600 font-medium">Fail</span>{% else %}<span class="text-gray-400">-</span>{% endif %}
+        </td>
+      </tr>
+      <tr>
+        <td>Scale</td>
+        <td class="text-center">
+          {% if eval.scale == 'pass' %}<span class="text-green-600 font-medium">Pass</span>{% elif eval.scale == 'fail' %}<span class="text-red-600 font-medium">Fail</span>{% else %}<span class="text-gray-400">-</span>{% endif %}
+        </td>
+      </tr>
+      <tr>
+        <td>Spectral Reflectance</td>
+        <td class="text-center">
+          {% if eval.spectral_reflectance == 'pass' %}<span class="text-green-600 font-medium">Pass</span>{% elif eval.spectral_reflectance == 'fail' %}<span class="text-red-600 font-medium">Fail</span>{% elif not eval.spectral_reflectance %}<span class="text-gray-400">N/A</span>{% else %}<span class="text-gray-400">-</span>{% endif %}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Shade Matching -->
+{% if eval.color_evaluations.all %}
+<div>
+  <h4 class="text-xs font-semibold text-muted uppercase tracking-wide mb-2">Shade Matching</h4>
+  <table class="eval-table">
+    <thead>
+      <tr>
+        <th class="text-left">Color</th>
+        <th class="text-left">Rating</th>
+        <th class="text-left">Comment</th>
+        <th class="text-center">Result</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for color_eval in eval.color_evaluations.all %}
+      <tr>
+        <td class="font-medium">{{ color_eval.color.color_name }}</td>
+        <td>{{ color_eval.get_rating_display|default:"-" }}</td>
+        <td class="text-muted">{{ color_eval.comment|default:"-" }}</td>
+        <td class="text-center">
+          {% if color_eval.rating %}
+            {% if color_eval.is_passing %}<span class="text-green-600 font-medium">Pass</span>{% else %}<span class="text-red-600 font-medium">Fail</span>{% endif %}
+          {% else %}<span class="text-gray-400">-</span>{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<!-- Comments -->
+{% if eval.comments %}
+<div>
+  <h4 class="text-xs font-semibold text-muted uppercase tracking-wide mb-1">Comments</h4>
+  <p class="text-sm italic text-gray-700 dark:text-gray-300">"{{ eval.comments }}"</p>
+</div>
+{% endif %}
