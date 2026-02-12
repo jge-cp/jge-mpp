@@ -940,6 +940,11 @@ class FAEvaluation(models.Model):
         blank=True,
         help_text='Pattern execution evaluation'
     )
+    pattern_execution_comment = models.CharField(
+        max_length=500,
+        blank=True,
+        help_text='Comment for pattern execution'
+    )
     
     scale = models.CharField(
         max_length=10,
@@ -947,12 +952,22 @@ class FAEvaluation(models.Model):
         blank=True,
         help_text='Scale evaluation'
     )
+    scale_comment = models.CharField(
+        max_length=500,
+        blank=True,
+        help_text='Comment for scale'
+    )
     
     spectral_reflectance = models.CharField(
         max_length=10,
         choices=PASS_FAIL_CHOICES,
         blank=True,
         help_text='Spectral reflectance evaluation (blank if Visible Spectrum Only)'
+    )
+    spectral_reflectance_comment = models.CharField(
+        max_length=500,
+        blank=True,
+        help_text='Comment for spectral reflectance'
     )
     
     # Overall comments for this evaluation stage
@@ -1270,17 +1285,32 @@ class LotSampleEvaluation(models.Model):
         choices=PASS_FAIL_CHOICES,
         blank=True
     )
+    pattern_execution_comment = models.CharField(
+        max_length=500,
+        blank=True,
+        help_text='Comment for pattern execution'
+    )
     
     scale = models.CharField(
         max_length=10,
         choices=PASS_FAIL_CHOICES,
         blank=True
     )
+    scale_comment = models.CharField(
+        max_length=500,
+        blank=True,
+        help_text='Comment for scale'
+    )
     
     spectral_reflectance = models.CharField(
         max_length=10,
         choices=PASS_FAIL_CHOICES,
         blank=True
+    )
+    spectral_reflectance_comment = models.CharField(
+        max_length=500,
+        blank=True,
+        help_text='Comment for spectral reflectance'
     )
     
     comments = models.TextField(blank=True)

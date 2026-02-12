@@ -55,28 +55,4 @@
 </div>
 {% endif %}
 
-{% if evaluation %}
-<div class="card p-6 mb-6">
-  <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Evaluation Results</h2>
-
-  <div class="mb-4 p-3 rounded-lg bg-warm">
-    <p class="text-sm">
-      <span class="font-medium">Reviewed by:</span>
-      {{ evaluation.inspector.get_full_name|default:evaluation.inspector.username }}
-    </p>
-    <p class="text-sm text-gray-600 dark:text-gray-400">
-      <span class="font-medium">Date:</span>
-      {{ evaluation.submitted_at|date:"M d, Y g:i A" }}
-    </p>
-    {% if evaluation.comments %}
-    <p class="text-sm mt-2">
-      <span class="font-medium">Comments:</span>
-      {{ evaluation.comments }}
-    </p>
-    {% endif %}
-  </div>
-  <p class="text-sm text-gray-500 dark:text-gray-400">Sample-level detail remains below (static). Refresh not required for status.</p>
-</div>
-{% endif %}
-
 

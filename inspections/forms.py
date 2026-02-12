@@ -159,8 +159,11 @@ class FAEvaluationForm(forms.ModelForm):
         model = FAEvaluation
         fields = [
             'pattern_execution',
+            'pattern_execution_comment',
             'scale',
+            'scale_comment',
             'spectral_reflectance',
+            'spectral_reflectance_comment',
             'comments',
         ]
         widgets = {
@@ -168,14 +171,26 @@ class FAEvaluationForm(forms.ModelForm):
                 choices=[('', '-- Select --')] + list(PASS_FAIL_CHOICES),
                 attrs={'class': 'evaluation-select', 'data-criterion': 'pattern'}
             ),
+            'pattern_execution_comment': forms.TextInput(attrs={
+                'class': FORM_INPUT,
+                'placeholder': 'Comment (optional)',
+            }),
             'scale': forms.Select(
                 choices=[('', '-- Select --')] + list(PASS_FAIL_CHOICES),
                 attrs={'class': 'evaluation-select', 'data-criterion': 'scale'}
             ),
+            'scale_comment': forms.TextInput(attrs={
+                'class': FORM_INPUT,
+                'placeholder': 'Comment (optional)',
+            }),
             'spectral_reflectance': forms.Select(
                 choices=[('', '-- Select --')] + list(PASS_FAIL_CHOICES),
                 attrs={'class': 'evaluation-select', 'data-criterion': 'spectral'}
             ),
+            'spectral_reflectance_comment': forms.TextInput(attrs={
+                'class': FORM_INPUT,
+                'placeholder': 'Comment (optional)',
+            }),
             'comments': forms.Textarea(attrs={
                 'rows': 4,
                 'placeholder': 'Overall evaluation comments'

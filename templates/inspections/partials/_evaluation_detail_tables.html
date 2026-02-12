@@ -1,4 +1,4 @@
-{# Reusable evaluation detail tables - expects 'eval' context variable (FAEvaluation instance) #}
+{# Reusable evaluation detail tables - expects 'eval' context variable (FAEvaluation or LotSampleEvaluation) #}
 
 <!-- Overall Criteria -->
 <div>
@@ -7,24 +7,28 @@
     <thead>
       <tr>
         <th class="text-left">Criterion</th>
+        <th class="text-left">Comment</th>
         <th class="text-center">Result</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td>Pattern Execution</td>
+        <td class="text-muted text-sm">{{ eval.pattern_execution_comment|default:"-" }}</td>
         <td class="text-center">
           {% if eval.pattern_execution == 'pass' %}<span class="text-green-600 font-medium">Pass</span>{% elif eval.pattern_execution == 'fail' %}<span class="text-red-600 font-medium">Fail</span>{% else %}<span class="text-gray-400">-</span>{% endif %}
         </td>
       </tr>
       <tr>
         <td>Scale</td>
+        <td class="text-muted text-sm">{{ eval.scale_comment|default:"-" }}</td>
         <td class="text-center">
           {% if eval.scale == 'pass' %}<span class="text-green-600 font-medium">Pass</span>{% elif eval.scale == 'fail' %}<span class="text-red-600 font-medium">Fail</span>{% else %}<span class="text-gray-400">-</span>{% endif %}
         </td>
       </tr>
       <tr>
         <td>Spectral Reflectance</td>
+        <td class="text-muted text-sm">{{ eval.spectral_reflectance_comment|default:"-" }}</td>
         <td class="text-center">
           {% if eval.spectral_reflectance == 'pass' %}<span class="text-green-600 font-medium">Pass</span>{% elif eval.spectral_reflectance == 'fail' %}<span class="text-red-600 font-medium">Fail</span>{% elif not eval.spectral_reflectance %}<span class="text-gray-400">N/A</span>{% else %}<span class="text-gray-400">-</span>{% endif %}
         </td>

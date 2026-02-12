@@ -2,6 +2,58 @@
 
 {% block title %}{{ lot.display_name }} - Multicam Partner Portal{% endblock %}
 
+{% block extra_head %}
+<style>
+    .result-pass {
+        background-color: #22c55e !important;
+        color: white !important;
+        font-weight: bold;
+        padding: 2px 8px;
+        border-radius: 4px;
+    }
+    .result-fail {
+        background-color: #ef4444 !important;
+        color: white !important;
+        font-weight: bold;
+        padding: 2px 8px;
+        border-radius: 4px;
+    }
+    .eval-table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+    }
+    .eval-table thead th {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #6b7280;
+        background-color: #efece8;
+        border-bottom: 1px solid #efece8;
+    }
+    .dark .eval-table thead th {
+        color: #d1d5db;
+        background-color: #0a0a0a;
+        border-bottom-color: #2a2d2d;
+    }
+    .eval-table tbody td {
+        padding: 0.5rem 0.75rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #efece8;
+        font-size: 0.875rem;
+    }
+    .dark .eval-table tbody td {
+        border-bottom-color: #2a2d2d;
+        color: #d1d5db;
+    }
+    .eval-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+</style>
+{% endblock %}
+
 {% block dashboard_content %}
 <div class="max-w-5xl mx-auto">
     <div class="flex justify-between items-start mb-6">
@@ -90,143 +142,56 @@
     </div>
     {% endif %}
     
-    <!-- Evaluation Results (only show if reviewed) -->
+    {# Evaluation Results - only show when there is a final outcome (approved or rejected) #}
+    {% if lot.status == 'approved' or lot.status == 'rejected' %}
     {% if evaluation %}
     <div class="card p-6 mb-6">
-        <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Evaluation Results</h2>
-        
-        <!-- Inspector Info -->
-        <div class="mb-4 p-3 rounded-lg bg-warm">
-            <p class="text-sm">
-                <span class="font-medium">Reviewed by:</span> 
-                {{ evaluation.inspector.get_full_name|default:evaluation.inspector.username }}
-            </p>
-            <p class="text-sm text-gray-600 dark:text-gray-400">
-                <span class="font-medium">Date:</span> 
-                {{ evaluation.submitted_at|date:"M d, Y g:i A" }}
-            </p>
-            {% if evaluation.comments %}
-            <p class="text-sm mt-2">
-                <span class="font-medium">Comments:</span> 
-                {{ evaluation.comments }}
-            </p>
+        <h2 class="text-xl font-bold mb-4 border-b border-theme pb-2">
+            Evaluation Results
+            {% if lot.status == 'approved' %}
+                <span class="ml-2 text-sm font-normal bg-green-600 text-white px-2 py-1 rounded">Approved</span>
+            {% else %}
+                <span class="ml-2 text-sm font-normal bg-red-600 text-white px-2 py-1 rounded">Rejected</span>
             {% endif %}
+        </h2>
+        <div class="space-y-2 text-sm mb-4">
+            <p><span class="text-muted">Reviewed by:</span> <span class="text-primary">{{ evaluation.inspector.get_full_name|default:evaluation.inspector.username }}</span></p>
+            <p><span class="text-muted">Date:</span> <span class="text-primary">{{ evaluation.submitted_at|date:"M d, Y H:i" }}</span></p>
         </div>
-        
-        <!-- Sample Evaluations -->
-        {% for sample in sample_evaluations %}
-        {% with is_even=forloop.counter|divisibleby:2 %}
-        <div class="mb-6 last:mb-0 p-4 rounded-lg {% if is_even %}bg-warm{% endif %}">
-            <h3 class="text-lg font-medium mb-3 flex items-center gap-2">
-                Sample {{ sample.sample_number }}: {{ sample.sample_id }}
-                {% if sample.pattern_execution == 'pass' and sample.scale == 'pass' and sample.spectral_reflectance == 'pass' %}
-                    <span class="badge-success">✓ Pass</span>
-                {% elif sample.pattern_execution == 'fail' or sample.scale == 'fail' or sample.spectral_reflectance == 'fail' %}
-                    <span class="badge-danger">✗ Fail</span>
-                {% endif %}
-            </h3>
-            
-            <div class="overflow-x-auto">
-                <table class="eval-table w-full">
-                    <thead>
-                        <tr class="bg-warm">
-                            <th class="text-left px-4 py-2">Criteria</th>
-                            <th class="text-center px-4 py-2">Rating</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="px-4 py-2">Pattern Execution</td>
-                            <td class="text-center px-4 py-2">
-                                {% if sample.pattern_execution == 'pass' %}
-                                    <span class="text-green-600 font-medium">✓ Pass</span>
-                                {% elif sample.pattern_execution == 'fail' %}
-                                    <span class="text-red-600 font-medium">✗ Fail</span>
-                                {% else %}
-                                    <span class="text-gray-400">-</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-4 py-2">Scale</td>
-                            <td class="text-center px-4 py-2">
-                                {% if sample.scale == 'pass' %}
-                                    <span class="text-green-600 font-medium">✓ Pass</span>
-                                {% elif sample.scale == 'fail' %}
-                                    <span class="text-red-600 font-medium">✗ Fail</span>
-                                {% else %}
-                                    <span class="text-gray-400">-</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-4 py-2">Spectral Reflectance</td>
-                            <td class="text-center px-4 py-2">
-                                {% if sample.spectral_reflectance == 'pass' %}
-                                    <span class="text-green-600 font-medium">✓ Pass</span>
-                                {% elif sample.spectral_reflectance == 'fail' %}
-                                    <span class="text-red-600 font-medium">✗ Fail</span>
-                                {% else %}
-                                    <span class="text-gray-400">-</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Color Evaluations for this sample -->
-            {% if sample.color_evaluations.all %}
-            <div class="mt-4">
 
-                <div class="overflow-x-auto">
-                    <table class="eval-table w-full">
-                        <thead>
-                            <tr class="bg-warm">
-                                <th class="text-left px-4 py-2">Color</th>
-                                <th class="text-center px-4 py-2">Rating</th>
-                                <th class="text-left px-4 py-2">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for color_eval in sample.color_evaluations.all %}
-                            <tr>
-                                <td class="px-4 py-2">
-                                    {{ color_eval.color.color_name }}
-                                </td>
-                                <td class="text-center px-4 py-2">
-                                    {% if color_eval.rating %}
-                                        {{ color_eval.get_rating_display }}
-                                    {% else %}
-                                        <span class="text-gray-400">-</span>
-                                    {% endif %}
-                                </td>
-                                <td class="px-4 py-2">
-                                    {% if color_eval.rating in '45' %}
-                                        <span class="text-green-600 font-medium">✓ Pass</span>
-                                    {% elif color_eval.rating in '0123' %}
-                                        <span class="text-red-600 font-medium">✗ Fail</span>
-                                    {% else %}
-                                        <span class="text-gray-400">-</span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+        <!-- Per-Sample Evaluation Details -->
+        {% for sample in sample_evaluations %}
+        <div class="mb-4 border border-theme rounded p-4">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="font-bold">Sample {{ sample.sample_number }}: {{ sample.sample_id }}</h3>
+                {% if sample.all_pass %}
+                    <span class="result-pass">Pass</span>
+                {% else %}
+                    <span class="result-fail">Fail</span>
+                {% endif %}
             </div>
-            {% endif %}
+            <details {% if not sample.all_pass %}open{% endif %}>
+                <summary class="cursor-pointer text-sm font-medium text-accent-600 dark:text-accent-400 hover:underline">View Sample Details</summary>
+                <div class="mt-3 space-y-4">
+                    {% with eval=sample %}
+                    {% include 'inspections/partials/_evaluation_detail_tables.html' %}
+                    {% endwith %}
+                </div>
+            </details>
         </div>
-        {% endwith %}
         {% endfor %}
+
+        <!-- Overall Comments -->
+        {% if evaluation.comments %}
+        <div class="mt-4">
+            <h4 class="text-xs font-semibold text-muted uppercase tracking-wide mb-1">Overall Comments</h4>
+            <p class="text-sm italic text-gray-700 dark:text-gray-300">"{{ evaluation.comments }}"</p>
+        </div>
+        {% endif %}
     </div>
+    {% endif %}
     {% elif lot.status == 'pending' %}
-    <div class="card p-6 mb-6 border-0" style="background-color: #e3d39c;">
-        <p class="text-gray-900">
-            <span class="font-bold">Awaiting Review</span> - This lot has not yet been evaluated by an inspector.
-        </p>
-    </div>
+    {# Lot is still pending review - no evaluation details #}
     {% elif lot.inspector_comments %}
     <!-- Fallback for older lots that have comments but no structured evaluation -->
     <div class="card p-6 mb-6">

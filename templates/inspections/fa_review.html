@@ -463,8 +463,9 @@
             <table class="w-full eval-table">
                 <thead>
                     <tr>
-                        <th class="text-left w-1/3">Criterion</th>
-                        <th class="text-left w-1/3">Evaluation</th>
+                        <th class="text-left w-1/4">Criterion</th>
+                        <th class="text-left w-1/4">Evaluation</th>
+                        <th class="text-left">Comment</th>
                         <th class="text-center w-24">Result</th>
                     </tr>
                 </thead>
@@ -481,6 +482,14 @@
                                 <option value="pass" {% if evaluation.pattern_execution == 'pass' %}selected{% endif %}>Pass</option>
                                 <option value="fail" {% if evaluation.pattern_execution == 'fail' %}selected{% endif %}>Fail</option>
                             </select>
+                        </td>
+                        <td>
+                            <textarea name="pattern_execution_comment"
+                                      class="form-textarea w-full auto-expand"
+                                      rows="1"
+                                      style="min-height: 38px; max-height: 200px; overflow-y: auto;"
+                                      placeholder="Comment (optional)"
+                                      {% if is_read_only %}disabled{% endif %}>{{ evaluation.pattern_execution_comment|default:'' }}</textarea>
                         </td>
                         <td class="text-center">
                             <span class="criterion-result result-pending" id="result-pattern">
@@ -502,6 +511,14 @@
                                 <option value="pass" {% if evaluation.scale == 'pass' %}selected{% endif %}>Pass</option>
                                 <option value="fail" {% if evaluation.scale == 'fail' %}selected{% endif %}>Fail</option>
                             </select>
+                        </td>
+                        <td>
+                            <textarea name="scale_comment"
+                                      class="form-textarea w-full auto-expand"
+                                      rows="1"
+                                      style="min-height: 38px; max-height: 200px; overflow-y: auto;"
+                                      placeholder="Comment (optional)"
+                                      {% if is_read_only %}disabled{% endif %}>{{ evaluation.scale_comment|default:'' }}</textarea>
                         </td>
                         <td class="text-center">
                             <span class="criterion-result result-pending" id="result-scale">
@@ -532,6 +549,16 @@
                                     <option value="pass" {% if evaluation.spectral_reflectance == 'pass' %}selected{% endif %}>Pass</option>
                                     <option value="fail" {% if evaluation.spectral_reflectance == 'fail' %}selected{% endif %}>Fail</option>
                                 </select>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if fa.spectral_reflectance_requirement != 'visible_only' %}
+                            <textarea name="spectral_reflectance_comment"
+                                      class="form-textarea w-full auto-expand"
+                                      rows="1"
+                                      style="min-height: 38px; max-height: 200px; overflow-y: auto;"
+                                      placeholder="Comment (optional)"
+                                      {% if is_read_only %}disabled{% endif %}>{{ evaluation.spectral_reflectance_comment|default:'' }}</textarea>
                             {% endif %}
                         </td>
                         <td class="text-center">

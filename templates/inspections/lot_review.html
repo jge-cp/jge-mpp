@@ -224,7 +224,7 @@
                 
                 <!-- Overall Criteria -->
                 <h4 class="font-semibold mb-2 text-sm text-muted uppercase">Overall Criteria</h4>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                     <div>
                         <label class="form-label text-sm">Pattern Execution</label>
                         <select name="sample_{{ sample.sample_number }}_pattern" 
@@ -235,6 +235,11 @@
                             <option value="pass" {% if sample.sample_eval.pattern_execution == 'pass' %}selected{% endif %}>Pass</option>
                             <option value="fail" {% if sample.sample_eval.pattern_execution == 'fail' %}selected{% endif %}>Fail</option>
                         </select>
+                        <textarea name="sample_{{ sample.sample_number }}_pattern_comment"
+                                  class="form-textarea w-full auto-expand mt-2"
+                                  rows="1"
+                                  style="min-height: 36px; max-height: 150px; overflow-y: auto;"
+                                  placeholder="Comment (optional)">{{ sample.sample_eval.pattern_execution_comment|default:'' }}</textarea>
                     </div>
                     <div>
                         <label class="form-label text-sm">Scale</label>
@@ -246,6 +251,11 @@
                             <option value="pass" {% if sample.sample_eval.scale == 'pass' %}selected{% endif %}>Pass</option>
                             <option value="fail" {% if sample.sample_eval.scale == 'fail' %}selected{% endif %}>Fail</option>
                         </select>
+                        <textarea name="sample_{{ sample.sample_number }}_scale_comment"
+                                  class="form-textarea w-full auto-expand mt-2"
+                                  rows="1"
+                                  style="min-height: 36px; max-height: 150px; overflow-y: auto;"
+                                  placeholder="Comment (optional)">{{ sample.sample_eval.scale_comment|default:'' }}</textarea>
                     </div>
                     <div>
                         <label class="form-label text-sm">
@@ -266,6 +276,11 @@
                                 <option value="pass" {% if sample.sample_eval.spectral_reflectance == 'pass' %}selected{% endif %}>Pass</option>
                                 <option value="fail" {% if sample.sample_eval.spectral_reflectance == 'fail' %}selected{% endif %}>Fail</option>
                             </select>
+                            <textarea name="sample_{{ sample.sample_number }}_spectral_comment"
+                                      class="form-textarea w-full auto-expand mt-2"
+                                      rows="1"
+                                      style="min-height: 36px; max-height: 150px; overflow-y: auto;"
+                                      placeholder="Comment (optional)">{{ sample.sample_eval.spectral_reflectance_comment|default:'' }}</textarea>
                         {% endif %}
                     </div>
                 </div>

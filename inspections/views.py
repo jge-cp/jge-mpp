@@ -680,8 +680,11 @@ def fa_review(request, fai_id):
     # If we're rendering an unsaved in-memory evaluation (GET), do not persist.
     if is_final_review and primary_evaluation:
         evaluation.pattern_execution = primary_evaluation.pattern_execution
+        evaluation.pattern_execution_comment = primary_evaluation.pattern_execution_comment
         evaluation.scale = primary_evaluation.scale
+        evaluation.scale_comment = primary_evaluation.scale_comment
         evaluation.spectral_reflectance = primary_evaluation.spectral_reflectance
+        evaluation.spectral_reflectance_comment = primary_evaluation.spectral_reflectance_comment
         if created:
             evaluation.save()
     
@@ -1000,8 +1003,11 @@ def lot_review(request, lot_id):
                 
                 # Update overall criteria
                 sample_eval.pattern_execution = request.POST.get(f'{sample_prefix}_pattern', '')
+                sample_eval.pattern_execution_comment = request.POST.get(f'{sample_prefix}_pattern_comment', '')
                 sample_eval.scale = request.POST.get(f'{sample_prefix}_scale', '')
+                sample_eval.scale_comment = request.POST.get(f'{sample_prefix}_scale_comment', '')
                 sample_eval.spectral_reflectance = request.POST.get(f'{sample_prefix}_spectral', '')
+                sample_eval.spectral_reflectance_comment = request.POST.get(f'{sample_prefix}_spectral_comment', '')
                 sample_eval.comments = request.POST.get(f'{sample_prefix}_comments', '')
                 sample_eval.save()
                 
