@@ -18,6 +18,39 @@
         padding: 2px 8px;
         border-radius: 4px;
     }
+    .eval-table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+    }
+    .eval-table thead th {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #6b7280;
+        background-color: #efece8;
+        border-bottom: 1px solid #efece8;
+    }
+    .dark .eval-table thead th {
+        color: #d1d5db;
+        background-color: #0a0a0a;
+        border-bottom-color: #2a2d2d;
+    }
+    .eval-table tbody td {
+        padding: 0.5rem 0.75rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #efece8;
+        font-size: 0.875rem;
+    }
+    .dark .eval-table tbody td {
+        border-bottom-color: #2a2d2d;
+        color: #d1d5db;
+    }
+    .eval-table tbody tr:last-child td {
+        border-bottom: none;
+    }
 </style>
 {% endblock %}
 
