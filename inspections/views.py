@@ -1046,10 +1046,10 @@ def lot_review(request, lot_id):
                     try:
                         if evaluation.all_pass:
                             from .emails import send_lot_approved_email
-                            send_lot_approved_email(lot)
+                            send_lot_approved_email(lot, evaluation=evaluation)
                         else:
                             from .emails import send_lot_rejected_email
-                            send_lot_rejected_email(lot)
+                            send_lot_rejected_email(lot, evaluation=evaluation)
                     except Exception as e:
                         import logging
                         logging.getLogger(__name__).error(f"Failed to send Lot review notification: {e}")
