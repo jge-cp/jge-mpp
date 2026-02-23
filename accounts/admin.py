@@ -67,8 +67,8 @@ class UserAdmin(BaseUserAdmin):
 @admin.register(PartnerCompany)
 class PartnerCompanyAdmin(ModelAdmin):
     """Admin for Partner Companies"""
-    list_display = ['name', 'code', 'status', 'contact_name', 'contact_email', 'created_at']
-    list_filter = ['status']
+    list_display = ['name', 'code', 'status', 'is_standard', 'is_narrow', 'contact_name', 'contact_email', 'created_at']
+    list_filter = ['status', 'is_standard', 'is_narrow']
     search_fields = ['name', 'code', 'contact_name', 'contact_email']
     readonly_fields = ['created_at', 'updated_at']
     ordering = ['name']
@@ -77,6 +77,10 @@ class PartnerCompanyAdmin(ModelAdmin):
         ('Company Identity', {
             'fields': ('code', 'name', 'status'),
             'description': 'The code is used for FA/Lot ID prefixes (e.g., ACME-FA-0001). Set it once and do not change after FAs exist.'
+        }),
+        ('Partner Categories', {
+            'fields': ('is_standard', 'is_narrow'),
+            'description': 'Determines which files and resources are visible to this company\'s users. A company can be both Standard and Narrow.',
         }),
         ('Primary Contact', {
             'fields': ('contact_name', 'contact_email', 'contact_phone'),

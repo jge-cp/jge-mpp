@@ -149,6 +149,66 @@ class FileUpload(models.Model):
         return f"{self.file_name} ({self.file_type})"
 
 
+class PartnerFile(models.Model):
+    """
+    Files uploaded by admins for partners to download.
+    Visibility is controlled by category: standard partners, narrow partners, or both.
+    """
+    
+    CATEGORY_CHOICES = [
+        ('standard', 'Standard Only'),
+        ('narrow', 'Narrow Only'),
+        ('both', 'Both (Standard & Narrow)'),
+    ]
+    
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    file = models.FileField(upload_to='partner_files/%Y/%m/')
+    category = models.CharField(
+        max_length=10,
+        choices=CATEGORY_CHOICES,
+        default='both',
+        help_text='Which partner types can see this file'
+    )
+    uploaded_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='uploaded_partner_files'
+    )
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Partner File'
+        verbose_name_plural = 'Partner Files'
+    
+    def __str__(self):
+        return f"{self.title} ({self.get_category_display()})"
+    
+    @property
+    def file_extension(self):
+        if self.file and self.file.name:
+            return self.file.name.rsplit('.', 1)[-1].upper() if '.' in self.file.name else ''
+        return ''
+    
+    @property
+    def file_size_display(self):
+        """Human-readable file size"""
+        try:
+            size = self.file.size
+        except (FileNotFoundError, ValueError):
+            return ''
+        if size < 1024:
+            return f"{size} B"
+        elif size < 1024 * 1024:
+            return f"{size / 1024:.1f} KB"
+        else:
+            return f"{size / (1024 * 1024):.1f} MB"
+
+
 class RawMaterialArticle(models.Model):
     """Raw Material Article registered by RM Suppliers (DB6)"""
     

@@ -47,6 +47,16 @@ class PartnerCompany(models.Model):
         default='active'
     )
     
+    # Partner category flags - determines which files/resources are visible
+    is_standard = models.BooleanField(
+        default=False,
+        help_text='Company is approved for standard goods'
+    )
+    is_narrow = models.BooleanField(
+        default=False,
+        help_text='Company is approved for narrow goods'
+    )
+    
     notes = models.TextField(blank=True)
     
     created_at = models.DateTimeField(auto_now_add=True)

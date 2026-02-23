@@ -322,6 +322,18 @@ These load on page load and refresh every 30 seconds.
                 </a>
             </li>
         </ul>
+
+        <div class="sidebar-section-title mt-6">Resources</div>
+        <ul class="space-y-1">
+            <li>
+                <a href="{% url 'dashboard:partner_files' %}" class="sidebar-link {% if request.resolver_match.url_name == 'partner_files' %}active{% endif %}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                    Files
+                </a>
+            </li>
+        </ul>
         {% endif %}
 
         {% if profile.is_any_inspector and profile.admin_role != 'full_admin' %}

@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.http import FileResponse, Http404
 from django.utils import timezone
 from django.db.models import Count, Q, Sum
 from datetime import timedelta
 from inspections.models import FirstArticleInspection, LotAcceptance, MonthlyReport
 from accounts.models import UserProfile
+from core.models import PartnerFile
 from inspections.listing import (
     parse_list_filters, build_fa_queryset, build_lot_queryset,
     submitted_by_options_for_inspector, submitted_by_options_for_partner,
@@ -576,3 +578,64 @@ def government_dashboard(request):
     """Deprecated - redirects to staff dashboard"""
     messages.info(request, 'Government dashboard has been merged into Staff dashboard.')
     return redirect('dashboard:staff_dashboard')
+
+
+@login_required
+def partner_files(request):
+    """File repository for partners, filtered by their company's categories."""
+    profile = request.profile
+    
+    if not profile.is_partner():
+        messages.warning(request, 'File repository is only available for partners.')
+        return redirect(profile.get_dashboard_url())
+    
+    company = profile.company
+    if not company:
+        files = PartnerFile.objects.none()
+    else:
+        categories = []
+        if company.is_standard:
+            categories.append('standard')
+        if company.is_narrow:
+            categories.append('narrow')
+        categories.append('both')
+        files = PartnerFile.objects.filter(is_active=True, category__in=categories)
+    
+    category_filter = request.GET.get('category', '')
+    if category_filter:
+        files = files.filter(category=category_filter)
+    
+    context = {
+        'files': files,
+        'company': company,
+        'category_filter': category_filter,
+    }
+    return render(request, 'dashboard/partner_files.html', context)
+
+
+@login_required
+def partner_file_download(request, file_id):
+    """Serve a partner file download after checking access."""
+    profile = request.profile
+    
+    if not profile.is_partner():
+        raise Http404
+    
+    company = profile.company
+    if not company:
+        raise Http404
+    
+    pf = PartnerFile.objects.filter(pk=file_id, is_active=True).first()
+    if not pf:
+        raise Http404
+    
+    # Verify the partner's company has access to this file's category
+    if pf.category == 'standard' and not company.is_standard:
+        raise Http404
+    if pf.category == 'narrow' and not company.is_narrow:
+        raise Http404
+    
+    try:
+        return FileResponse(pf.file.open('rb'), as_attachment=True, filename=pf.file.name.split('/')[-1])
+    except FileNotFoundError:
+        raise Http404

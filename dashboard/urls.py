@@ -19,6 +19,10 @@ urlpatterns = [
     # Staff dashboard (executives, finance, operations)
     path('admin/staff/', views.staff_dashboard, name='staff_dashboard'),
     
+    # Partner file repository
+    path('files/', views.partner_files, name='partner_files'),
+    path('files/<int:file_id>/download/', views.partner_file_download, name='partner_file_download'),
+    
     # Legacy dashboards - redirect to appropriate new dashboards
     path('dashboard/rm-supplier/', views.rm_supplier_dashboard, name='rm_supplier_dashboard'),
     path('dashboard/fp-supplier/', views.fp_supplier_dashboard, name='fp_supplier_dashboard'),
