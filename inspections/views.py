@@ -233,12 +233,6 @@ def lot_submit(request):
             lot.submitter_first_name = request.user.first_name or request.user.username
             lot.submitter_last_name = request.user.last_name or ''
             
-            # Get individual sample numbers from hidden field
-            lot.individual_sample_numbers = request.POST.get('individual_sample_numbers', '')
-            
-            # Get number of samples from hidden field (auto-calculated)
-            lot.number_of_samples = int(request.POST.get('number_of_samples', 2))
-            
             # Auto-populate fields from original FA
             original_fa = form.cleaned_data['original_fa']
             lot.fabric_style = original_fa.fabric_style

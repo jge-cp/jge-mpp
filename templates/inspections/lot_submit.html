@@ -75,18 +75,6 @@
                 </template>
             </div>
             
-            <!-- Lot Number - full width -->
-            <div class="mb-4">
-                <label class="form-label" for="{{ form.lot_lot_number.id_for_label }}">
-                    Lot Number *
-                </label>
-                {{ form.lot_lot_number }}
-                {% if form.lot_lot_number.errors %}
-                    <p class="text-red-500 text-xs mt-1">{{ form.lot_lot_number.errors.0 }}</p>
-                {% endif %}
-                <p class="text-xs text-muted mt-1">Your unique identifier for this lot</p>
-            </div>
-
             <!-- Yards Printed + Number of Samples -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
@@ -117,7 +105,6 @@
                     <p class="text-xs text-muted mt-1">
                         0-800 yards = 2 samples, 801-22,000 = 3 samples, 22,001+ = 5 samples
                     </p>
-                    <input type="hidden" name="number_of_samples" :value="sampleCount">
                 </div>
             </div>
 
@@ -149,41 +136,18 @@
                 {{ form.tracking_number }}
             </div>
             
-            <!-- Dynamic Sample Number Inputs -->
-            <div class="mb-6">
-                <label class="form-label">
-                    Individual Sample Numbers *
-                    <span class="text-muted font-normal" x-show="sampleCount">
-                        (<span x-text="sampleCount"></span> required)
-                    </span>
-                </label>
-                
-                <template x-if="!sampleCount">
+            <!-- Sample Preview -->
+            <template x-if="sampleCount">
+                <div class="mb-6">
+                    <label class="form-label">Samples</label>
                     <div class="bg-elevated rounded-lg p-4 border border-theme">
-                        <p class="text-sm text-muted">Enter Number of Yards Printed to generate sample fields</p>
+                        <p class="text-sm text-muted mb-2">
+                            <span x-text="sampleCount"></span> samples will be auto-generated when you submit.
+                        </p>
+                        <p class="text-xs text-muted">Sample IDs are based on the system-assigned lot number (e.g., LOT-0001 - 1, LOT-0001 - 2, etc.)</p>
                     </div>
-                </template>
-                
-                <template x-if="sampleCount">
-                    <div class="space-y-3">
-                        <template x-for="(sample, index) in sampleInputs" :key="index">
-                            <div class="flex items-center gap-3">
-                                <span class="text-sm text-muted w-24" x-text="'Sample ' + (index + 1) + ':'"></span>
-                                <input type="text" 
-                                       :name="'sample_number_' + (index + 1)"
-                                       class="form-input flex-1"
-                                       :placeholder="'Enter sample ' + (index + 1) + ' number'"
-                                       x-model="sampleInputs[index]"
-                                       required>
-                            </div>
-                        </template>
-                        <p class="text-xs text-muted">Enter unique identifier for each sample (e.g., LOT-001-1, LOT-001-2)</p>
-                    </div>
-                </template>
-                
-                <!-- Hidden field to store combined sample numbers -->
-                <input type="hidden" name="individual_sample_numbers" :value="sampleInputs.filter(s => s).join(', ')">
-            </div>
+                </div>
+            </template>
             
             <!-- Supporting Documents - drag/drop style -->
             <div class="mb-6">
@@ -228,33 +192,21 @@ function lotForm() {
         faDetails: null,
         yardsPrinted: '',
         sampleCount: 0,
-        sampleInputs: [],
         
         init() {
-            // Initialize with any existing values
             this.updateSampleCount();
         },
         
         updateSampleCount() {
             const yards = parseInt(this.yardsPrinted) || 0;
-            let newCount = 0;
-            
-            if (yards > 0) {
-                if (yards <= 800) {
-                    newCount = 2;
-                } else if (yards <= 22000) {
-                    newCount = 3;
-                } else {
-                    newCount = 5;
-                }
-            }
-            
-            // Only update inputs if count changed
-            if (newCount !== this.sampleCount) {
-                this.sampleCount = newCount;
-                // Preserve existing values when possible
-                const oldInputs = [...this.sampleInputs];
-                this.sampleInputs = Array(newCount).fill('').map((_, i) => oldInputs[i] || '');
+            if (yards <= 0) {
+                this.sampleCount = 0;
+            } else if (yards <= 800) {
+                this.sampleCount = 2;
+            } else if (yards <= 22000) {
+                this.sampleCount = 3;
+            } else {
+                this.sampleCount = 5;
             }
         },
         
@@ -277,11 +229,7 @@ function lotForm() {
         isFormValid() {
             if (!this.selectedFa) return false;
             if (!this.yardsPrinted || parseInt(this.yardsPrinted) < 1) return false;
-            if (this.sampleCount === 0) return false;
-            
-            // Check all sample inputs have values
-            const filledSamples = this.sampleInputs.filter(s => s && s.trim()).length;
-            return filledSamples === this.sampleCount;
+            return this.sampleCount > 0;
         }
     }
 }

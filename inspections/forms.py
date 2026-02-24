@@ -81,7 +81,6 @@ class LotAcceptanceForm(forms.ModelForm):
         model = LotAcceptance
         fields = [
             'original_fa',
-            'lot_lot_number',
             'number_of_yards_printed',
             'date_of_printing',
             'date_shipped',
@@ -92,10 +91,6 @@ class LotAcceptanceForm(forms.ModelForm):
                 'class': FORM_SELECT,
                 'hx-get': '/portal/lot/fa-details/',
                 'hx-target': '#fa-details'
-            }),
-            'lot_lot_number': forms.TextInput(attrs={
-                'class': FORM_INPUT,
-                'placeholder': 'Enter lot number'
             }),
             'number_of_yards_printed': forms.NumberInput(attrs={
                 'class': FORM_INPUT,

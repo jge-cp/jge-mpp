@@ -560,8 +560,8 @@ class LotAcceptance(models.Model):
     spectral_reflectance_requirement = models.CharField(max_length=20)  # From FA
     original_fa_lot_number = models.CharField(max_length=50)  # Copied from FA's fa_lot_number
     
-    # FREEFORM (from LA Main) - The Lot's own lot number
-    lot_lot_number = models.CharField(max_length=50)  # Partner enters
+    # Lot number - auto-set from lot_id if not provided
+    lot_lot_number = models.CharField(max_length=50, blank=True)
     
     # FREEFORM INT (from LA Main)
     number_of_yards_printed = models.IntegerField(validators=[MinValueValidator(1)])
@@ -736,11 +736,13 @@ class LotAcceptance(models.Model):
                 else:
                     self.number_of_samples = 5
             
-            # Auto-generate individual sample numbers if not set
-            # Format: {lot_lot_number}-1, {lot_lot_number}-2, etc.
-            if not self.individual_sample_numbers and self.lot_lot_number:
-                sample_ids = [f"{self.lot_lot_number}-{i}" for i in range(1, self.number_of_samples + 1)]
-                self.individual_sample_numbers = ', '.join(sample_ids)
+            # Default lot_lot_number to lot_id if not provided
+            if not self.lot_lot_number:
+                self.lot_lot_number = self.lot_id
+            
+            # Always generate sample IDs: {lot_lot_number}-1, {lot_lot_number}-2, etc.
+            sample_ids = [f"{self.lot_lot_number} - {i}" for i in range(1, self.number_of_samples + 1)]
+            self.individual_sample_numbers = ', '.join(sample_ids)
             
             # Determine evaluation type based on sample count
             if self.number_of_samples <= 2:
