@@ -736,12 +736,15 @@ class LotAcceptance(models.Model):
                 else:
                     self.number_of_samples = 5
             
-            # Default lot_lot_number to lot_id if not provided
-            if not self.lot_lot_number:
+            # Default lot_lot_number to the original FA's lot number
+            if not self.lot_lot_number and self.original_fa_lot_number:
+                self.lot_lot_number = self.original_fa_lot_number
+            elif not self.lot_lot_number:
                 self.lot_lot_number = self.lot_id
             
-            # Always generate sample IDs: {lot_lot_number}-1, {lot_lot_number}-2, etc.
-            sample_ids = [f"{self.lot_lot_number} - {i}" for i in range(1, self.number_of_samples + 1)]
+            # Always generate sample IDs from the FA lot number: {fa_lot}-1, {fa_lot}-2, etc.
+            base = self.original_fa_lot_number or self.lot_lot_number
+            sample_ids = [f"{base} - {i}" for i in range(1, self.number_of_samples + 1)]
             self.individual_sample_numbers = ', '.join(sample_ids)
             
             # Determine evaluation type based on sample count
