@@ -614,8 +614,8 @@ def partner_files(request):
 
 
 @login_required
-def partner_file_download(request, file_id):
-    """Serve a partner file download after checking access."""
+def partner_file_view(request, file_id):
+    """Serve a partner file inline in the browser after checking access."""
     profile = request.profile
     
     if not profile.is_partner():
@@ -629,13 +629,19 @@ def partner_file_download(request, file_id):
     if not pf:
         raise Http404
     
-    # Verify the partner's company has access to this file's category
     if pf.category == 'standard' and not company.is_standard:
         raise Http404
     if pf.category == 'narrow' and not company.is_narrow:
         raise Http404
     
+    import mimetypes
+    content_type, _ = mimetypes.guess_type(pf.file.name)
+    if not content_type:
+        content_type = 'application/octet-stream'
+    
     try:
-        return FileResponse(pf.file.open('rb'), as_attachment=True, filename=pf.file.name.split('/')[-1])
+        response = FileResponse(pf.file.open('rb'), content_type=content_type)
+        response['Content-Disposition'] = f'inline; filename="{pf.file.name.split("/")[-1]}"'
+        return response
     except FileNotFoundError:
         raise Http404

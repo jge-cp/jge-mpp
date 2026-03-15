@@ -42,19 +42,19 @@
     {% if files %}
     <div class="space-y-3">
         {% for file in files %}
-        <div class="card p-4 flex items-center gap-4 hover:shadow-md transition-shadow">
+        <a href="{% url 'dashboard:partner_file_view' file.pk %}" target="_blank"
+           class="card p-4 flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer block">
             <!-- File type icon -->
             <div class="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center
                 {% if file.file_extension == 'PDF' %}bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400
-                {% elif file.file_extension == 'DOC' or file.file_extension == 'DOCX' %}bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400
-                {% elif file.file_extension == 'XLS' or file.file_extension == 'XLSX' %}bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400
+                {% elif file.file_extension == 'JPG' or file.file_extension == 'JPEG' or file.file_extension == 'PNG' or file.file_extension == 'GIF' or file.file_extension == 'WEBP' %}bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400
                 {% else %}bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400{% endif %}">
                 <span class="text-xs font-bold">{{ file.file_extension|default:"FILE" }}</span>
             </div>
 
             <!-- File info -->
             <div class="flex-1 min-w-0">
-                <h3 class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ file.title }}</h3>
+                <h3 class="text-sm font-semibold text-accent-600 dark:text-accent-400 truncate hover:underline">{{ file.title }}</h3>
                 {% if file.description %}
                 <p class="text-xs text-muted mt-0.5 line-clamp-1">{{ file.description }}</p>
                 {% endif %}
@@ -74,15 +74,13 @@
                 </div>
             </div>
 
-            <!-- Download button -->
-            <a href="{% url 'dashboard:partner_file_download' file.pk %}"
-               class="flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-accent-600 dark:text-accent-400 bg-accent-50 dark:bg-accent-900/20 rounded-lg hover:bg-accent-100 dark:hover:bg-accent-900/30 transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+            <!-- Open indicator -->
+            <div class="flex-shrink-0 text-gray-400 dark:text-gray-500">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
                 </svg>
-                Download
-            </a>
-        </div>
+            </div>
+        </a>
         {% endfor %}
     </div>
     {% else %}
