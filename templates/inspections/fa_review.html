@@ -354,7 +354,7 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
                 <dt class="text-sm font-medium text-muted">Partner</dt>
-                <dd class="mt-1 text-primary font-semibold">{{ fa.vendor.company_name }}</dd>
+                <dd class="mt-1 text-primary font-semibold">{% if fa.company %}{{ fa.company.name }}{% elif fa.vendor %}{{ fa.vendor.company_name }}{% else %}—{% endif %}</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-muted">Fabric Style</dt>

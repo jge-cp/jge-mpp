@@ -15,11 +15,11 @@
           </div>
           <div class="flex justify-between">
             <dt class="text-muted">Company:</dt>
-            <dd>{{ item.company.name|default:item.vendor.company_name|default:"—" }}</dd>
+            <dd>{% if item.company %}{{ item.company.name }}{% elif item.vendor %}{{ item.vendor.company_name }}{% else %}—{% endif %}</dd>
           </div>
           <div class="flex justify-between">
             <dt class="text-muted">By:</dt>
-            <dd class="truncate ml-2">{{ item.submitter_full_name|default:item.vendor.user.get_full_name|default:item.vendor.user.username }}</dd>
+            <dd class="truncate ml-2">{% if item.submitter_full_name %}{{ item.submitter_full_name }}{% elif item.vendor %}{{ item.vendor.user.get_full_name|default:item.vendor.user.username }}{% else %}—{% endif %}</dd>
           </div>
           <div class="flex justify-between">
             <dt class="text-muted">Submitted:</dt>
@@ -48,11 +48,11 @@
           </div>
           <div class="flex justify-between">
             <dt class="text-muted">Company:</dt>
-            <dd>{{ item.company.name|default:item.vendor.company_name|default:"—" }}</dd>
+            <dd>{% if item.company %}{{ item.company.name }}{% elif item.vendor %}{{ item.vendor.company_name }}{% else %}—{% endif %}</dd>
           </div>
           <div class="flex justify-between">
             <dt class="text-muted">By:</dt>
-            <dd class="truncate ml-2">{{ item.submitter_full_name|default:item.vendor.user.get_full_name|default:item.vendor.user.username }}</dd>
+            <dd class="truncate ml-2">{% if item.submitter_full_name %}{{ item.submitter_full_name }}{% elif item.vendor %}{{ item.vendor.user.get_full_name|default:item.vendor.user.username }}{% else %}—{% endif %}</dd>
           </div>
           <div class="flex justify-between">
             <dt class="text-muted">Submitted:</dt>

@@ -36,7 +36,7 @@
                     <div class="flex items-center justify-between p-3 rounded-lg border border-theme bg-cream-100 dark:bg-dark-card hover:shadow-sm transition-all">
                         <div class="min-w-0 flex-1 mr-4">
                             <p class="font-medium truncate group-hover:text-accent-600">{{ fa.display_name }}</p>
-                            <p class="text-sm text-muted">{{ fa.company.name|default:fa.vendor.company_name }}</p>
+                            <p class="text-sm text-muted">{% if fa.company %}{{ fa.company.name }}{% elif fa.vendor %}{{ fa.vendor.company_name }}{% else %}—{% endif %}</p>
                         </div>
                         <div class="text-right flex-shrink-0">
                             <span class="badge {{ meta.badge_variant }}">{{ meta.badge_label }}</span>
@@ -68,7 +68,7 @@
                     <div class="flex items-center justify-between p-3 rounded-lg border border-theme bg-cream-100 dark:bg-dark-card hover:shadow-sm transition-all">
                         <div class="min-w-0 flex-1 mr-4">
                             <p class="font-medium truncate group-hover:text-accent-600">{{ lot.display_name }}</p>
-                            <p class="text-sm text-muted">{{ lot.vendor.company_name }}</p>
+                            <p class="text-sm text-muted">{% if lot.company %}{{ lot.company.name }}{% elif lot.vendor %}{{ lot.vendor.company_name }}{% else %}—{% endif %}</p>
                         </div>
                         <div class="text-right flex-shrink-0">
                             <span class="badge {{ meta.badge_variant }}">{{ meta.badge_label }}</span>

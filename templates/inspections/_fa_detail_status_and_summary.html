@@ -5,7 +5,7 @@
   <dl class="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2 md:grid-cols-3">
     <div>
       <dt class="text-sm font-medium text-muted">Company</dt>
-      <dd class="mt-1 text-primary font-semibold">{{ fa.company.name|default:fa.vendor.company_name }}</dd>
+      <dd class="mt-1 text-primary font-semibold">{% if fa.company %}{{ fa.company.name }}{% elif fa.vendor %}{{ fa.vendor.company_name }}{% else %}—{% endif %}</dd>
     </div>
     <div>
       <dt class="text-sm font-medium text-muted">Submitted By</dt>

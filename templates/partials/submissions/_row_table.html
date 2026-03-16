@@ -10,10 +10,10 @@
       {{ item.multicam_variant.camouflage_name|default:"—" }}
     </td>
     <td class="px-5 py-5 text-gray-500 dark:text-gray-400">
-      {{ item.company.name|default:item.vendor.company_name|default:"—" }}
+      {% if item.company %}{{ item.company.name }}{% elif item.vendor %}{{ item.vendor.company_name }}{% else %}—{% endif %}
     </td>
     <td class="px-5 py-5 text-gray-500 dark:text-gray-400">
-      <div class="truncate">{{ item.submitter_full_name|default:item.vendor.user.get_full_name|default:item.vendor.user.username }}</div>
+      <div class="truncate">{% if item.submitter_full_name %}{{ item.submitter_full_name }}{% elif item.vendor %}{{ item.vendor.user.get_full_name|default:item.vendor.user.username }}{% else %}—{% endif %}</div>
     </td>
     <td class="px-5 py-5 text-gray-500 dark:text-gray-400 whitespace-nowrap">{{ item.submission_date|date:"M d, Y" }}</td>
     <td class="px-5 py-5 w-[140px]">
@@ -36,10 +36,10 @@
       {{ item.original_fa.multicam_variant.camouflage_name|default:"—" }}
     </td>
     <td class="px-5 py-5 text-gray-500 dark:text-gray-400">
-      {{ item.company.name|default:item.vendor.company_name|default:"—" }}
+      {% if item.company %}{{ item.company.name }}{% elif item.vendor %}{{ item.vendor.company_name }}{% else %}—{% endif %}
     </td>
     <td class="px-5 py-5 text-gray-500 dark:text-gray-400">
-      <div class="truncate">{{ item.submitter_full_name|default:item.vendor.user.get_full_name|default:item.vendor.user.username }}</div>
+      <div class="truncate">{% if item.submitter_full_name %}{{ item.submitter_full_name }}{% elif item.vendor %}{{ item.vendor.user.get_full_name|default:item.vendor.user.username }}{% else %}—{% endif %}</div>
     </td>
     <td class="px-5 py-5 text-gray-500 dark:text-gray-400 whitespace-nowrap">{{ item.submission_date|date:"M d, Y" }}</td>
     <td class="px-5 py-5 w-[140px]">

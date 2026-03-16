@@ -14,7 +14,7 @@
       </span>
     </div>
     <div class="text-sm text-white/80">
-      <span class="font-medium">Company:</span> {{ lot.company.name|default:lot.vendor.company_name }}
+      <span class="font-medium">Company:</span> {% if lot.company %}{{ lot.company.name }}{% elif lot.vendor %}{{ lot.vendor.company_name }}{% else %}—{% endif %}
       <span class="mx-2">|</span>
       <span class="font-medium">Submitted by:</span> {{ lot.submitter_full_name|default:"-" }}
     </div>
@@ -33,7 +33,7 @@
       </span>
     </div>
     <div class="text-sm text-white/80">
-      <span class="font-medium">Company:</span> {{ lot.company.name|default:lot.vendor.company_name }}
+      <span class="font-medium">Company:</span> {% if lot.company %}{{ lot.company.name }}{% elif lot.vendor %}{{ lot.vendor.company_name }}{% else %}—{% endif %}
       <span class="mx-2">|</span>
       <span class="font-medium">Submitted by:</span> {{ lot.submitter_full_name|default:"-" }}
     </div>
@@ -47,7 +47,7 @@
       <span class="text-gray-800">Submitted {{ lot.submission_date|timesince }} ago</span>
     </div>
     <div class="text-sm text-gray-700">
-      <span class="font-medium">Company:</span> {{ lot.company.name|default:lot.vendor.company_name }}
+      <span class="font-medium">Company:</span> {% if lot.company %}{{ lot.company.name }}{% elif lot.vendor %}{{ lot.vendor.company_name }}{% else %}—{% endif %}
       <span class="mx-2">|</span>
       <span class="font-medium">Submitted by:</span> {{ lot.submitter_full_name|default:"-" }}
     </div>
