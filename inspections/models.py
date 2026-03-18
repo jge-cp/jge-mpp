@@ -76,6 +76,7 @@ class FirstArticleInspection(models.Model):
         ('alpha', 'Alpha'),
         ('beta', 'Beta'),
         ('swir', 'SWIR'),  # Short-Wave Infrared - skips primary review
+        ('Visible Spectrum Only', 'Visible Spectrum Only'),
     ]
     
     EVALUATION_CHOICES = [
@@ -159,7 +160,7 @@ class FirstArticleInspection(models.Model):
     shade_standard_number = models.CharField(max_length=20, blank=True)
     
     spectral_reflectance_requirement = models.CharField(
-        max_length=20,
+        max_length=30,
         choices=SPECTRAL_REFLECTANCE_CHOICES
     )
     
@@ -557,7 +558,7 @@ class LotAcceptance(models.Model):
     # SYSTEM GENERATED from FA Workbook (from LA Main)
     shade_standard = models.CharField(max_length=10)  # From FA
     shade_standard_number = models.CharField(max_length=20, blank=True)  # From FA
-    spectral_reflectance_requirement = models.CharField(max_length=20)  # From FA
+    spectral_reflectance_requirement = models.CharField(max_length=30)  # From FA
     original_fa_lot_number = models.CharField(max_length=50)  # Copied from FA's fa_lot_number
     
     # Lot number - auto-set from lot_id if not provided

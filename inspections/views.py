@@ -702,6 +702,8 @@ def fa_review(request, fai_id):
 
             evaluation = eval_form.save(commit=False)
             evaluation.inspector = request.user
+            if fa.spectral_reflectance_requirement == 'Visible Spectrum Only':
+                evaluation.spectral_reflectance = 'pass'
             evaluation.save()
             
             # Process color evaluations
@@ -1000,7 +1002,10 @@ def lot_review(request, lot_id):
                 sample_eval.pattern_execution_comment = request.POST.get(f'{sample_prefix}_pattern_comment', '')
                 sample_eval.scale = request.POST.get(f'{sample_prefix}_scale', '')
                 sample_eval.scale_comment = request.POST.get(f'{sample_prefix}_scale_comment', '')
-                sample_eval.spectral_reflectance = request.POST.get(f'{sample_prefix}_spectral', '')
+                if lot.spectral_reflectance_requirement == 'Visible Spectrum Only':
+                    sample_eval.spectral_reflectance = 'pass'
+                else:
+                    sample_eval.spectral_reflectance = request.POST.get(f'{sample_prefix}_spectral', '')
                 sample_eval.spectral_reflectance_comment = request.POST.get(f'{sample_prefix}_spectral_comment', '')
                 sample_eval.comments = request.POST.get(f'{sample_prefix}_comments', '')
                 sample_eval.save()

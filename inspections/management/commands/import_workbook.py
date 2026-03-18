@@ -313,8 +313,13 @@ class Command(BaseCommand):
 
             shade_std_num = '' if is_historic_value(row[4]) else to_str(row[4], 20)
 
-            spectral = str(row[5] or '').strip().lower()
-            if spectral not in ('alpha', 'beta', 'swir'):
+            spectral_raw = str(row[5] or '').strip()
+            spectral_lower = spectral_raw.lower()
+            if spectral_lower in ('alpha', 'beta', 'swir'):
+                spectral = spectral_lower
+            elif 'visible' in spectral_lower:
+                spectral = 'Visible Spectrum Only'
+            else:
                 spectral = 'alpha'
 
             lot_number = '' if is_historic_value(row[6]) else to_str(row[6], 50)

@@ -531,14 +531,15 @@
                     <tr class="rating-row {% if evaluation.spectral_reflectance == 'pass' %}pass-row{% elif evaluation.spectral_reflectance == 'fail' %}fail-row{% endif %}">
                         <td class="font-medium">
                             Spectral Reflectance
-                            {% if fa.spectral_reflectance_requirement == 'visible_only' %}
-                                <span class="text-xs text-muted">(Visible Spectrum Only - N/A)</span>
+                            {% if fa.spectral_reflectance_requirement == 'Visible Spectrum Only' %}
+                                <span class="text-xs text-muted">(Auto-passed)</span>
                             {% endif %}
                         </td>
                         <td>
-                            {% if fa.spectral_reflectance_requirement == 'visible_only' %}
-                                <span class="text-muted">N/A - Visible Spectrum Only</span>
-                                <input type="hidden" name="spectral_reflectance" value="">
+                            {% if fa.spectral_reflectance_requirement == 'Visible Spectrum Only' %}
+                                <span class="text-green-600 font-medium">Pass</span>
+                                <span class="text-xs text-muted ml-1">(Visible Spectrum Only — auto-passed)</span>
+                                <input type="hidden" name="spectral_reflectance" value="pass">
                             {% else %}
                                 <select name="spectral_reflectance" 
                                         class="form-select w-full criteria-select"
@@ -552,7 +553,7 @@
                             {% endif %}
                         </td>
                         <td>
-                            {% if fa.spectral_reflectance_requirement != 'visible_only' %}
+                            {% if fa.spectral_reflectance_requirement != 'Visible Spectrum Only' %}
                             <textarea name="spectral_reflectance_comment"
                                       class="form-textarea w-full auto-expand"
                                       rows="1"
@@ -562,8 +563,8 @@
                             {% endif %}
                         </td>
                         <td class="text-center">
-                            <span class="criterion-result {% if fa.spectral_reflectance_requirement == 'visible_only' %}result-pass{% else %}result-pending{% endif %}" id="result-spectral">
-                                {% if fa.spectral_reflectance_requirement == 'visible_only' %}
+                            <span class="criterion-result {% if fa.spectral_reflectance_requirement == 'Visible Spectrum Only' %}result-pass{% elif evaluation.spectral_reflectance == 'pass' %}result-pass{% elif evaluation.spectral_reflectance == 'fail' %}result-fail{% else %}result-pending{% endif %}" id="result-spectral">
+                                {% if fa.spectral_reflectance_requirement == 'Visible Spectrum Only' %}
                                     Pass
                                 {% elif evaluation.spectral_reflectance %}
                                     {% if evaluation.spectral_reflectance == 'pass' %}Pass{% else %}Fail{% endif %}

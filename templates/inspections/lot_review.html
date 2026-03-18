@@ -260,13 +260,14 @@
                     <div>
                         <label class="form-label text-sm">
                             Spectral Reflectance
-                            {% if lot.original_fa.spectral_reflectance_requirement == 'visible_only' %}
-                                <span class="text-xs text-muted">(N/A)</span>
+                            {% if lot.spectral_reflectance_requirement == 'Visible Spectrum Only' %}
+                                <span class="text-xs text-muted">(Auto-passed)</span>
                             {% endif %}
                         </label>
-                        {% if lot.original_fa.spectral_reflectance_requirement == 'visible_only' %}
-                            <span class="text-muted block py-2">N/A - Visible Spectrum Only</span>
-                            <input type="hidden" name="sample_{{ sample.sample_number }}_spectral" value="">
+                        {% if lot.spectral_reflectance_requirement == 'Visible Spectrum Only' %}
+                            <span class="text-green-600 font-medium block py-2">Pass</span>
+                            <span class="text-xs text-muted">(Visible Spectrum Only — auto-passed)</span>
+                            <input type="hidden" name="sample_{{ sample.sample_number }}_spectral" value="pass">
                         {% else %}
                             <select name="sample_{{ sample.sample_number }}_spectral" 
                                     class="form-select w-full criteria-select"
