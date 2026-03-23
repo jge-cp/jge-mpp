@@ -4,7 +4,6 @@
 
 {% block extra_head %}
 <style>
-    /* Evaluation result indicators */
     .result-pass {
         background-color: #16a34a !important;
         color: white !important;
@@ -28,23 +27,19 @@
         letter-spacing: 0.05em;
     }
     .result-pending {
-        background-color: #b9ac9e;
+        background-color: #9ca3af;
         color: white;
         font-weight: bold;
         padding: 4px 12px;
         border-radius: 4px;
         display: inline-block;
     }
-    
-    /* Sample section pass/fail border colors */
     .sample-section.pass-section {
         border-color: #16a34a !important;
     }
     .sample-section.fail-section {
         border-color: #dc2626 !important;
     }
-    
-    /* Rating row styling - warm backgrounds */
     .rating-row {
         transition: background-color 0.2s;
     }
@@ -54,29 +49,6 @@
     .rating-row.fail-row {
         background-color: rgba(220, 38, 38, 0.15) !important;
     }
-    
-    /* Evaluation table */
-    .eval-table th {
-        background-color: #efece8;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.7rem;
-        letter-spacing: 0.05em;
-    }
-    .dark .eval-table th {
-        background-color: #0a0a0a;
-        color: #d1d5db;
-    }
-    .eval-table td, .eval-table th {
-        padding: 0.5rem 0.75rem;
-        border: 1px solid #efece8;
-    }
-    .dark .eval-table td, .dark .eval-table th {
-        border-color: #2a2d2d;
-        color: #d1d5db;
-    }
-    
-    /* Overall result styling - matches FA */
     .overall-pass {
         background-color: #16a34a !important;
         color: white !important;
@@ -105,7 +77,7 @@
             <h2 class="text-xl text-muted mt-1">{{ lot.display_name }}</h2>
         </div>
         <div>
-            <span class="text-sm px-3 py-1 rounded-full font-semibold" style="background-color: #d9d4cc; color: #594936;">{{ num_samples }} Samples</span>
+            <span class="text-sm px-3 py-1 rounded-full font-semibold" style="background-color: #e5e7eb; color: #374151;">{{ num_samples }} Samples</span>
         </div>
     </div>
     
@@ -115,39 +87,39 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
                 <dt class="text-sm font-medium text-muted">Partner</dt>
-                <dd class="mt-1 text-primary font-semibold">{% if lot.company %}{{ lot.company.name }}{% elif lot.vendor %}{{ lot.vendor.company_name }}{% else %}—{% endif %}</dd>
+                <dd class="mt-1 text-gray-900 dark:text-white font-semibold">{% if lot.company %}{{ lot.company.name }}{% elif lot.vendor %}{{ lot.vendor.company_name }}{% else %}—{% endif %}</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-muted">Original FA</dt>
                 <dd class="mt-1">
-                    <a href="{% url 'inspections:fa_detail' lot.original_fa.fai_id %}" class="text-accent-600 hover:underline dark:text-accent-400">
+                    <a href="{% url 'inspections:fa_detail' lot.original_fa.fai_id %}" class="text-blue-600 hover:underline dark:text-blue-400">
                         {{ lot.original_fa.display_name }}
                     </a>
                 </dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-muted">Fabric Style</dt>
-                <dd class="mt-1 text-primary">{{ lot.fabric_style }}</dd>
+                <dd class="mt-1 text-gray-900 dark:text-white">{{ lot.fabric_style }}</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-muted">MultiCam Variant</dt>
-                <dd class="mt-1 text-primary">{{ lot.multicam_variant.camouflage_name }}</dd>
+                <dd class="mt-1 text-gray-900 dark:text-white">{{ lot.multicam_variant.camouflage_name }}</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-muted">Lot Number</dt>
-                <dd class="mt-1 text-primary font-semibold">{{ lot.lot_lot_number }}</dd>
+                <dd class="mt-1 text-gray-900 dark:text-white font-semibold">{{ lot.lot_lot_number }}</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-muted">Yards Printed</dt>
-                <dd class="mt-1 text-primary">{{ lot.number_of_yards_printed }}</dd>
+                <dd class="mt-1 text-gray-900 dark:text-white">{{ lot.number_of_yards_printed }}</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-muted">Spectral Reflectance Req.</dt>
-                <dd class="mt-1 text-primary">{{ lot.original_fa.get_spectral_reflectance_requirement_display }}</dd>
+                <dd class="mt-1 text-gray-900 dark:text-white">{{ lot.original_fa.get_spectral_reflectance_requirement_display }}</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-muted">Date of Printing</dt>
-                <dd class="mt-1 text-primary">{{ lot.date_of_printing|date:"M d, Y" }}</dd>
+                <dd class="mt-1 text-gray-900 dark:text-white">{{ lot.date_of_printing|date:"M d, Y" }}</dd>
             </div>
         </div>
     </div>
@@ -324,7 +296,7 @@
                             <span class="overall-result-text text-white">✗ FAIL</span>
                         {% endif %}
                     {% else %}
-                        <span class="overall-result-text" style="color: #b9ac9e;">INCOMPLETE</span>
+                        <span class="overall-result-text" style="color: #9ca3af;">INCOMPLETE</span>
                     {% endif %}
                 </div>
             </div>
@@ -467,8 +439,8 @@
         overallCard.classList.remove('overall-pass', 'overall-fail');
         
         if (!allSamplesComplete) {
-            overallDisplay.innerHTML = '<span class="overall-result-text" style="color: #b9ac9e;">INCOMPLETE</span>';
-            overallCard.style.borderColor = '#efece8';
+            overallDisplay.innerHTML = '<span class="overall-result-text" style="color: #9ca3af;">INCOMPLETE</span>';
+            overallCard.style.borderColor = '#f9fafb';
             if (overallTitle) overallTitle.className = 'text-2xl font-bold';
             if (overallSubtitle) overallSubtitle.className = 'text-muted text-sm';
         } else if (allSamplesPass) {

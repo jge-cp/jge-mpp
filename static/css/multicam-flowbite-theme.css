@@ -1,0 +1,55 @@
+/* Multicam Partner Portal - Minimal Theme Overrides
+ * Only defines: fonts + status badge color tokens
+ * Everything else uses Flowbite/Tailwind defaults
+ */
+
+:root {
+  /* Typography */
+  --font-sans: 'Roboto', ui-sans-serif, system-ui, sans-serif;
+  --font-heading: 'Roboto Condensed', Arial Narrow, sans-serif;
+
+  /* Status badge colors - these semantic tokens are used by .badge-* classes */
+  --color-success-soft: #ecfdf5;
+  --color-success-subtle: #a7f3d0;
+  --color-fg-success-strong: #064e3b;
+
+  --color-warning-soft: #fffbeb;
+  --color-warning-subtle: #fde68a;
+  --color-fg-warning: #92400e;
+
+  --color-danger-soft: #fef2f2;
+  --color-danger-subtle: #fecaca;
+  --color-fg-danger-strong: #7f1d1d;
+  --color-danger: #dc2626;
+
+  --color-info-soft: #eff6ff;
+  --color-info-subtle: #bfdbfe;
+
+  /* Brand accent for pending-final badge */
+  --color-brand-soft: #FCE4D8;
+  --color-brand-subtle: #F9C6AF;
+  --color-fg-brand-strong: #B42E10;
+}
+
+/* Dark mode overrides for badges */
+.dark {
+  --color-success-soft: #022c22;
+  --color-success-subtle: #064e3b;
+  --color-fg-success-strong: #6ee7b7;
+
+  --color-warning-soft: #451a03;
+  --color-warning-subtle: #78350f;
+  --color-fg-warning: #fcd34d;
+
+  --color-danger-soft: #450a0a;
+  --color-danger-subtle: #7f1d1d;
+  --color-fg-danger-strong: #fca5a5;
+  --color-danger: #dc2626;
+
+  --color-info-soft: #1e3a5f;
+  --color-info-subtle: #1e40af;
+
+  --color-brand-soft: #2e1510;
+  --color-brand-subtle: #5c2a1a;
+  --color-fg-brand-strong: #F5A07C;
+}
