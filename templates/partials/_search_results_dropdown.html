@@ -1,0 +1,52 @@
+{% load inspections_ui %}
+{% if not query %}
+{% elif not fas and not lots %}
+<div class="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
+    No results for "<span class="font-medium text-gray-700 dark:text-gray-300">{{ query }}</span>"
+</div>
+{% else %}
+<div class="max-h-96 overflow-y-auto divide-y divide-gray-100 dark:divide-gray-700">
+    {% if fas %}
+    <div class="py-2">
+        <p class="px-4 py-1 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">First Articles</p>
+        {% for fa in fas %}
+        {% fa_status_meta fa as meta %}
+        <a href="{% url 'inspections:fa_detail' fa.fai_id %}"
+           class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700">
+            <div class="min-w-0 flex-1">
+                <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ fa.display_name }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                    {{ fa.fai_id }} · {% if fa.company %}{{ fa.company.name }}{% elif fa.vendor %}{{ fa.vendor.company_name }}{% endif %}
+                </p>
+            </div>
+            <span class="badge {{ meta.badge_variant }} shrink-0">{{ meta.badge_label }}</span>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% if lots %}
+    <div class="py-2">
+        <p class="px-4 py-1 text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Lots</p>
+        {% for lot in lots %}
+        {% lot_status_meta lot as meta %}
+        <a href="{% url 'inspections:lot_detail' lot.lot_id %}"
+           class="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700">
+            <div class="min-w-0 flex-1">
+                <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ lot.display_name }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                    {{ lot.lot_id }} · {% if lot.company %}{{ lot.company.name }}{% elif lot.vendor %}{{ lot.vendor.company_name }}{% endif %}
+                </p>
+            </div>
+            <span class="badge {{ meta.badge_variant }} shrink-0">{{ meta.badge_label }}</span>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% if fa_total > 5 or lot_total > 5 %}
+<a href="{% url 'inspections:global_search' %}?q={{ query|urlencode }}"
+   class="block py-2.5 text-sm font-medium text-center text-blue-700 hover:text-blue-800 bg-gray-50 dark:bg-gray-700 dark:text-blue-400 dark:hover:text-blue-300 border-t border-gray-200 dark:border-gray-600 rounded-b-lg">
+    View all {{ fa_total|add:lot_total }} results
+</a>
+{% endif %}
+{% endif %}

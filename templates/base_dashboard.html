@@ -57,16 +57,95 @@ Child templates should:
             
             <!-- Right: Search, Notifications, Dark Mode, User -->
             <div class="flex items-center gap-2 md:gap-3">
-                <!-- Search (hidden on mobile) -->
-                <div class="hidden md:block">
-                    <label for="topbar-search" class="sr-only">Search</label>
-                    <div class="relative">
+                <!-- Search -->
+                <div x-data="{ mobileSearchOpen: false, dropdownOpen: false, query: '' }"
+                     @click.outside="dropdownOpen = false; mobileSearchOpen = false"
+                     @keydown.escape.window="dropdownOpen = false; mobileSearchOpen = false">
+
+                    <!-- Mobile: search icon button (visible below md, hidden when overlay is open) -->
+                    <button @click="mobileSearchOpen = true; $nextTick(() => $refs.searchInput.focus())"
+                            x-show="!mobileSearchOpen"
+                            type="button"
+                            class="md:hidden p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700">
+                        <span class="sr-only">Search</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/>
+                        </svg>
+                    </button>
+
+                    <!-- Mobile: full-width search overlay (fixed to top of screen) -->
+                    <div x-show="mobileSearchOpen" x-cloak
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 -translate-y-2"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         class="md:hidden fixed inset-x-0 top-0 z-[60] bg-white dark:bg-gray-800 p-3 shadow-lg border-b border-gray-200 dark:border-gray-700">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/>
+                                </svg>
+                            </div>
+                            <input type="text" name="q"
+                                   x-ref="searchInput"
+                                   x-model="query"
+                                   @input="dropdownOpen = query.trim().length > 0"
+                                   @keydown.enter.prevent="if (query.trim()) window.location.href = '{% url 'inspections:global_search' %}?q=' + encodeURIComponent(query.trim())"
+                                   hx-get="{% url 'inspections:global_search' %}"
+                                   hx-trigger="input changed delay:300ms"
+                                   hx-target="#search-results-mobile"
+                                   hx-swap="innerHTML"
+                                   hx-on::after-swap="dropdownOpen = query.trim().length > 0"
+                                   class="block w-full p-2.5 pl-10 pr-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                   placeholder="Search..."
+                                   autocomplete="off">
+                            <button @click="mobileSearchOpen = false; query = ''; dropdownOpen = false"
+                                    type="button"
+                                    class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div id="search-results-mobile"
+                             x-show="dropdownOpen && query.trim().length > 0"
+                             x-cloak
+                             class="mt-2 max-h-[70vh] overflow-y-auto bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+                        </div>
+                    </div>
+
+                    <!-- Desktop: inline search input (hidden below md) -->
+                    <div class="hidden md:block relative">
+                        <label for="topbar-search" class="sr-only">Search</label>
                         <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                             <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/>
                             </svg>
                         </div>
-                        <input type="text" id="topbar-search" class="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search...">
+                        <input type="text" id="topbar-search" name="q"
+                               x-model="query"
+                               @focus="if (query.trim()) dropdownOpen = true"
+                               @blur="setTimeout(() => dropdownOpen = false, 150)"
+                               @input="dropdownOpen = query.trim().length > 0"
+                               @keydown.enter.prevent="if (query.trim()) window.location.href = '{% url 'inspections:global_search' %}?q=' + encodeURIComponent(query.trim())"
+                               hx-get="{% url 'inspections:global_search' %}"
+                               hx-trigger="input changed delay:300ms"
+                               hx-target="#search-results-dropdown"
+                               hx-swap="innerHTML"
+                               hx-on::after-swap="dropdownOpen = query.trim().length > 0"
+                               class="block w-64 p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 focus:w-80 transition-[width] duration-200 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                               placeholder="Search..."
+                               autocomplete="off">
+                        <div id="search-results-dropdown"
+                             x-show="dropdownOpen && query.trim().length > 0"
+                             x-cloak
+                             x-transition:enter="transition ease-out duration-150"
+                             x-transition:enter-start="opacity-0 translate-y-1"
+                             x-transition:enter-end="opacity-100 translate-y-0"
+                             x-transition:leave="transition ease-in duration-100"
+                             x-transition:leave-start="opacity-100 translate-y-0"
+                             x-transition:leave-end="opacity-0 translate-y-1"
+                             class="absolute top-full right-0 mt-1 w-[480px] bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 z-50">
+                        </div>
                     </div>
                 </div>
                 

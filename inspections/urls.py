@@ -42,6 +42,9 @@ urlpatterns = [
     path('badge/fa-final/', views.fa_final_queue_badge, name='fa_final_queue_badge'),
     path('badge/lot/', views.lot_queue_badge, name='lot_queue_badge'),
     
+    # Global search
+    path('search/', views.global_search, name='global_search'),
+    
     # Accounting URLs - Staff facing
     path('admin/reports/', views.accounting_reports_queue, name='accounting_reports_queue'),
     path('admin/reports/review/<int:report_id>/', views.accounting_review, name='accounting_review'),

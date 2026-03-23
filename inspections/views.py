@@ -16,6 +16,7 @@ from .forms import (
 )
 from core.file_validation import validate_uploads, FileValidationError
 from .listing import (
+    ListFilters,
     parse_list_filters,
     FA_STATUS_OPTIONS,
     LOT_STATUS_OPTIONS,
@@ -1200,6 +1201,37 @@ def accounting_reports_queue(request):
         'status_filter': status_filter,
     }
     return render(request, 'inspections/accounting_reports_queue.html', context)
+
+
+@login_required
+def global_search(request):
+    """Global search across FAs and Lots, used by the top navbar search bar."""
+    query = (request.GET.get('q') or '').strip()
+    profile = request.profile
+
+    if not query:
+        if request.headers.get('HX-Request'):
+            return render(request, 'partials/_search_results_dropdown.html', {'query': ''})
+        return render(request, 'inspections/search_results.html', {'query': '', 'fas': [], 'lots': []})
+
+    search_filters = ListFilters(q=query)
+    fas = build_fa_queryset(profile, search_filters)
+    lots = build_lot_queryset(profile, search_filters)
+
+    if request.headers.get('HX-Request'):
+        return render(request, 'partials/_search_results_dropdown.html', {
+            'query': query,
+            'fas': fas[:5],
+            'lots': lots[:5],
+            'fa_total': fas.count(),
+            'lot_total': lots.count(),
+        })
+
+    return render(request, 'inspections/search_results.html', {
+        'query': query,
+        'fas': fas,
+        'lots': lots,
+    })
 
 
 @login_required
