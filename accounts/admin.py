@@ -43,6 +43,12 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
             'fields': ('username', 'email', 'first_name', 'last_name', 'usable_password', 'password1', 'password2'),
         }),
     )
+
+    def get_inlines(self, request, obj=None):
+        """Only show the Profile inline on the change form, not on Add User."""
+        if obj is None:
+            return []
+        return self.inlines
     
     def get_user_type(self, obj):
         if hasattr(obj, 'profile'):
