@@ -148,6 +148,10 @@ class PartnerCompanyAdmin(ModelAdmin):
 
 @admin.register(UserProfile)
 class UserProfileAdmin(ModelAdmin):
+    def has_module_permission(self, request):
+        """Hide from admin sidebar — profiles are managed via User inline."""
+        return False
+
     list_display = ['company_name', 'user', 'company', 'user_functionality', 'admin_role', 'status', 'technical_email']
     list_filter = ['user_functionality', 'admin_role', 'status', 'partner_type', 'company']
     search_fields = ['company_name', 'technical_email', 'commercial_email', 'company__name', 'company__code']

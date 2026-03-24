@@ -137,7 +137,7 @@ class UserProfile(models.Model):
     # Legacy company_name field - kept for backwards compatibility during migration
     # New partners should have company FK set instead
     company_name = models.CharField(max_length=255)
-    technical_email = models.EmailField(unique=True, validators=[EmailValidator()])
+    technical_email = models.EmailField(blank=True, default='', validators=[EmailValidator()])
     technical_contact = models.CharField(max_length=255, blank=True)
     commercial_email = models.EmailField(blank=True)
     commercial_contact = models.CharField(max_length=255, blank=True)
