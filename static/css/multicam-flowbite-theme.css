@@ -22,13 +22,13 @@
   --color-fg-danger-strong: #7f1d1d;
   --color-danger: #dc2626;
 
-  --color-info-soft: #eff6ff;
-  --color-info-subtle: #bfdbfe;
+  --color-info-soft: #FFF4ED;
+  --color-info-subtle: #FFC999;
 
   /* Brand accent for pending-final badge */
-  --color-brand-soft: #FCE4D8;
-  --color-brand-subtle: #F9C6AF;
-  --color-fg-brand-strong: #B42E10;
+  --color-brand-soft: #FFF4ED;
+  --color-brand-subtle: #FFC999;
+  --color-fg-brand-strong: #BF4800;
 }
 
 /* Dark mode overrides for badges */
@@ -46,8 +46,8 @@
   --color-fg-danger-strong: #fca5a5;
   --color-danger: #dc2626;
 
-  --color-info-soft: #1e3a5f;
-  --color-info-subtle: #1e40af;
+  --color-info-soft: #3d200a;
+  --color-info-subtle: #732B00;
 
   --color-brand-soft: #2e1510;
   --color-brand-subtle: #5c2a1a;

@@ -5,12 +5,12 @@
 {% block content %}
 <div class="max-w-4xl mx-auto px-4 py-6">
     <div class="mb-6">
-        <a href="{% url 'inspections:accounting_reports_queue' %}" class="text-blue-600 hover:underline">&larr; Back to Reports Queue</a>
+        <a href="{% url 'inspections:accounting_reports_queue' %}" class="text-accent-500 hover:underline">&larr; Back to Reports Queue</a>
         <h1 class="text-3xl font-bold text-gray-900 mt-2">Review Report #{{ report.report_id }}</h1>
         <div class="flex items-center mt-2 space-x-2">
             <span class="px-3 py-1 text-sm rounded-full 
                 {% if report.status == 'invoiced' %}bg-green-100 text-green-800
-                {% elif report.status == 'reviewed' %}bg-blue-100 text-blue-800
+                {% elif report.status == 'reviewed' %}bg-accent-100 text-accent-700
                 {% else %}bg-yellow-100 text-yellow-800{% endif %}">
                 {{ report.get_status_display }}
             </span>
@@ -25,7 +25,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- Report Details -->
         <div>
-            <div class="bg-white shadow rounded-lg p-6 mb-6">
+            <div class="bg-warm-white shadow rounded-lg p-6 mb-6">
                 <h2 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Printer Information</h2>
                 <dl class="space-y-3">
                     <div>
@@ -39,7 +39,7 @@
                 </dl>
             </div>
             
-            <div class="bg-white shadow rounded-lg p-6 mb-6">
+            <div class="bg-warm-white shadow rounded-lg p-6 mb-6">
                 <h2 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Reporting Period</h2>
                 <dl class="grid grid-cols-2 gap-3">
                     <div>
@@ -61,7 +61,7 @@
                 </dl>
             </div>
             
-            <div class="bg-white shadow rounded-lg p-6 mb-6">
+            <div class="bg-warm-white shadow rounded-lg p-6 mb-6">
                 <h2 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Customer & Production</h2>
                 <dl class="space-y-3">
                     <div>
@@ -86,7 +86,7 @@
                     </div>
                     <div class="pt-2 border-t">
                         <dt class="text-sm text-gray-500">Yardage Produced</dt>
-                        <dd class="font-bold text-xl text-blue-600">{{ report.yardage_produced }} yards</dd>
+                        <dd class="font-bold text-xl text-accent-500">{{ report.yardage_produced }} yards</dd>
                     </div>
                     <div>
                         <dt class="text-sm text-gray-500">Cuttable Width</dt>
@@ -98,7 +98,7 @@
         
         <!-- Accounting Actions -->
         <div>
-            <div class="bg-white shadow rounded-lg p-6">
+            <div class="bg-warm-white shadow rounded-lg p-6">
                 <h2 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Accounting Review</h2>
                 
                 <form method="post">
@@ -133,7 +133,7 @@
                     <div class="flex flex-col space-y-2">
                         {% if report.status == 'submitted' %}
                             <button type="submit" name="action" value="review" 
-                                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline">
+                                class="w-full bg-accent-500 hover:bg-accent-600 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline">
                                 Mark as Reviewed
                             </button>
                         {% endif %}
@@ -156,7 +156,7 @@
             </div>
             
             {% if report.notes %}
-            <div class="bg-white shadow rounded-lg p-6 mt-6">
+            <div class="bg-warm-white shadow rounded-lg p-6 mt-6">
                 <h2 class="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Notes</h2>
                 <p class="text-gray-700">{{ report.notes }}</p>
             </div>

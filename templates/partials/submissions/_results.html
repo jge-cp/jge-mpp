@@ -32,14 +32,14 @@
           <th class="px-6 py-2">
             <input type="text" name="{{ sort_prefix|default:'' }}q" value="{{ filters.q|default:'' }}"
               placeholder=""
-              class="w-full py-1.5 px-2 text-xs font-normal rounded border border-gray-300 bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white dark:placeholder-gray-400"
+              class="w-full py-1.5 px-2 text-xs font-normal rounded border border-gray-300 bg-white text-gray-900 focus:ring-accent-500 focus:border-accent-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white dark:placeholder-gray-400"
               hx-get="." hx-trigger="keyup changed delay:300ms"
               hx-target="#{% if target_id %}{{ target_id }}{% else %}list-results{% endif %}" hx-swap="innerHTML"
               hx-include="#{% if form_id %}{{ form_id }}{% else %}filters-form{% endif %}" hx-replace-url="true" />
           </th>
           <th class="px-6 py-2">
             <select name="{{ sort_prefix|default:'' }}variant"
-              class="w-full py-1.5 px-2 text-xs font-normal rounded border border-gray-300 bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+              class="w-full py-1.5 px-2 text-xs font-normal rounded border border-gray-300 bg-white text-gray-900 focus:ring-accent-500 focus:border-accent-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
               hx-get="." hx-trigger="change"
               hx-target="#{% if target_id %}{{ target_id }}{% else %}list-results{% endif %}" hx-swap="innerHTML"
               hx-include="#{% if form_id %}{{ form_id }}{% else %}filters-form{% endif %}" hx-replace-url="true">
@@ -51,7 +51,7 @@
           </th>
           <th class="px-6 py-2">
             <select name="{{ sort_prefix|default:'' }}company"
-              class="w-full py-1.5 px-2 text-xs font-normal rounded border border-gray-300 bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+              class="w-full py-1.5 px-2 text-xs font-normal rounded border border-gray-300 bg-white text-gray-900 focus:ring-accent-500 focus:border-accent-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
               hx-get="." hx-trigger="change"
               hx-target="#{% if target_id %}{{ target_id }}{% else %}list-results{% endif %}" hx-swap="innerHTML"
               hx-include="#{% if form_id %}{{ form_id }}{% else %}filters-form{% endif %}" hx-replace-url="true">
@@ -63,7 +63,7 @@
           </th>
           <th class="px-6 py-2">
             <select name="{{ sort_prefix|default:'' }}submitted_by"
-              class="w-full py-1.5 px-2 text-xs font-normal rounded border border-gray-300 bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+              class="w-full py-1.5 px-2 text-xs font-normal rounded border border-gray-300 bg-white text-gray-900 focus:ring-accent-500 focus:border-accent-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
               hx-get="." hx-trigger="change"
               hx-target="#{% if target_id %}{{ target_id }}{% else %}list-results{% endif %}" hx-swap="innerHTML"
               hx-include="#{% if form_id %}{{ form_id }}{% else %}filters-form{% endif %}" hx-replace-url="true">
@@ -76,7 +76,7 @@
           <th class="px-6 py-2">
             <input type="text" name="{{ sort_prefix|default:'' }}date_from" value="{{ filters.date_from|default:'' }}"
               placeholder=""
-              class="w-full py-1.5 px-2 text-xs font-normal rounded border border-gray-300 bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white dark:placeholder-gray-400"
+              class="w-full py-1.5 px-2 text-xs font-normal rounded border border-gray-300 bg-white text-gray-900 focus:ring-accent-500 focus:border-accent-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white dark:placeholder-gray-400"
               onfocus="this.type='date'" onblur="if(!this.value)this.type='text'"
               hx-get="." hx-trigger="change"
               hx-target="#{% if target_id %}{{ target_id }}{% else %}list-results{% endif %}" hx-swap="innerHTML"
@@ -84,7 +84,7 @@
           </th>
           <th class="px-6 py-2 w-[140px]">
             <select name="{{ sort_prefix|default:'' }}status"
-              class="w-full py-1.5 px-2 text-xs font-normal rounded border border-gray-300 bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+              class="w-full py-1.5 px-2 text-xs font-normal rounded border border-gray-300 bg-white text-gray-900 focus:ring-accent-500 focus:border-accent-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
               hx-get="." hx-trigger="change"
               hx-target="#{% if target_id %}{{ target_id }}{% else %}list-results{% endif %}" hx-swap="innerHTML"
               hx-include="#{% if form_id %}{{ form_id }}{% else %}filters-form{% endif %}" hx-replace-url="true">

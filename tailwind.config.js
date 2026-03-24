@@ -18,48 +18,53 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        // Headers - Roboto Condensed
         'heading': ['"Roboto Condensed"', 'Arial Narrow', 'sans-serif'],
-        // Body copy - Roboto
         'body': ['Roboto', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        // Sans fallback
         'sans': ['Roboto', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       colors: {
-        // Multicam Brand Colors
-        brand: {
-          50: '#f8f7f7',
-          100: '#eeedec',
-          200: '#e0dcd7',
-          300: '#d2c6b6',
-          400: '#bdab93',
-          500: '#a88f71',
-          600: '#8e7657',
-          700: '#756148',
-          800: '#594936',
-          900: '#3f3427',
-          950: '#28221b',
+        // Warm-gray scale — overrides Tailwind's cool gray everywhere
+        gray: {
+          50:  '#FAF9F7',
+          100: '#F5F3EF',
+          200: '#E8E4DE',
+          300: '#D5CFC6',
+          400: '#A8A196',
+          500: '#857E73',
+          600: '#6B6459',
+          700: '#2A2520',
+          800: '#1A1714',
+          900: '#0F0D0B',
+          950: '#080706',
         },
-        // Original Multicam palette for accents
-        multicam: {
-          sand: '#C4B396',
-          olive: '#5C5844',
-          brown: '#6B5C4A',
-          green: '#4A5442',
-          tan: '#D4C5A9',
-        },
-        // Orange accent (coral)
+        // Warm white for card/panel surfaces (inputs stay pure #fff)
+        'warm-white': '#FEFDFB',
+        // Vibrant orange accent (#FF6000) — primary action color
         accent: {
-          50: '#FEF3EE',
-          100: '#FCE4D8',
-          200: '#F9C6AF',
-          300: '#F5A07C',
-          400: '#F07347',
-          500: '#E84D1C',
-          600: '#D93D12',
-          700: '#B42E10',
-          800: '#902614',
-          900: '#742316',
+          50:  '#FFF4ED',
+          100: '#FFE4CC',
+          200: '#FFC999',
+          300: '#FFA366',
+          400: '#FF8133',
+          500: '#FF6000',
+          600: '#E65600',
+          700: '#BF4800',
+          800: '#993900',
+          900: '#732B00',
+        },
+        // Multicam camo tones — used very sparingly for brand texture
+        camo: {
+          olive: '#5C5844',
+          green: '#4A5442',
+          sand:  '#C4B396',
+          tan:   '#D4C5A9',
+          brown: '#6B5C4A',
+        },
+        // Legacy brand scale (kept for backward compat, rarely used)
+        brand: {
+          50: '#f8f7f7', 100: '#eeedec', 200: '#e0dcd7', 300: '#d2c6b6',
+          400: '#bdab93', 500: '#a88f71', 600: '#8e7657', 700: '#756148',
+          800: '#594936', 900: '#3f3427', 950: '#28221b',
         },
       },
     },

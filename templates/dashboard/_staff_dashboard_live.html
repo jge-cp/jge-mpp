@@ -10,11 +10,11 @@
         <p class="font-heading font-bold text-5xl text-gray-900 dark:text-white">{{ lot_stats.approved }}</p>
         <p class="text-base font-heading font-medium mt-1 text-gray-700 dark:text-gray-300">Approved Lots</p>
     </div>
-    <div class="rounded-lg p-5 text-center bg-blue-600">
+    <div class="rounded-lg p-5 text-center bg-camo-green">
         <p class="font-heading font-bold text-5xl text-white">{{ summary.active_partners }}</p>
         <p class="text-base font-heading font-medium text-white/90 mt-1">Active Partners</p>
     </div>
-    <div class="rounded-lg p-5 text-center bg-blue-600">
+    <div class="rounded-lg p-5 text-center bg-camo-olive">
         <p class="font-heading font-bold text-5xl text-white">{{ total_yardage|floatformat:0 }}</p>
         <p class="text-base font-heading font-medium text-white/90 mt-1">Total Yardage</p>
     </div>
@@ -26,7 +26,7 @@
     <div class="card p-5">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-bold font-heading text-gray-900 dark:text-white">Recent First Articles</h2>
-            <a href="{% url 'inspections:fa_list' %}" class="text-sm hover:underline text-blue-600 dark:text-blue-500">View all →</a>
+            <a href="{% url 'inspections:fa_list' %}" class="text-sm hover:underline text-accent-500 dark:text-accent-400">View all →</a>
         </div>
         <div class="space-y-3">
             {% for fa in recent_fas %}
@@ -58,7 +58,7 @@
     <div class="card p-5">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-bold font-heading text-gray-900 dark:text-white">Recent Lots</h2>
-            <a href="{% url 'inspections:lot_list' %}" class="text-sm hover:underline text-blue-600 dark:text-blue-500">View all →</a>
+            <a href="{% url 'inspections:lot_list' %}" class="text-sm hover:underline text-accent-500 dark:text-accent-400">View all →</a>
         </div>
         <div class="space-y-3">
             {% for lot in recent_lots %}
@@ -227,7 +227,7 @@
                     <p class="text-sm text-gray-500 dark:text-gray-400">{{ partner.approved_fas }} approved FAs</p>
                 </div>
                 <div class="text-right">
-                    <p class="text-2xl font-bold text-blue-600 dark:text-blue-500">{{ partner.lot_count }}</p>
+                    <p class="text-2xl font-bold text-accent-500 dark:text-accent-400">{{ partner.lot_count }}</p>
                     <p class="text-xs text-gray-500 dark:text-gray-400">total lots</p>
                 </div>
             </div>
@@ -298,10 +298,10 @@ function initDashboardCharts() {
         pendingFinal: '#fb923c',
         approved: '#16a34a',
         rejected: '#dc2626',
-        accent: '#2563eb',
-        brand: '#6b7280',
-        text: isDark ? '#d1d5db' : '#374151',
-        background: isDark ? '#1f2937' : '#f9fafb'
+        accent: '#FF6000',
+        brand: '#6B5C4A',
+        text: isDark ? '#D5CFC6' : '#504A41',
+        background: isDark ? '#1A1714' : '#FAF9F7'
     };
     
     const faChartEl = document.querySelector("#fa-chart");
@@ -443,8 +443,8 @@ function initDashboardCharts() {
                         fontSize: '12px'
                     }
                 },
-                axisBorder: { color: isDark ? '#374151' : '#e5e7eb' },
-                axisTicks: { color: isDark ? '#374151' : '#e5e7eb' }
+                axisBorder: { color: isDark ? '#2A2520' : '#E8E4DE' },
+                axisTicks: { color: isDark ? '#2A2520' : '#E8E4DE' }
             },
             yaxis: {
                 labels: {
@@ -455,7 +455,7 @@ function initDashboardCharts() {
                 }
             },
             grid: {
-                borderColor: isDark ? '#374151' : '#e5e7eb',
+                borderColor: isDark ? '#2A2520' : '#E8E4DE',
                 strokeDashArray: 4
             },
             legend: {

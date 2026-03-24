@@ -63,7 +63,7 @@
             <div>
                 <dt class="text-sm font-medium text-muted">Original First Article</dt>
                 <dd class="mt-1 text-sm">
-                    <a href="{% url 'inspections:fa_detail' lot.original_fa.fai_id %}" class="text-blue-600 hover:underline dark:text-blue-400">
+                    <a href="{% url 'inspections:fa_detail' lot.original_fa.fai_id %}" class="text-accent-500 hover:underline dark:text-accent-400">
                         {{ lot.original_fa.display_name }}
                     </a>
                 </dd>
@@ -138,7 +138,7 @@
                 {% endif %}
             </div>
             <details {% if not sample.all_pass %}open{% endif %}>
-                <summary class="cursor-pointer text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">View Sample Details</summary>
+                <summary class="cursor-pointer text-sm font-medium text-accent-500 dark:text-accent-400 hover:underline">View Sample Details</summary>
                 <div class="mt-3 space-y-4">
                     {% with eval=sample %}
                     {% include 'inspections/partials/_evaluation_detail_tables.html' %}

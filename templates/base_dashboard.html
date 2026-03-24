@@ -15,7 +15,7 @@ Child templates should:
 
 {% block sidebar %}
 <!-- Top Navbar -->
-<nav class="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+<nav class="fixed top-0 z-50 w-full bg-warm-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
     <div class="px-3 py-3 lg:px-5 lg:pl-3">
         <div class="flex items-center justify-between">
             <!-- Left: Hamburger + Logo -->
@@ -78,7 +78,7 @@ Child templates should:
                          x-transition:enter="transition ease-out duration-150"
                          x-transition:enter-start="opacity-0 -translate-y-2"
                          x-transition:enter-end="opacity-100 translate-y-0"
-                         class="md:hidden fixed inset-x-0 top-0 z-[60] bg-white dark:bg-gray-800 p-3 shadow-lg border-b border-gray-200 dark:border-gray-700">
+                         class="md:hidden fixed inset-x-0 top-0 z-[60] bg-warm-white dark:bg-gray-800 p-3 shadow-lg border-b border-gray-200 dark:border-gray-700">
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                 <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -95,7 +95,7 @@ Child templates should:
                                    hx-target="#search-results-mobile"
                                    hx-swap="innerHTML"
                                    hx-on::after-swap="dropdownOpen = query.trim().length > 0"
-                                   class="block w-full p-2.5 pl-10 pr-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                   class="block w-full p-2.5 pl-10 pr-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-accent-500 focus:border-accent-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                                    placeholder="Search..."
                                    autocomplete="off">
                             <button @click="mobileSearchOpen = false; query = ''; dropdownOpen = false"
@@ -109,7 +109,7 @@ Child templates should:
                         <div id="search-results-mobile"
                              x-show="dropdownOpen && query.trim().length > 0"
                              x-cloak
-                             class="mt-2 max-h-[70vh] overflow-y-auto bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+                             class="mt-2 max-h-[70vh] overflow-y-auto bg-warm-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
                         </div>
                     </div>
 
@@ -132,7 +132,7 @@ Child templates should:
                                hx-target="#search-results-dropdown"
                                hx-swap="innerHTML"
                                hx-on::after-swap="dropdownOpen = query.trim().length > 0"
-                               class="block w-64 p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 focus:w-80 transition-[width] duration-200 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                               class="block w-64 p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-white focus:ring-accent-500 focus:border-accent-500 focus:w-80 transition-[width] duration-200 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-accent-500 dark:focus:border-accent-500"
                                placeholder="Search..."
                                autocomplete="off">
                         <div id="search-results-dropdown"
@@ -144,7 +144,7 @@ Child templates should:
                              x-transition:leave="transition ease-in duration-100"
                              x-transition:leave-start="opacity-100 translate-y-0"
                              x-transition:leave-end="opacity-0 translate-y-1"
-                             class="absolute top-full right-0 mt-1 w-[480px] bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 z-50">
+                             class="absolute top-full right-0 mt-1 w-[480px] bg-warm-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 z-50">
                         </div>
                     </div>
                 </div>
@@ -178,7 +178,7 @@ Child templates should:
                          x-transition:leave="transition ease-in duration-150"
                          x-transition:leave-start="opacity-100 translate-y-0"
                          x-transition:leave-end="opacity-0 translate-y-1"
-                         class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 z-50">
+                         class="absolute right-0 mt-2 w-80 bg-warm-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 z-50">
                         <div class="block px-4 py-2 font-medium text-center text-gray-700 rounded-t-lg bg-gray-50 dark:bg-gray-800 dark:text-white border-b border-gray-200 dark:border-gray-700">
                             Notifications
                         </div>
@@ -218,7 +218,7 @@ Child templates should:
                             type="button"
                             class="flex items-center text-sm rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600">
                         <span class="sr-only">Open user menu</span>
-                        <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium">
+                        <div class="w-8 h-8 rounded-full bg-accent-500 flex items-center justify-center text-white font-medium">
                             {{ user.username|slice:":1"|upper }}
                         </div>
                     </button>
@@ -232,7 +232,7 @@ Child templates should:
                          x-transition:leave="transition ease-in duration-75"
                          x-transition:leave-start="transform opacity-100 scale-100"
                          x-transition:leave-end="transform opacity-0 scale-95"
-                         class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 z-50">
+                         class="absolute right-0 mt-2 w-48 bg-warm-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700 z-50">
                         <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
                             <p class="text-sm text-gray-900 dark:text-white font-medium truncate">{{ user.get_full_name|default:user.username }}</p>
                             <p class="text-sm text-gray-500 dark:text-gray-400 truncate">{{ user.email }}</p>

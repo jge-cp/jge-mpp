@@ -1,7 +1,7 @@
 <!-- Prominent Action Buttons - Flowbite style -->
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
     <a href="{% url 'inspections:fa_submit' %}"
-       class="group p-6 rounded-lg shadow-sm transition-all hover:shadow-md bg-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+       class="group p-6 rounded-lg shadow-sm transition-all hover:shadow-md bg-warm-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
         <div class="flex items-center space-x-4">
             <div class="flex-shrink-0 w-14 h-14 rounded-lg flex items-center justify-center bg-gray-100 dark:bg-gray-700">
                 <svg class="w-7 h-7 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -18,7 +18,7 @@
     </a>
 
     <a href="{% url 'inspections:lot_submit' %}"
-       class="group p-6 rounded-lg shadow-sm transition-all hover:shadow-md bg-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700 {% if not fa_stats.approved %}opacity-50 pointer-events-none{% endif %}">
+       class="group p-6 rounded-lg shadow-sm transition-all hover:shadow-md bg-warm-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700 {% if not fa_stats.approved %}opacity-50 pointer-events-none{% endif %}">
         <div class="flex items-center space-x-4">
             <div class="flex-shrink-0 w-14 h-14 rounded-lg flex items-center justify-center bg-gray-100 dark:bg-gray-700">
                 <svg class="w-7 h-7 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -41,7 +41,7 @@
 <div class="card p-6 mb-8">
     <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-bold text-gray-900 dark:text-white">All First Articles</h2>
-        <a href="{% url 'inspections:fa_list' %}" class="text-sm font-medium hover:underline text-blue-600 dark:text-blue-500">
+        <a href="{% url 'inspections:fa_list' %}" class="text-sm font-medium hover:underline text-accent-500 dark:text-accent-400">
             View all →
         </a>
     </div>
@@ -61,7 +61,7 @@
 <div class="card p-6">
     <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-bold text-gray-900 dark:text-white">All Lots</h2>
-        <a href="{% url 'inspections:lot_list' %}" class="text-sm font-medium hover:underline text-blue-600 dark:text-blue-500">
+        <a href="{% url 'inspections:lot_list' %}" class="text-sm font-medium hover:underline text-accent-500 dark:text-accent-400">
             View all →
         </a>
     </div>

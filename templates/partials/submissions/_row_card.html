@@ -2,7 +2,7 @@
 {% if kind == 'fa' %}
   {% fa_status_meta item mode as meta %}
     <a href="{% url row_url item.fai_id %}" class="block group">
-      <div class="p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow bg-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+      <div class="p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow bg-warm-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
         <div class="flex items-start justify-between gap-3 mb-3">
           <div class="font-medium text-gray-900 dark:text-white group-hover:opacity-80">{{ item.display_name }}</div>
           <span class="badge {{ meta.badge_variant }} flex-shrink-0">{{ meta.badge_label }}</span>
@@ -35,7 +35,7 @@
 {% else %}
   {% lot_status_meta item mode as meta %}
     <a href="{% url row_url item.lot_id %}" class="block group">
-      <div class="p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow bg-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+      <div class="p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow bg-warm-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
         <div class="flex items-start justify-between gap-3 mb-3">
           <div class="font-medium text-gray-900 dark:text-white group-hover:opacity-80">{{ item.display_name }}</div>
           <span class="badge {{ meta.badge_variant }} flex-shrink-0">{{ meta.badge_label }}</span>
