@@ -1,0 +1,14 @@
+{% autoescape off %}
+Hello{{ user.first_name|yesno:", ," }} {{ user.first_name|default:user.username }},
+
+Your account has been created on the MultiCam Partner Portal.
+
+To get started, please set your password by clicking the link below:
+
+{{ protocol }}://{{ domain }}{% url 'accounts:password_reset_confirm' uidb64=uid token=token %}
+
+This link can only be used once. If it expires, you can request a new one from the login page using "Forgot Password."
+
+---
+MultiCam Partner Portal
+{% endautoescape %}

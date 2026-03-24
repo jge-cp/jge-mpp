@@ -1,10 +1,14 @@
-from django.contrib import admin
+import logging
+
+from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordResetForm
 from django.conf import settings
 from unfold.admin import ModelAdmin, TabularInline
 from .models import UserProfile, PartnerCompany
+
+logger = logging.getLogger(__name__)
 
 
 class UserProfileInline(TabularInline):
@@ -28,12 +32,52 @@ class UserAdmin(BaseUserAdmin):
     inlines = [UserProfileInline]
     list_display = ['username', 'email', 'first_name', 'last_name', 'is_staff', 'get_user_type']
     actions = ['send_password_reset_email']
+
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'email', 'first_name', 'last_name', 'usable_password', 'password1', 'password2'),
+        }),
+    )
     
     def get_user_type(self, obj):
         if hasattr(obj, 'profile'):
             return obj.profile.get_user_functionality_display()
         return '-'
     get_user_type.short_description = 'User Type'
+
+    def response_add(self, request, obj, post_url_continue=None):
+        """Remind admin to assign company/role after creating a user."""
+        self.message_user(
+            request,
+            'Now assign a company and role below. A welcome email will be sent automatically when you save.',
+            messages.INFO,
+        )
+        return super().response_add(request, obj, post_url_continue)
+
+    def save_related(self, request, form, formsets, change):
+        """After inlines are saved, send welcome email if company was just assigned to a new user."""
+        super().save_related(request, form, formsets, change)
+        user = form.instance
+        if not user.email or user.last_login is not None:
+            return
+        profile = getattr(user, 'profile', None)
+        if not profile or not profile.company:
+            return
+        try:
+            reset_form = PasswordResetForm({'email': user.email})
+            if reset_form.is_valid():
+                reset_form.save(
+                    request=request,
+                    use_https=request.is_secure(),
+                    email_template_name='registration/welcome_email.html',
+                    subject_template_name='registration/welcome_subject.txt',
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                )
+                self.message_user(request, f'Welcome email sent to {user.email}.', messages.SUCCESS)
+        except Exception as e:
+            logger.error(f'Failed to send welcome email to {user.email}: {e}')
+            self.message_user(request, f'Welcome email failed: {e}', messages.WARNING)
     
     @admin.action(description='Send password reset email to selected users')
     def send_password_reset_email(self, request, queryset):
@@ -46,7 +90,6 @@ class UserAdmin(BaseUserAdmin):
                 skipped_count += 1
                 continue
             
-            # Use Django's PasswordResetForm to send the email
             form = PasswordResetForm({'email': user.email})
             if form.is_valid():
                 form.save(
