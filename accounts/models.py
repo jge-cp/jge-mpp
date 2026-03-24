@@ -274,6 +274,9 @@ class UserProfile(models.Model):
         # Auto-update permissions if user type or admin role changed
         if is_new or functionality_changed or (self.user_functionality == 'admin' and admin_role_changed):
             self.set_default_permissions()
+
+        if self.company:
+            self.company_name = self.company.name
         
         super().save(*args, **kwargs)
         
