@@ -2911,6 +2911,11 @@ a:is(.dark *) {
   background-color: rgb(92 88 68 / var(--tw-bg-opacity, 1));
 }
 
+.bg-camo-tan {
+  --tw-bg-opacity: 1;
+  background-color: rgb(212 197 169 / var(--tw-bg-opacity, 1));
+}
+
 .bg-cyan-100 {
   --tw-bg-opacity: 1;
   background-color: rgb(207 250 254 / var(--tw-bg-opacity, 1));
@@ -2957,11 +2962,6 @@ a:is(.dark *) {
 
 .bg-green-900\/30 {
   background-color: rgb(1 71 55 / 0.3);
-}
-
-.bg-orange-400 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(255 138 76 / var(--tw-bg-opacity, 1));
 }
 
 .bg-orange-500 {
@@ -3023,11 +3023,6 @@ a:is(.dark *) {
 .bg-yellow-100 {
   --tw-bg-opacity: 1;
   background-color: rgb(253 246 178 / var(--tw-bg-opacity, 1));
-}
-
-.bg-yellow-300 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(250 202 21 / var(--tw-bg-opacity, 1));
 }
 
 .bg-yellow-50 {
