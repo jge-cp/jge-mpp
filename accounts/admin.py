@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordResetForm
 from django.conf import settings
 from unfold.admin import ModelAdmin, TabularInline
+from unfold.forms import AdminPasswordChangeForm, UserChangeForm, UserCreationForm
 from .models import UserProfile, PartnerCompany
 
 logger = logging.getLogger(__name__)
@@ -27,8 +28,11 @@ admin.site.unregister(User)
 
 
 @admin.register(User)
-class UserAdmin(BaseUserAdmin):
+class UserAdmin(BaseUserAdmin, ModelAdmin):
     """Custom User admin with UserProfile inline"""
+    form = UserChangeForm
+    add_form = UserCreationForm
+    change_password_form = AdminPasswordChangeForm
     inlines = [UserProfileInline]
     list_display = ['username', 'email', 'first_name', 'last_name', 'is_staff', 'get_user_type']
     actions = ['send_password_reset_email']
