@@ -4,40 +4,6 @@
 
 {% block extra_head %}
 <style>
-    /* Evaluation table styling */
-    .eval-table {
-        border-collapse: separate;
-        border-spacing: 0;
-    }
-    .eval-table thead th {
-        padding: 0.75rem 1rem;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: #6b7280;
-        background-color: #efece8;
-        border-bottom: 1px solid #efece8;
-    }
-    .dark .eval-table thead th {
-        color: #d1d5db;
-        background-color: #0a0a0a;
-        border-bottom-color: #2a2d2d;
-    }
-    .eval-table tbody td {
-        padding: 0.75rem 1rem;
-        vertical-align: middle;
-        border-bottom: 1px solid #efece8;
-    }
-    .dark .eval-table tbody td {
-        border-bottom-color: #2a2d2d;
-        color: #d1d5db;
-    }
-    .eval-table tbody tr:last-child td {
-        border-bottom: none;
-    }
-    
-    /* Override input/select/textarea padding within tables for tighter fit */
     .eval-table select,
     .eval-table input[type="text"],
     .eval-table textarea {
@@ -47,8 +13,6 @@
     .eval-table select {
         padding-right: 2rem;
     }
-    
-    /* Evaluation result indicators - VERY VISUAL */
     .result-pass {
         background-color: #16a34a !important;
         color: white !important;
@@ -72,26 +36,22 @@
         letter-spacing: 0.05em;
     }
     .result-pending {
-        background-color: #b9ac9e;
+        background-color: #A8A196;
         color: white;
         font-weight: bold;
         padding: 4px 12px;
         border-radius: 4px;
         display: inline-block;
     }
-    
-    /* Rating row styling - GREEN/RED backgrounds */
     .rating-row {
         transition: background-color 0.2s;
     }
     .rating-row.pass-row {
-        background-color: rgba(22, 163, 74, 0.25) !important;
+        background-color: rgba(22, 163, 74, 0.12) !important;
     }
     .rating-row.fail-row {
-        background-color: rgba(220, 38, 38, 0.25) !important;
+        background-color: rgba(220, 38, 38, 0.12) !important;
     }
-    
-    /* Overall result styling */
     .overall-pass {
         background-color: #16a34a !important;
         color: white !important;
@@ -108,8 +68,6 @@
         text-transform: uppercase;
         letter-spacing: 0.1em;
     }
-    
-    /* Status badges - more prominent */
     .status-approved {
         background-color: #16a34a !important;
         color: white !important;
@@ -126,26 +84,6 @@
         border-radius: 6px;
         font-weight: bold;
     }
-    
-    /* Evaluation table */
-    .eval-table th {
-        background-color: #efece8;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.05em;
-    }
-    .dark .eval-table th {
-        background-color: #0a0a0a;
-        color: #d1d5db;
-    }
-    .eval-table td, .eval-table th {
-        padding: 0.75rem 1rem;
-        border: 1px solid #efece8;
-    }
-    .dark .eval-table td, .dark .eval-table th {
-        border-color: #2a2d2d;
-    }
 </style>
 {% endblock %}
 
@@ -159,7 +97,7 @@
         </div>
         <div class="flex items-center space-x-3">
             <!-- Attempt Number Badge - neutral warm color -->
-            <span class="text-sm px-3 py-1 rounded-full font-semibold" style="background-color: #d9d4cc; color: #594936;">
+            <span class="text-sm px-3 py-1 rounded-full font-semibold" style="background-color: #E8E4DE; color: #504A41;">
                 ATTEMPT #{{ current_attempt }}
             </span>
             {% if is_read_only and not is_primary_viewing_pending_final %}
@@ -192,9 +130,9 @@
         <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Current Attempt: #{{ current_attempt }}</p>
         <div class="grid md:grid-cols-2 gap-4">
             <!-- Primary Review Status -->
-            <div class="p-4 rounded-2xl border-2 border-warm {% if primary_eval_for_display and primary_eval_for_display.is_submitted %}{% if primary_eval_for_display.all_pass %}bg-green-50 dark:bg-green-900/20{% else %}bg-red-50 dark:bg-red-900/20{% endif %}{% elif fa.skip_primary_review %}bg-blue-50 dark:bg-blue-900/20{% else %}bg-cream-50 dark:bg-dark-card{% endif %}">
+            <div class="p-4 rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-warm-white dark:bg-gray-800">
                 <div class="flex items-center justify-between mb-2">
-                    <span class="font-bold text-primary">Primary Review</span>
+                    <span class="font-bold text-gray-900 dark:text-white">Primary Review</span>
                     {% if primary_eval_for_display and primary_eval_for_display.is_submitted %}
                         {% if primary_eval_for_display.all_pass %}
                             <span class="result-pass">✓ PASSED</span>
@@ -202,7 +140,7 @@
                             <span class="result-fail">✗ FAILED</span>
                         {% endif %}
                     {% elif fa.skip_primary_review %}
-                        <span class="bg-blue-500 text-white font-bold px-3 py-1 rounded">⏭ SKIPPED</span>
+                        <span class="bg-accent-500 text-white font-bold px-3 py-1 rounded">⏭ SKIPPED</span>
                     {% else %}
                         <span class="result-pending">PENDING</span>
                     {% endif %}
@@ -221,7 +159,7 @@
                         <p class="text-sm mt-2 italic">"{{ primary_eval_for_display.comments }}"</p>
                     {% endif %}
                 {% elif fa.skip_primary_review %}
-                    <p class="text-sm text-blue-600 dark:text-blue-400">Direct to Final Inspector</p>
+                    <p class="text-sm text-accent-500 dark:text-accent-400">Direct to Final Inspector</p>
                     <p class="text-xs text-muted mt-1">IMTP, SWIR, or BDCS submission</p>
                 {% else %}
                     <p class="text-sm text-muted">Awaiting primary inspector review</p>
@@ -229,9 +167,9 @@
             </div>
             
             <!-- Final Review Status -->
-            <div class="p-4 rounded-2xl border-2 border-warm {% if final_eval_for_display and final_eval_for_display.is_submitted %}{% if final_eval_for_display.all_pass %}bg-green-50 dark:bg-green-900/20{% else %}bg-red-50 dark:bg-red-900/20{% endif %}{% elif fa.status == 'pending_final' %}bg-yellow-50 dark:bg-yellow-900/20{% else %}bg-cream-50 dark:bg-dark-card{% endif %}">
+            <div class="p-4 rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-warm-white dark:bg-gray-800">
                 <div class="flex items-center justify-between mb-2">
-                    <span class="font-bold text-primary">Final Review</span>
+                    <span class="font-bold text-gray-900 dark:text-white">Final Review</span>
                     {% if final_eval_for_display and final_eval_for_display.is_submitted %}
                         {% if final_eval_for_display.all_pass %}
                             <span class="result-pass">✓ PASSED</span>
@@ -279,11 +217,11 @@
             </summary>
             <div class="mt-4 space-y-3">
                 {% for attempt_num, evals in evaluation_history.items %}
-                <div class="p-3 rounded-2xl border-2 border-warm {% if attempt_num == current_attempt %}bg-cream-100 dark:bg-dark-card{% else %}bg-white dark:bg-dark-card{% endif %}">
+                <div class="p-3 rounded-2xl border-2 border-gray-200 dark:border-gray-700 {% if attempt_num == current_attempt %}bg-gray-50 dark:bg-gray-800{% else %}bg-warm-white dark:bg-gray-800{% endif %}">
                     <div class="flex items-center justify-between mb-2">
                         <span class="font-semibold text-gray-900 dark:text-white">Attempt #{{ attempt_num }}</span>
                         {% if attempt_num == current_attempt %}
-                            <span class="text-xs px-2 py-1 rounded-full font-semibold" style="background-color: #d9d4cc; color: #594936;">CURRENT</span>
+                            <span class="text-xs px-2 py-1 rounded-full font-semibold" style="background-color: #E8E4DE; color: #504A41;">CURRENT</span>
                         {% endif %}
                     </div>
                     <div class="grid md:grid-cols-2 gap-2 text-sm">
@@ -338,7 +276,7 @@
         </div>
         {% endif %}
     {% elif is_read_only %}
-    <div class="mb-6 p-4 bg-cream-100 dark:bg-warm-gray-800 border border-cream-200 dark:border-warm-gray-700 rounded">
+    <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded">
         <p class="text-warm-gray-700 dark:text-warm-gray-200">
             <strong>View Only:</strong> This FA has been {{ fa.status }}. 
             {% if fa.status == 'rejected' %}
@@ -354,35 +292,35 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
                 <dt class="text-sm font-medium text-muted">Partner</dt>
-                <dd class="mt-1 text-primary font-semibold">{% if fa.company %}{{ fa.company.name }}{% elif fa.vendor %}{{ fa.vendor.company_name }}{% else %}—{% endif %}</dd>
+                <dd class="mt-1 text-gray-900 dark:text-white font-semibold">{% if fa.company %}{{ fa.company.name }}{% elif fa.vendor %}{{ fa.vendor.company_name }}{% else %}—{% endif %}</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-muted">Fabric Style</dt>
-                <dd class="mt-1 text-primary">{{ fa.fabric_style }}</dd>
+                <dd class="mt-1 text-gray-900 dark:text-white">{{ fa.fabric_style }}</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-muted">MultiCam Variant</dt>
-                <dd class="mt-1 text-primary">{{ fa.multicam_variant.camouflage_name }}</dd>
+                <dd class="mt-1 text-gray-900 dark:text-white">{{ fa.multicam_variant.camouflage_name }}</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-muted">FA Lot Number</dt>
-                <dd class="mt-1 text-primary">{{ fa.fa_lot_number }}</dd>
+                <dd class="mt-1 text-gray-900 dark:text-white">{{ fa.fa_lot_number }}</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-muted">Shade Standard</dt>
-                <dd class="mt-1 text-primary">{{ fa.get_shade_standard_display }}</dd>
+                <dd class="mt-1 text-gray-900 dark:text-white">{{ fa.get_shade_standard_display }}</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-muted">Shade Standard No.</dt>
-                <dd class="mt-1 text-primary">{{ fa.shade_standard_number|default:"-" }}</dd>
+                <dd class="mt-1 text-gray-900 dark:text-white">{{ fa.shade_standard_number|default:"-" }}</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-muted">Spectral Reflectance Req.</dt>
-                <dd class="mt-1 text-primary">{{ fa.get_spectral_reflectance_requirement_display }}</dd>
+                <dd class="mt-1 text-gray-900 dark:text-white">{{ fa.get_spectral_reflectance_requirement_display }}</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-muted">Date of Printing</dt>
-                <dd class="mt-1 text-primary">{{ fa.date_of_printing|date:"M d, Y" }}</dd>
+                <dd class="mt-1 text-gray-900 dark:text-white">{{ fa.date_of_printing|date:"M d, Y" }}</dd>
             </div>
         </div>
     </div>
@@ -591,7 +529,7 @@
         <div class="card p-6 mb-6">
             <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Inspection Documents</h2>
             <div class="flex items-center justify-center w-full">
-                <label for="inspection_documents" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer bg-cream-100 dark:bg-dark-card hover:bg-cream-200 dark:hover:bg-dark-elevated transition-colors border-warm">
+                <label for="inspection_documents" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border-gray-200 dark:border-gray-700">
                     <div class="flex flex-col items-center justify-center pt-5 pb-6">
                         <svg class="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
@@ -653,7 +591,7 @@
     
     {% if is_final_review and primary_evaluation %}
     <!-- Primary Inspector's Evaluation Reference -->
-    <div class="card p-6 mt-6 bg-opacity-50" style="background-color: rgba(156, 163, 175, 0.1);">
+    <div class="card p-6 mt-6 bg-opacity-50" style="background-color: rgba(168, 161, 150, 0.1);">
         <h3 class="text-lg font-bold mb-2 text-muted">Primary Inspector's Evaluation (Reference)</h3>
         <p class="text-sm text-muted mb-2">
             Reviewed by: {{ primary_evaluation.inspector.username }} on {{ primary_evaluation.evaluation_date|date:"M d, Y H:i" }}
@@ -785,8 +723,8 @@
         overallCard.classList.remove('overall-pass', 'overall-fail');
         
         if (!allRated) {
-            overallDisplay.innerHTML = '<span class="overall-result-text" style="color: #b9ac9e;">INCOMPLETE</span>';
-            overallCard.style.borderColor = document.documentElement.classList.contains('dark') ? '#2a2d2d' : '#efece8';
+            overallDisplay.innerHTML = '<span class="overall-result-text" style="color: #A8A196;">INCOMPLETE</span>';
+            overallCard.style.borderColor = document.documentElement.classList.contains('dark') ? '#2A2520' : '#FAF9F7';
             if (overallTitle) overallTitle.className = 'text-2xl font-bold';
             if (overallSubtitle) overallSubtitle.className = 'text-muted text-sm';
         } else if (allPass) {

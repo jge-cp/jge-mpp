@@ -1,6 +1,7 @@
-/* Multicam Partner Portal - Custom Styles */
-/* Typography: Golden Ratio (1.618) with 24px base */
-/* Fonts: Roboto Condensed (headers), Roboto Mono (body) */
+/* Multicam Partner Portal - Tailwind + Flowbite Styles
+ * Uses Flowbite/Tailwind defaults for most components
+ * Only custom: status badges, eval table, sidebar styling
+ */
 
 @tailwind base;
 @tailwind components;
@@ -10,301 +11,199 @@
    BASE LAYER - Typography & Defaults
    ============================================ */
 @layer base {
-  /* Import Google Fonts */
   @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;600;700&display=swap');
 
-  /* Default body styles */
   body {
-    @apply font-body text-base text-gray-700 bg-background antialiased;
+    @apply font-body text-base antialiased bg-gray-50 text-gray-700 dark:bg-gray-900 dark:text-gray-300;
   }
 
-  /* Headings use Roboto Condensed */
   h1, h2, h3, h4, h5, h6 {
-    @apply font-heading font-semibold text-gray-900 tracking-tight;
+    @apply font-heading font-semibold tracking-tight text-gray-900 dark:text-white;
   }
 
-  h1 {
-    @apply text-xl; /* 63px */
-  }
-
-  h2 {
-    @apply text-lg; /* 39px */
-  }
-
-  h3 {
-    @apply text-md; /* 30px */
-  }
-
-  h4 {
-    @apply text-base font-bold; /* 24px */
-  }
-
-  h5 {
-    @apply text-sm font-bold; /* 15px */
-  }
-
-  h6 {
-    @apply text-xs font-bold uppercase tracking-wide; /* 9px */
-  }
-
-  /* Links - orange accent */
   a {
-    @apply text-accent-500 hover:text-accent-600 transition-colors;
-  }
-
-  /* Code elements use Roboto Mono (already default) */
-  code, pre, kbd {
-    @apply font-body;
+    @apply text-accent-500 dark:text-accent-400 hover:underline;
   }
 }
 
 /* ============================================
-   COMPONENT LAYER - Custom Components
+   COMPONENT LAYER - Domain-Specific Components
    ============================================ */
 @layer components {
-  /* Card Component - cream background, warm border */
-  .card {
-    @apply bg-cream rounded-2xl shadow-sm border;
-    border-color: #efece8;
-  }
-
-  .card-body {
-    @apply p-8;
-  }
-
-  .card-header {
-    @apply px-8 py-5 border-b font-heading font-semibold text-lg text-gray-900;
-    border-color: #efece8;
-  }
-
-  /* Stat Card - cream background, no border */
-  .stat-card {
-    @apply bg-cream rounded-2xl shadow-sm p-8;
-  }
-
-  .stat-value {
-    @apply font-heading text-lg font-bold text-gray-900;
-  }
-
-  .stat-label {
-    @apply text-sm text-gray-500 uppercase tracking-wide;
-  }
-
-  /* Status Badges - filled pill style, uniform size */
+  /* Status Badges - inspection status semantics
+     These are applied dynamically by inspections_ui.py template tags */
   .badge {
-    @apply flex items-center justify-center w-full max-w-[140px] min-h-[48px] px-4 py-2 rounded-full text-xs font-semibold text-white text-center leading-tight;
-  }
-
-  /* Inline badge variant for mobile cards */
-  .badge.flex-shrink-0 {
-    @apply w-auto max-w-none min-h-0 py-1.5;
-  }
-
-  /* Count badge variant - for "X pending" headers - RED */
-  .badge-count {
-    @apply bg-red-600 w-auto max-w-none min-h-0 py-2 px-6;
+    @apply inline-flex items-center justify-center px-2.5 py-0.5 
+           rounded-full text-xs font-medium whitespace-nowrap;
   }
 
   .badge-pending {
-    background-color: #fffbeb;
-    @apply text-gray-900;
+    background-color: var(--color-warning-soft);
+    border: 1px solid var(--color-warning-subtle);
+    color: var(--color-fg-warning);
   }
 
   .badge-pending-final {
-    background-color: #dd8a4e;
+    background-color: var(--color-brand-soft);
+    border: 1px solid var(--color-brand-subtle);
+    color: var(--color-fg-brand-strong);
   }
 
   .badge-approved {
-    @apply bg-green-600;
+    background-color: var(--color-success-soft);
+    border: 1px solid var(--color-success-subtle);
+    color: var(--color-fg-success-strong);
   }
 
   .badge-rejected {
-    @apply bg-red-600;
+    background-color: var(--color-danger-soft);
+    border: 1px solid var(--color-danger-subtle);
+    color: var(--color-fg-danger-strong);
   }
 
   .badge-active {
-    @apply bg-green-600;
+    background-color: var(--color-success-soft);
+    border: 1px solid var(--color-success-subtle);
+    color: var(--color-fg-success-strong);
   }
 
   .badge-in-progress {
-    @apply bg-blue-600;
+    background-color: var(--color-info-soft);
+    border: 1px solid var(--color-info-subtle);
+    @apply text-accent-700 dark:text-accent-300;
   }
 
-  /* Form Components */
+  /* Count badge - notification count style */
+  .badge-count {
+    @apply inline-flex items-center justify-center min-w-[20px] h-5 
+           px-1.5 text-xs font-semibold rounded-full bg-red-600 text-white;
+  }
+
+  /* Card - single source of truth for panel/card containers */
+  .card {
+    @apply rounded-lg shadow-sm bg-warm-white border border-gray-200 
+           dark:bg-gray-800 dark:border-gray-700;
+  }
+
+  /* Form controls - Flowbite defaults */
   .form-label {
-    @apply block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2;
+    @apply block mb-2 text-sm font-medium text-gray-900 dark:text-white;
   }
 
   .form-input {
-    @apply w-full px-6 py-3.5 text-base rounded-full 
-           bg-white
-           focus:ring-2 focus:ring-primary-500 focus:border-primary-500 
-           transition-colors;
-    border: 1px solid #efece8;
+    @apply bg-white border border-gray-300 text-gray-900 text-sm rounded-lg 
+           focus:ring-accent-500 focus:border-accent-500 block w-full p-2.5 
+           dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
+           dark:text-white dark:focus:ring-accent-500 dark:focus:border-accent-500;
   }
 
   .form-select {
-    @apply w-full px-6 py-3.5 text-base rounded-full 
-           focus:ring-2 focus:ring-primary-500 focus:border-primary-500 
-           bg-white transition-colors;
-    border: 1px solid #efece8;
+    @apply bg-white border border-gray-300 text-gray-900 text-sm rounded-lg 
+           focus:ring-accent-500 focus:border-accent-500 block w-full p-2.5 
+           dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
+           dark:text-white dark:focus:ring-accent-500 dark:focus:border-accent-500;
   }
 
   .form-textarea {
-    @apply w-full px-6 py-3.5 text-base rounded-3xl 
-           bg-white
-           focus:ring-2 focus:ring-primary-500 focus:border-primary-500 
-           transition-colors resize-y;
-    border: 1px solid #efece8;
+    @apply bg-white border border-gray-300 text-gray-900 text-sm rounded-lg 
+           focus:ring-accent-500 focus:border-accent-500 block w-full p-2.5 
+           dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
+           dark:text-white dark:focus:ring-accent-500 dark:focus:border-accent-500;
   }
 
-  /* Button Components */
-  .btn {
-    @apply inline-flex items-center justify-center px-8 py-3 
-           font-heading font-semibold text-sm uppercase tracking-wide
-           rounded-lg border-2 transition-all duration-200
-           focus:outline-none focus:ring-2 focus:ring-offset-2;
-  }
-
+  /* Buttons - Flowbite defaults */
   .btn-primary {
-    @apply btn bg-accent-500 border-accent-500 text-white 
-           hover:bg-accent-600 hover:border-accent-600
-           focus:ring-accent-500;
+    @apply text-white bg-accent-500 hover:bg-accent-600 focus:ring-4 focus:ring-accent-200 
+           font-medium rounded-lg text-sm px-5 py-2.5 
+           dark:bg-accent-600 dark:hover:bg-accent-700 focus:outline-none 
+           dark:focus:ring-accent-800 inline-flex items-center;
   }
 
   .btn-secondary {
-    @apply btn bg-white text-gray-700 
-           hover:bg-cream-100
-           focus:ring-gray-500;
-    border-color: #efece8;
+    @apply text-gray-900 bg-white border border-gray-300 focus:outline-none 
+           hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium 
+           rounded-lg text-sm px-5 py-2.5 
+           dark:bg-gray-800 dark:text-white dark:border-gray-600 
+           dark:hover:bg-gray-700 dark:hover:border-gray-600 
+           dark:focus:ring-gray-700 inline-flex items-center;
   }
 
-  .btn-secondary:hover {
-    border-color: #e0dcd7;
+  /* Badge aliases for semantic use in templates */
+  .badge-success {
+    background-color: var(--color-success-soft);
+    border: 1px solid var(--color-success-subtle);
+    color: var(--color-fg-success-strong);
+    @apply inline-flex items-center justify-center px-2.5 py-0.5 
+           rounded-full text-xs font-medium whitespace-nowrap;
   }
 
-  .btn-danger {
-    @apply btn bg-error-600 border-error-600 text-white 
-           hover:bg-error-700 hover:border-error-700
-           focus:ring-error-500;
+  .badge-danger {
+    background-color: var(--color-danger-soft);
+    border: 1px solid var(--color-danger-subtle);
+    color: var(--color-fg-danger-strong);
+    @apply inline-flex items-center justify-center px-2.5 py-0.5 
+           rounded-full text-xs font-medium whitespace-nowrap;
   }
 
-  .btn-success {
-    @apply btn bg-success-600 border-success-600 text-white 
-           hover:bg-success-700 hover:border-success-700
-           focus:ring-success-500;
+  .badge-warning {
+    background-color: var(--color-warning-soft);
+    border: 1px solid var(--color-warning-subtle);
+    color: var(--color-fg-warning);
+    @apply inline-flex items-center justify-center px-2.5 py-0.5 
+           rounded-full text-xs font-medium whitespace-nowrap;
   }
 
-  .btn-ghost {
-    @apply btn bg-transparent border-transparent text-gray-700 
-           hover:bg-cream-100 
-           focus:ring-gray-500;
+  .badge-info {
+    background-color: var(--color-info-soft);
+    border: 1px solid var(--color-info-subtle);
+    @apply inline-flex items-center justify-center px-2.5 py-0.5 
+           rounded-full text-xs font-medium whitespace-nowrap 
+           text-accent-700 dark:text-accent-300;
   }
 
-  .btn-sm {
-    @apply px-4 py-2 text-xs;
-  }
-
-  .btn-lg {
-    @apply px-8 py-4 text-base;
-  }
-
-  /* Sidebar Styles */
+  /* Sidebar link - Flowbite style with standard Tailwind classes */
   .sidebar-link {
-    @apply flex items-center gap-3 px-4 py-3 text-sm text-gray-600 
-           rounded-lg transition-colors
-           hover:bg-primary-50 hover:text-primary-700;
+    @apply flex items-center p-2 text-gray-900 rounded-lg 
+           dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 
+           transition-colors;
   }
 
   .sidebar-link.active {
-    @apply bg-primary-100 text-primary-800 font-semibold;
+    @apply bg-gray-100 dark:bg-gray-700 font-semibold;
   }
 
-  .sidebar-section-title {
-    @apply px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider;
+  .sidebar-link svg {
+    @apply w-5 h-5 text-gray-500 dark:text-gray-400 transition-colors;
   }
 
-  /* Sidebar count badge - red circle like notification badge */
-  .sidebar-badge {
-    @apply inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-semibold text-white bg-red-600 rounded-full;
+  .sidebar-link:hover svg {
+    @apply text-gray-900 dark:text-white;
   }
 
-  /* Table Styles */
-  .table-header {
-    @apply text-xs font-semibold text-gray-500 uppercase tracking-wide;
-    background-color: #efece8;
+  /* Evaluation table - pass/fail row highlighting 
+     Used in fa_review.html and lot_review.html */
+  .eval-table {
+    @apply w-full text-sm text-left text-gray-500 dark:text-gray-400;
   }
 
-  /* Evaluation table styles */
-  .eval-table thead tr {
-    background-color: #efece8;
-  }
-
-  .eval-table:is(.dark *) thead tr,
-  .dark .eval-table thead tr {
-    background-color: #0a0a0a;
+  .eval-table thead {
+    @apply text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400;
   }
 
   .eval-table th {
-    @apply text-xs font-semibold text-gray-600 uppercase tracking-wide px-4 py-3;
-  }
-
-  .eval-table:is(.dark *) th,
-  .dark .eval-table th {
-    @apply text-gray-300;
+    @apply px-6 py-3;
   }
 
   .eval-table td {
-    @apply px-4 py-3;
+    @apply px-6 py-4;
   }
 
-  .eval-table:is(.dark *) td,
-  .dark .eval-table td {
-    @apply text-gray-300;
+  .eval-table tbody tr {
+    @apply bg-warm-white border-b dark:bg-gray-800 dark:border-gray-700;
   }
 
-  .table-row {
-    @apply hover:bg-white transition-colors;
-    border-bottom: 1px solid #efece8;
-  }
-
-  .table-cell {
-    @apply px-5 py-5 text-sm text-gray-700;
-  }
-
-  /* Striped table - apply to table element */
-  .table-striped tbody tr {
-    border-bottom: 1px solid #efece8;
-  }
-
-  .table-striped tbody tr:nth-child(even) {
-    background-color: #efece8;
-  }
-
-  .table-striped tbody tr:hover {
-    @apply bg-white;
-  }
-
-  /* Alert Components */
-  .alert {
-    @apply p-4 rounded-lg flex items-start gap-3;
-    border: 2px solid #efece8;
-  }
-
-  .alert-info {
-    @apply bg-info-50 border-info-200 text-info-800;
-  }
-
-  .alert-success {
-    @apply bg-success-50 border-success-200 text-success-800;
-  }
-
-  .alert-warning {
-    @apply bg-warning-50 border-warning-200 text-warning-800;
-  }
-
-  .alert-error {
-    @apply bg-error-50 border-error-200 text-error-800;
+  .eval-table tbody tr:hover {
+    @apply bg-gray-50 dark:bg-gray-600;
   }
 }
 
@@ -312,169 +211,7 @@
    UTILITIES LAYER - Custom Utilities
    ============================================ */
 @layer utilities {
-  /* Text utilities */
   .text-muted {
-    @apply text-gray-500;
-  }
-
-  .text-heading {
-    @apply font-heading text-gray-900;
-  }
-
-  /* Background utilities */
-  .bg-elevated {
-    @apply bg-cream-100;
-  }
-
-  /* Border utilities */
-  .border-theme {
-    border-color: #efece8;
-  }
-
-  /* Warm background for light mode - dark card for dark mode */
-  .bg-warm {
-    background-color: #efece8;
-  }
-
-  /* Warm border for light mode */
-  .border-warm {
-    border-color: #efece8;
-  }
-
-  /* Focus ring */
-  .focus-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
-  }
-
-  /* Truncate multiple lines */
-  .line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .line-clamp-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    @apply text-gray-500 dark:text-gray-400;
   }
 }
-
-/* ============================================
-   DARK MODE OVERRIDES
-   ============================================ */
-.dark {
-  body {
-    @apply text-gray-300;
-    background-color: #000000;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    @apply text-white;
-  }
-
-  a {
-    @apply text-accent-400 hover:text-accent-300;
-  }
-
-  .card {
-    background-color: #1f2121;
-    border-color: #2a2d2d;
-  }
-
-  .card-header {
-    @apply text-white;
-    border-color: #2a2d2d;
-  }
-
-  .stat-card {
-    background-color: #1f2121;
-    border-color: #2a2d2d;
-  }
-
-  .form-input, .form-select, .form-textarea {
-    @apply text-gray-200 focus:border-primary-500;
-    background-color: #000000;
-    border-color: #2a2d2d;
-  }
-
-  /* Native select, input, textarea elements */
-  select, input[type="text"], input[type="email"], input[type="password"], 
-  input[type="date"], input[type="number"], input[type="tel"], input[type="url"],
-  input[type="search"], textarea {
-    background-color: #000000;
-    @apply text-gray-200;
-    border-color: #2a2d2d;
-  }
-
-  .sidebar-link {
-    @apply text-gray-400 hover:text-white;
-  }
-
-  .sidebar-link:hover {
-    background-color: #1f2121;
-  }
-
-  .sidebar-link.active {
-    @apply text-primary-400;
-    background-color: #1f2121;
-  }
-
-  .table-header {
-    @apply text-gray-300;
-    background-color: #0a0a0a;
-  }
-
-  .table-row {
-    border-color: #2a2d2d;
-  }
-
-  .table-row:hover {
-    background-color: rgba(31, 33, 33, 0.5);
-  }
-
-  .table-cell {
-    @apply text-gray-300;
-  }
-
-  .table-striped tbody tr {
-    border-color: #2a2d2d;
-  }
-
-  .table-striped tbody tr:nth-child(even) {
-    background-color: #161818;
-  }
-
-  .table-striped tbody tr:hover {
-    background-color: #000000;
-  }
-
-  .text-muted {
-    @apply text-gray-500;
-  }
-
-  .bg-elevated {
-    background-color: #1f2121;
-  }
-
-  .border-theme {
-    border-color: #2a2d2d;
-  }
-
-  .bg-warm {
-    background-color: #0a0a0a;
-  }
-
-  .border-warm {
-    border-color: #2a2d2d;
-  }
-
-  /* Fix placeholder text color in dark mode */
-  input::placeholder,
-  textarea::placeholder {
-    @apply text-gray-500;
-  }
-}
-

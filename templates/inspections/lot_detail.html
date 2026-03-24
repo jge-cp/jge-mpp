@@ -18,39 +18,6 @@
         padding: 2px 8px;
         border-radius: 4px;
     }
-    .eval-table {
-        border-collapse: separate;
-        border-spacing: 0;
-        width: 100%;
-    }
-    .eval-table thead th {
-        padding: 0.5rem 0.75rem;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: #6b7280;
-        background-color: #efece8;
-        border-bottom: 1px solid #efece8;
-    }
-    .dark .eval-table thead th {
-        color: #d1d5db;
-        background-color: #0a0a0a;
-        border-bottom-color: #2a2d2d;
-    }
-    .eval-table tbody td {
-        padding: 0.5rem 0.75rem;
-        vertical-align: middle;
-        border-bottom: 1px solid #efece8;
-        font-size: 0.875rem;
-    }
-    .dark .eval-table tbody td {
-        border-bottom-color: #2a2d2d;
-        color: #d1d5db;
-    }
-    .eval-table tbody tr:last-child td {
-        border-bottom: none;
-    }
 </style>
 {% endblock %}
 
@@ -83,48 +50,48 @@
         <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
             <div>
                 <dt class="text-sm font-medium text-muted">Fabric Style</dt>
-                <dd class="mt-1 text-sm text-primary">{{ lot.fabric_style }}</dd>
+                <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ lot.fabric_style }}</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-muted">MultiCam Variant</dt>
-                <dd class="mt-1 text-sm text-primary">{{ lot.multicam_variant.camouflage_name }}</dd>
+                <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ lot.multicam_variant.camouflage_name }}</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-muted">Lot Number</dt>
-                <dd class="mt-1 text-sm text-primary font-semibold">{{ lot.lot_lot_number }}</dd>
+                <dd class="mt-1 text-sm text-gray-900 dark:text-white font-semibold">{{ lot.lot_lot_number }}</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-muted">Original First Article</dt>
                 <dd class="mt-1 text-sm">
-                    <a href="{% url 'inspections:fa_detail' lot.original_fa.fai_id %}" class="text-accent-600 hover:underline dark:text-accent-400">
+                    <a href="{% url 'inspections:fa_detail' lot.original_fa.fai_id %}" class="text-accent-500 hover:underline dark:text-accent-400">
                         {{ lot.original_fa.display_name }}
                     </a>
                 </dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-muted">Original FA Lot Number</dt>
-                <dd class="mt-1 text-sm text-primary">{{ lot.original_fa_lot_number }}</dd>
+                <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ lot.original_fa_lot_number }}</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-muted">Yards Printed</dt>
-                <dd class="mt-1 text-sm text-primary">{{ lot.number_of_yards_printed|floatformat:0 }}</dd>
+                <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ lot.number_of_yards_printed|floatformat:0 }}</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-muted">Number of Samples</dt>
-                <dd class="mt-1 text-sm text-primary">{{ lot.number_of_samples }}</dd>
+                <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ lot.number_of_samples }}</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-muted">Submission Date</dt>
-                <dd class="mt-1 text-sm text-primary">{{ lot.submission_date|date:"M d, Y" }}</dd>
+                <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ lot.submission_date|date:"M d, Y" }}</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-muted">Date of Printing</dt>
-                <dd class="mt-1 text-sm text-primary">{{ lot.date_of_printing|date:"M d, Y" }}</dd>
+                <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ lot.date_of_printing|date:"M d, Y" }}</dd>
             </div>
             {% if lot.submitter_full_name %}
             <div>
                 <dt class="text-sm font-medium text-muted">Submitted By</dt>
-                <dd class="mt-1 text-sm text-primary">{{ lot.submitter_full_name }}</dd>
+                <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ lot.submitter_full_name }}</dd>
             </div>
             {% endif %}
         </dl>
@@ -136,7 +103,7 @@
         <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Sample Numbers</h2>
         <div class="flex flex-wrap gap-2">
             {% for sample in lot.individual_sample_numbers.split %}
-            <span class="px-3 py-1 rounded-full text-sm bg-warm">{{ sample|cut:"," }}</span>
+            <span class="px-3 py-1 rounded-full text-sm bg-gray-100 dark:bg-gray-700">{{ sample|cut:"," }}</span>
             {% endfor %}
         </div>
     </div>
@@ -146,7 +113,7 @@
     {% if lot.status == 'approved' or lot.status == 'rejected' %}
     {% if evaluation %}
     <div class="card p-6 mb-6">
-        <h2 class="text-xl font-bold mb-4 border-b border-theme pb-2">
+        <h2 class="text-xl font-bold mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
             Evaluation Results
             {% if lot.status == 'approved' %}
                 <span class="ml-2 text-sm font-normal bg-green-600 text-white px-2 py-1 rounded">Approved</span>
@@ -155,13 +122,13 @@
             {% endif %}
         </h2>
         <div class="space-y-2 text-sm mb-4">
-            <p><span class="text-muted">Reviewed by:</span> <span class="text-primary">{{ evaluation.inspector.get_full_name|default:evaluation.inspector.username }}</span></p>
-            <p><span class="text-muted">Date:</span> <span class="text-primary">{{ evaluation.submitted_at|date:"M d, Y H:i" }}</span></p>
+            <p><span class="text-muted">Reviewed by:</span> <span class="text-gray-900 dark:text-white">{{ evaluation.inspector.get_full_name|default:evaluation.inspector.username }}</span></p>
+            <p><span class="text-muted">Date:</span> <span class="text-gray-900 dark:text-white">{{ evaluation.submitted_at|date:"M d, Y H:i" }}</span></p>
         </div>
 
         <!-- Per-Sample Evaluation Details -->
         {% for sample in sample_evaluations %}
-        <div class="mb-4 border border-theme rounded p-4">
+        <div class="mb-4 border border-gray-200 dark:border-gray-700 rounded p-4">
             <div class="flex items-center justify-between mb-3">
                 <h3 class="font-bold">Sample {{ sample.sample_number }}: {{ sample.sample_id }}</h3>
                 {% if sample.all_pass %}
@@ -171,7 +138,7 @@
                 {% endif %}
             </div>
             <details {% if not sample.all_pass %}open{% endif %}>
-                <summary class="cursor-pointer text-sm font-medium text-accent-600 dark:text-accent-400 hover:underline">View Sample Details</summary>
+                <summary class="cursor-pointer text-sm font-medium text-accent-500 dark:text-accent-400 hover:underline">View Sample Details</summary>
                 <div class="mt-3 space-y-4">
                     {% with eval=sample %}
                     {% include 'inspections/partials/_evaluation_detail_tables.html' %}

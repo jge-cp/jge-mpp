@@ -37,12 +37,12 @@
             
             <div id="fa-details" class="mb-6">
                 <template x-if="!faDetails">
-                    <div class="bg-elevated rounded-lg p-4 border border-theme">
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
                         <p class="text-sm text-muted">Select an approved First Article to see its details</p>
                     </div>
                 </template>
                 <template x-if="faDetails">
-                    <div class="bg-elevated rounded-lg p-4 border border-theme">
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
                         <h3 class="font-bold mb-3">Selected First Article Details</h3>
                         <div class="grid grid-cols-2 gap-4 text-sm">
                             <div>
@@ -98,7 +98,7 @@
                     <label class="form-label">
                         Number of Samples (auto-calculated)
                     </label>
-                    <div class="form-input bg-gray-100 dark:bg-dark-card cursor-not-allowed">
+                    <div class="form-input bg-gray-100 dark:bg-gray-800 cursor-not-allowed">
                         <span x-text="sampleCount || '--'"></span>
                         <span class="text-muted text-sm ml-2" x-show="sampleCount">samples required</span>
                     </div>
@@ -140,7 +140,7 @@
             <template x-if="sampleCount">
                 <div class="mb-6">
                     <label class="form-label">Samples</label>
-                    <div class="bg-elevated rounded-lg p-4 border border-theme">
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
                         <p class="text-sm text-muted mb-2">
                             <span x-text="sampleCount"></span> samples will be auto-generated when you submit.
                         </p>
@@ -153,7 +153,7 @@
             <div class="mb-6">
                 <label class="form-label">Supporting Documents</label>
                 <div class="flex items-center justify-center w-full">
-                    <label for="submission_documents" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer bg-cream-100 dark:bg-dark-card hover:bg-cream-200 dark:hover:bg-dark-elevated transition-colors border-warm">
+                    <label for="submission_documents" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border-gray-200 dark:border-gray-700">
                         <div class="flex flex-col items-center justify-center pt-5 pb-6">
                             <svg class="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>

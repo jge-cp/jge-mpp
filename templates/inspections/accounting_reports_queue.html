@@ -11,34 +11,34 @@
     
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div class="bg-white rounded-lg shadow p-4">
+        <div class="bg-warm-white rounded-lg shadow p-4">
             <p class="text-sm text-gray-500">Total Yardage</p>
-            <p class="text-2xl font-bold text-blue-600">{{ totals.total_yardage|floatformat:0 }}</p>
+            <p class="text-2xl font-bold text-accent-500">{{ totals.total_yardage|floatformat:0 }}</p>
         </div>
-        <div class="bg-white rounded-lg shadow p-4">
+        <div class="bg-warm-white rounded-lg shadow p-4">
             <p class="text-sm text-gray-500">Submitted</p>
             <p class="text-2xl font-bold text-yellow-600">{{ totals.submitted_count }}</p>
         </div>
-        <div class="bg-white rounded-lg shadow p-4">
+        <div class="bg-warm-white rounded-lg shadow p-4">
             <p class="text-sm text-gray-500">Reviewed</p>
-            <p class="text-2xl font-bold text-blue-600">{{ totals.reviewed_count }}</p>
+            <p class="text-2xl font-bold text-accent-500">{{ totals.reviewed_count }}</p>
         </div>
-        <div class="bg-white rounded-lg shadow p-4">
+        <div class="bg-warm-white rounded-lg shadow p-4">
             <p class="text-sm text-gray-500">Invoiced</p>
             <p class="text-2xl font-bold text-green-600">{{ totals.invoiced_count }}</p>
         </div>
     </div>
     
     <!-- Filters -->
-    <div class="bg-white rounded-lg shadow p-4 mb-6">
+    <div class="bg-warm-white rounded-lg shadow p-4 mb-6">
         <div class="flex flex-wrap gap-2">
-            <a href="?status=all" class="px-4 py-2 rounded {% if status_filter == 'all' %}bg-blue-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
+            <a href="?status=all" class="px-4 py-2 rounded {% if status_filter == 'all' %}bg-accent-500 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
                 All
             </a>
             <a href="?status=submitted" class="px-4 py-2 rounded {% if status_filter == 'submitted' %}bg-yellow-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
                 Submitted ({{ totals.submitted_count }})
             </a>
-            <a href="?status=reviewed" class="px-4 py-2 rounded {% if status_filter == 'reviewed' %}bg-blue-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
+            <a href="?status=reviewed" class="px-4 py-2 rounded {% if status_filter == 'reviewed' %}bg-accent-500 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
                 Reviewed ({{ totals.reviewed_count }})
             </a>
             <a href="?status=invoiced" class="px-4 py-2 rounded {% if status_filter == 'invoiced' %}bg-green-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
@@ -48,7 +48,7 @@
     </div>
     
     <!-- Reports Table -->
-    <div class="bg-white shadow overflow-hidden sm:rounded-md">
+    <div class="bg-warm-white shadow overflow-hidden sm:rounded-md">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
@@ -63,11 +63,11 @@
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody class="bg-warm-white divide-y divide-gray-200">
                 {% for report in reports %}
                     <tr class="hover:bg-gray-50 {% if report.status == 'submitted' %}bg-yellow-50{% endif %}">
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <a href="{% url 'inspections:accounting_review' report.report_id %}" class="text-blue-600 hover:underline font-medium">
+                            <a href="{% url 'inspections:accounting_review' report.report_id %}" class="text-accent-500 hover:underline font-medium">
                                 #{{ report.report_id }}
                             </a>
                         </td>
@@ -92,7 +92,7 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 py-1 text-xs rounded-full 
                                 {% if report.status == 'invoiced' %}bg-green-100 text-green-800
-                                {% elif report.status == 'reviewed' %}bg-blue-100 text-blue-800
+                                {% elif report.status == 'reviewed' %}bg-accent-100 text-accent-700
                                 {% else %}bg-yellow-100 text-yellow-800{% endif %}">
                                 {{ report.get_status_display }}
                             </span>
@@ -101,7 +101,7 @@
                             {{ report.invoice_reference|default:"-" }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <a href="{% url 'inspections:accounting_review' report.report_id %}" class="text-blue-600 hover:underline">
+                            <a href="{% url 'inspections:accounting_review' report.report_id %}" class="text-accent-500 hover:underline">
                                 Review
                             </a>
                         </td>

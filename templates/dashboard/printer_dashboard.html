@@ -5,7 +5,7 @@
 {% block content %}
 <div class="px-4 py-6">
     <!-- Header with Partner Badge and Info -->
-    <div class="bg-white rounded-lg shadow p-6 mb-8">
+    <div class="bg-warm-white rounded-lg shadow p-6 mb-8">
         <div class="flex items-start justify-between">
             <div class="flex items-center space-x-4">
                 <!-- Partner Level Badge -->
@@ -38,7 +38,7 @@
     <!-- Navigation Buttons - All 7 as per mockup -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         <!-- License Agreement -->
-        <a href="#" class="block bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg shadow p-4 transition-all transform hover:scale-105">
+        <a href="#" class="block bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white rounded-lg shadow p-4 transition-all transform hover:scale-105">
             <div class="flex items-center space-x-3">
                 <div class="bg-white/20 rounded-lg p-2">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,7 +50,7 @@
         </a>
         
         <!-- Technical Data MC -->
-        <a href="#" class="block bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg shadow p-4 transition-all transform hover:scale-105">
+        <a href="#" class="block bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white rounded-lg shadow p-4 transition-all transform hover:scale-105">
             <div class="flex items-center space-x-3">
                 <div class="bg-white/20 rounded-lg p-2">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -62,7 +62,7 @@
         </a>
         
         <!-- Approved MC Variants -->
-        <a href="#" class="block bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg shadow p-4 transition-all transform hover:scale-105">
+        <a href="#" class="block bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white rounded-lg shadow p-4 transition-all transform hover:scale-105">
             <div class="flex items-center space-x-3">
                 <div class="bg-white/20 rounded-lg p-2">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -74,7 +74,7 @@
         </a>
         
         <!-- First Article Inspection -->
-        <a href="{% url 'inspections:fa_submit' %}" class="block bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg shadow p-4 transition-all transform hover:scale-105">
+        <a href="{% url 'inspections:fa_submit' %}" class="block bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white rounded-lg shadow p-4 transition-all transform hover:scale-105">
             <div class="flex items-center space-x-3">
                 <div class="bg-white/20 rounded-lg p-2">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -86,7 +86,7 @@
         </a>
         
         <!-- Monthly Reporting -->
-        <a href="{% url 'inspections:report_submit' %}" class="block bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg shadow p-4 transition-all transform hover:scale-105">
+        <a href="{% url 'inspections:report_submit' %}" class="block bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white rounded-lg shadow p-4 transition-all transform hover:scale-105">
             <div class="flex items-center space-x-3">
                 <div class="bg-white/20 rounded-lg p-2">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -98,7 +98,7 @@
         </a>
         
         <!-- History FAI / Reporting -->
-        <a href="{% url 'inspections:report_list' %}" class="block bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg shadow p-4 transition-all transform hover:scale-105">
+        <a href="{% url 'inspections:report_list' %}" class="block bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white rounded-lg shadow p-4 transition-all transform hover:scale-105">
             <div class="flex items-center space-x-3">
                 <div class="bg-white/20 rounded-lg p-2">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -110,7 +110,7 @@
         </a>
         
         <!-- Consulting Raw Materials -->
-        <a href="#" class="block bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg shadow p-4 transition-all transform hover:scale-105 md:col-span-2">
+        <a href="#" class="block bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-600 hover:to-accent-700 text-white rounded-lg shadow p-4 transition-all transform hover:scale-105 md:col-span-2">
             <div class="flex items-center space-x-3">
                 <div class="bg-white/20 rounded-lg p-2">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -124,40 +124,40 @@
     
     <!-- Stats Cards -->
     <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
-        <div class="bg-white rounded-lg shadow p-4 text-center">
+        <div class="bg-warm-white rounded-lg shadow p-4 text-center">
             <p class="text-3xl font-bold text-yellow-600">{{ fa_stats.pending }}</p>
             <p class="text-xs text-gray-500">FA Pending</p>
         </div>
-        <div class="bg-white rounded-lg shadow p-4 text-center">
+        <div class="bg-warm-white rounded-lg shadow p-4 text-center">
             <p class="text-3xl font-bold text-green-600">{{ fa_stats.approved }}</p>
             <p class="text-xs text-gray-500">FA Approved</p>
         </div>
-        <div class="bg-white rounded-lg shadow p-4 text-center">
+        <div class="bg-warm-white rounded-lg shadow p-4 text-center">
             <p class="text-3xl font-bold text-red-600">{{ fa_stats.rejected }}</p>
             <p class="text-xs text-gray-500">FA Rejected</p>
         </div>
-        <div class="bg-white rounded-lg shadow p-4 text-center">
+        <div class="bg-warm-white rounded-lg shadow p-4 text-center">
             <p class="text-3xl font-bold text-yellow-600">{{ lot_stats.pending }}</p>
             <p class="text-xs text-gray-500">Lot Pending</p>
         </div>
-        <div class="bg-white rounded-lg shadow p-4 text-center">
+        <div class="bg-warm-white rounded-lg shadow p-4 text-center">
             <p class="text-3xl font-bold text-green-600">{{ lot_stats.approved }}</p>
             <p class="text-xs text-gray-500">Lot Approved</p>
         </div>
-        <div class="bg-white rounded-lg shadow p-4 text-center">
+        <div class="bg-warm-white rounded-lg shadow p-4 text-center">
             <p class="text-3xl font-bold text-red-600">{{ lot_stats.rejected }}</p>
             <p class="text-xs text-gray-500">Lot Rejected</p>
         </div>
     </div>
     
     <!-- Recent Activity -->
-    <div class="bg-white rounded-lg shadow p-6">
+    <div class="bg-warm-white rounded-lg shadow p-6">
         <h2 class="text-xl font-bold mb-4">Recent Activity</h2>
         <div class="space-y-3">
             {% for fa in recent_fas %}
                 <div class="flex items-center justify-between border-b pb-3">
                     <div>
-                        <a href="{% url 'inspections:fa_detail' fa.fai_id %}" class="text-blue-600 hover:underline font-medium">
+                        <a href="{% url 'inspections:fa_detail' fa.fai_id %}" class="text-accent-500 hover:underline font-medium">
                             {{ fa.display_name }}
                         </a>
                         <p class="text-sm text-gray-600">FA Lot #: {{ fa.fa_lot_number }}</p>
@@ -176,7 +176,7 @@
             {% for lot in recent_lots %}
                 <div class="flex items-center justify-between border-b pb-3">
                     <div>
-                        <a href="{% url 'inspections:lot_detail' lot.lot_id %}" class="text-blue-600 hover:underline font-medium">
+                        <a href="{% url 'inspections:lot_detail' lot.lot_id %}" class="text-accent-500 hover:underline font-medium">
                             {{ lot.display_name }}
                         </a>
                         <p class="text-sm text-gray-600">Lot #: {{ lot.lot_lot_number }} - {{ lot.number_of_yards_printed }} yds</p>

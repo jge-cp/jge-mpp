@@ -14,7 +14,7 @@
         </a>
     </div>
     
-    <div class="bg-white shadow overflow-hidden sm:rounded-md">
+    <div class="bg-warm-white shadow overflow-hidden sm:rounded-md">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
@@ -26,7 +26,7 @@
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody class="bg-warm-white divide-y divide-gray-200">
                 {% for article in articles %}
                     <tr class="hover:bg-gray-50">
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -50,7 +50,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                             {% with current_tds=article.tds_documents.filter|first %}
                                 {% if article.tds_documents.exists %}
-                                    <a href="{{ article.tds_documents.first.file.url }}" class="text-blue-600 hover:underline" target="_blank">
+                                    <a href="{{ article.tds_documents.first.file.url }}" class="text-accent-500 hover:underline" target="_blank">
                                         Download
                                     </a>
                                 {% else %}
@@ -72,7 +72,7 @@
                 {% empty %}
                     <tr>
                         <td colspan="6" class="px-6 py-4 text-center text-gray-500">
-                            No articles registered yet. <a href="{% url 'core:rm_new_article' %}" class="text-blue-600 hover:underline">Register your first article</a>.
+                            No articles registered yet. <a href="{% url 'core:rm_new_article' %}" class="text-accent-500 hover:underline">Register your first article</a>.
                         </td>
                     </tr>
                 {% endfor %}

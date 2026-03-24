@@ -13,190 +13,59 @@ module.exports = {
     'badge-active',
     'badge-in-progress',
     'badge-count',
-    'bg-warm',
-    'border-warm',
-    'dark:bg-dark-card',
-    'dark:bg-dark-bg',
-    'dark:border-dark-border',
-    'dark:hover:bg-dark-card',
-    'dark:hover:bg-dark-elevated',
   ],
   darkMode: 'class',
   theme: {
-    // Typography Scale with 18px base - readable minimum sizes
-    fontSize: {
-      'xs': ['14px', { lineHeight: '1.5' }],   // Was 10px - now readable
-      'sm': ['16px', { lineHeight: '1.5' }],   // Was 14px
-      'base': ['18px', { lineHeight: '1.6' }], // Base size
-      'lg': ['24px', { lineHeight: '1.35' }],  // Section headers
-      'xl': ['32px', { lineHeight: '1.2' }],   // Page headers
-      '2xl': ['48px', { lineHeight: '1.1' }],  // Hero text
-      '3xl': ['64px', { lineHeight: '1.05' }], // Large display
-      // Additional sizes
-      '2xs': ['12px', { lineHeight: '1.5' }],  // Tiny labels only
-      'md': ['20px', { lineHeight: '1.4' }],   // Between base and lg
-    },
     extend: {
       fontFamily: {
-        // Headers - Roboto Condensed
         'heading': ['"Roboto Condensed"', 'Arial Narrow', 'sans-serif'],
-        // Body copy - Roboto
         'body': ['Roboto', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        // Sans fallback
         'sans': ['Roboto', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       colors: {
-        // Multicam Brand Colors (from Flowbite theme generator)
-        brand: {
-          50: '#f8f7f7',
-          100: '#eeedec',
-          200: '#e0dcd7',
-          300: '#d2c6b6',
-          400: '#bdab93',
-          500: '#a88f71',
-          600: '#8e7657',
-          700: '#756148',
-          800: '#594936',
-          900: '#3f3427',
-          950: '#28221b',
-        },
-        // Primary uses brand colors
-        primary: {
-          50: '#f8f7f7',
-          100: '#eeedec',
-          200: '#e0dcd7',
-          300: '#d2c6b6',
-          400: '#bdab93',
-          500: '#a88f71',
-          600: '#8e7657',
-          700: '#756148',
-          800: '#594936',
-          900: '#3f3427',
-          950: '#28221b',
-        },
-        // Original Multicam palette for accents
-        multicam: {
-          sand: '#C4B396',
-          olive: '#5C5844',
-          brown: '#6B5C4A',
-          green: '#4A5442',
-          tan: '#D4C5A9',
-        },
-        // Status colors - full scales
-        success: {
-          50: '#ecfdf5',
-          100: '#d1fae5',
-          200: '#a7f3d0',
-          300: '#6ee7b7',
-          400: '#34d399',
-          500: '#10b981',
-          600: '#059669',
-          700: '#047857',
-          800: '#065f46',
-          900: '#064e3b',
-        },
-        warning: {
-          50: '#fffbeb',
-          100: '#fef3c7',
-          200: '#fde68a',
-          300: '#fcd34d',
-          400: '#fbbf24',
-          500: '#f59e0b',
-          600: '#d97706',
-          700: '#b45309',
-          800: '#92400e',
-          900: '#78350f',
-        },
-        error: {
-          50: '#fef2f2',
-          100: '#fee2e2',
-          200: '#fecaca',
-          300: '#fca5a5',
-          400: '#f87171',
-          500: '#ef4444',
-          600: '#dc2626',
-          700: '#b91c1c',
-          800: '#991b1b',
-          900: '#7f1d1d',
-        },
-        info: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
-        },
-        // Warm background color (INITIATE-style beige)
-        background: {
-          DEFAULT: '#E8E4DE',
-          light: '#F2EFEA',
-          dark: '#D9D4CC',
-        },
-        // Cream for cards
-        cream: {
-          DEFAULT: '#F5F3EF',
-          50: '#FDFCFB',
+        // Warm-gray scale — overrides Tailwind's cool gray everywhere
+        gray: {
+          50:  '#FAF9F7',
           100: '#F5F3EF',
-          200: '#EBE7E0',
+          200: '#E8E4DE',
+          300: '#D5CFC6',
+          400: '#A8A196',
+          500: '#857E73',
+          600: '#6B6459',
+          700: '#2A2520',
+          800: '#1A1714',
+          900: '#0F0D0B',
+          950: '#080706',
         },
-        // Border color - warm gray
-        border: {
-          DEFAULT: '#efece8',
-        },
-        // Stripe color for table rows
-        stripe: {
-          DEFAULT: '#efece8',
-        },
-        // Orange accent (INITIATE-style coral)
+        // Warm white for card/panel surfaces (inputs stay pure #fff)
+        'warm-white': '#FEFDFB',
+        // Vibrant orange accent (#FF6000) — primary action color
         accent: {
-          50: '#FEF3EE',
-          100: '#FCE4D8',
-          200: '#F9C6AF',
-          300: '#F5A07C',
-          400: '#F07347',
-          500: '#E84D1C',
-          600: '#D93D12',
-          700: '#B42E10',
-          800: '#902614',
-          900: '#742316',
+          50:  '#FFF4ED',
+          100: '#FFE4CC',
+          200: '#FFC999',
+          300: '#FFA366',
+          400: '#FF8133',
+          500: '#FF6000',
+          600: '#E65600',
+          700: '#BF4800',
+          800: '#993900',
+          900: '#732B00',
         },
-        // Dark mode specific colors
-        'dark-bg': '#000000',        // Pure black main background
-        'dark-card': '#1f2121',      // Slightly lighter for cards
-        'dark-border': '#2a2d2d',    // Border color
-        'dark-elevated': '#2a2d2d',  // Elevated elements
-      },
-      // Border radius - larger, more rounded (matching Flowbite theme)
-      borderRadius: {
-        'none': '0px',
-        'sm': '8px',
-        'DEFAULT': '16px',
-        'md': '16px',
-        'lg': '20px',
-        'xl': '24px',
-        '2xl': '32px',
-        '3xl': '40px',
-        'full': '9999px',
-      },
-      // Border width
-      borderWidth: {
-        'DEFAULT': '2px',
-        '0': '0px',
-        '1': '1px',
-        '2': '2px',
-        '3': '3px',
-        '4': '4px',
-      },
-      // Spacing adjustments
-      spacing: {
-        '18': '4.5rem',
-        '88': '22rem',
-        '128': '32rem',
+        // Multicam camo tones — used very sparingly for brand texture
+        camo: {
+          olive: '#5C5844',
+          green: '#4A5442',
+          sand:  '#C4B396',
+          tan:   '#D4C5A9',
+          brown: '#6B5C4A',
+        },
+        // Legacy brand scale (kept for backward compat, rarely used)
+        brand: {
+          50: '#f8f7f7', 100: '#eeedec', 200: '#e0dcd7', 300: '#d2c6b6',
+          400: '#bdab93', 500: '#a88f71', 600: '#8e7657', 700: '#756148',
+          800: '#594936', 900: '#3f3427', 950: '#28221b',
+        },
       },
     },
   },
@@ -204,4 +73,3 @@ module.exports = {
     require('flowbite/plugin')
   ],
 }
-

@@ -1,52 +1,52 @@
 {% load inspections_ui %}
 {% if kind == 'fa' %}
   {% fa_status_meta item mode as meta %}
-  <tr class="hover:bg-white dark:hover:bg-black transition-colors relative cursor-pointer">
-    <td class="px-5 py-5">
+  <tr class="relative cursor-pointer bg-warm-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-600">
+    <td class="border-t border-gray-200 dark:border-gray-700 px-6 py-4">
       <a href="{% url row_url item.fai_id %}" class="absolute inset-0" aria-label="Open {{ item.display_name }}"></a>
       <div class="font-medium text-gray-900 dark:text-white">{{ item.display_name }}</div>
     </td>
-    <td class="px-5 py-5 text-gray-500 dark:text-gray-400 whitespace-nowrap">
+    <td class="border-t border-gray-200 dark:border-gray-700 px-6 py-4 whitespace-nowrap">
       {{ item.multicam_variant.camouflage_name|default:"—" }}
     </td>
-    <td class="px-5 py-5 text-gray-500 dark:text-gray-400">
+    <td class="border-t border-gray-200 dark:border-gray-700 px-6 py-4">
       {% if item.company %}{{ item.company.name }}{% elif item.vendor %}{{ item.vendor.company_name }}{% else %}—{% endif %}
     </td>
-    <td class="px-5 py-5 text-gray-500 dark:text-gray-400">
+    <td class="border-t border-gray-200 dark:border-gray-700 px-6 py-4">
       <div class="truncate">{% if item.submitter_full_name %}{{ item.submitter_full_name }}{% elif item.vendor %}{{ item.vendor.user.get_full_name|default:item.vendor.user.username }}{% else %}—{% endif %}</div>
     </td>
-    <td class="px-5 py-5 text-gray-500 dark:text-gray-400 whitespace-nowrap">{{ item.submission_date|date:"M d, Y" }}</td>
-    <td class="px-5 py-5 w-[140px]">
+    <td class="border-t border-gray-200 dark:border-gray-700 px-6 py-4 whitespace-nowrap">{{ item.submission_date|date:"M d, Y" }}</td>
+    <td class="border-t border-gray-200 dark:border-gray-700 px-6 py-4 w-[140px]">
       <div class="w-full">
         <span class="badge {{ meta.badge_variant }}">{{ meta.badge_label }}</span>
         {% if meta.subtext %}
-          <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center">{{ meta.subtext }}</div>
+          <div class="text-xs mt-1 text-center text-gray-500 dark:text-gray-400">{{ meta.subtext }}</div>
         {% endif %}
       </div>
     </td>
   </tr>
 {% else %}
   {% lot_status_meta item mode as meta %}
-  <tr class="hover:bg-white dark:hover:bg-black transition-colors relative cursor-pointer">
-    <td class="px-5 py-5">
+  <tr class="relative cursor-pointer bg-warm-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-600">
+    <td class="border-t border-gray-200 dark:border-gray-700 px-6 py-4">
       <a href="{% url row_url item.lot_id %}" class="absolute inset-0" aria-label="Open {{ item.display_name }}"></a>
       <div class="font-medium text-gray-900 dark:text-white">{{ item.display_name }}</div>
     </td>
-    <td class="px-5 py-5 text-gray-500 dark:text-gray-400 whitespace-nowrap">
+    <td class="border-t border-gray-200 dark:border-gray-700 px-6 py-4 whitespace-nowrap">
       {{ item.original_fa.multicam_variant.camouflage_name|default:"—" }}
     </td>
-    <td class="px-5 py-5 text-gray-500 dark:text-gray-400">
+    <td class="border-t border-gray-200 dark:border-gray-700 px-6 py-4">
       {% if item.company %}{{ item.company.name }}{% elif item.vendor %}{{ item.vendor.company_name }}{% else %}—{% endif %}
     </td>
-    <td class="px-5 py-5 text-gray-500 dark:text-gray-400">
+    <td class="border-t border-gray-200 dark:border-gray-700 px-6 py-4">
       <div class="truncate">{% if item.submitter_full_name %}{{ item.submitter_full_name }}{% elif item.vendor %}{{ item.vendor.user.get_full_name|default:item.vendor.user.username }}{% else %}—{% endif %}</div>
     </td>
-    <td class="px-5 py-5 text-gray-500 dark:text-gray-400 whitespace-nowrap">{{ item.submission_date|date:"M d, Y" }}</td>
-    <td class="px-5 py-5 w-[140px]">
+    <td class="border-t border-gray-200 dark:border-gray-700 px-6 py-4 whitespace-nowrap">{{ item.submission_date|date:"M d, Y" }}</td>
+    <td class="border-t border-gray-200 dark:border-gray-700 px-6 py-4 w-[140px]">
       <div class="w-full">
         <span class="badge {{ meta.badge_variant }}">{{ meta.badge_label }}</span>
         {% if meta.subtext %}
-          <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 text-center">{{ meta.subtext }}</div>
+          <div class="text-xs mt-1 text-center text-gray-500 dark:text-gray-400">{{ meta.subtext }}</div>
         {% endif %}
       </div>
     </td>

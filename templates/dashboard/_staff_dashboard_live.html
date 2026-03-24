@@ -2,20 +2,20 @@
 
 <!-- High-Level Summary Stats Cards -->
 <div class="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-    <div class="rounded-2xl p-5 text-center" style="background-color: #fffbeb;">
-        <p class="font-heading font-bold text-gray-900" style="font-size: 3rem;">{{ fa_stats.approved }}</p>
-        <p class="text-base font-heading font-medium text-gray-700 mt-1">Approved FAs</p>
+    <div class="rounded-lg p-5 text-center bg-yellow-50 dark:bg-yellow-900/20">
+        <p class="font-heading font-bold text-5xl text-gray-900 dark:text-white">{{ fa_stats.approved }}</p>
+        <p class="text-base font-heading font-medium mt-1 text-gray-700 dark:text-gray-300">Approved FAs</p>
     </div>
-    <div class="rounded-2xl p-5 text-center" style="background-color: #fffbeb;">
-        <p class="font-heading font-bold text-gray-900" style="font-size: 3rem;">{{ lot_stats.approved }}</p>
-        <p class="text-base font-heading font-medium text-gray-700 mt-1">Approved Lots</p>
+    <div class="rounded-lg p-5 text-center bg-yellow-50 dark:bg-yellow-900/20">
+        <p class="font-heading font-bold text-5xl text-gray-900 dark:text-white">{{ lot_stats.approved }}</p>
+        <p class="text-base font-heading font-medium mt-1 text-gray-700 dark:text-gray-300">Approved Lots</p>
     </div>
-    <div class="bg-accent-500 rounded-2xl p-5 text-center">
-        <p class="font-heading font-bold text-white" style="font-size: 3rem;">{{ summary.active_partners }}</p>
+    <div class="rounded-lg p-5 text-center bg-camo-green">
+        <p class="font-heading font-bold text-5xl text-white">{{ summary.active_partners }}</p>
         <p class="text-base font-heading font-medium text-white/90 mt-1">Active Partners</p>
     </div>
-    <div class="bg-accent-500 rounded-2xl p-5 text-center">
-        <p class="font-heading font-bold text-white" style="font-size: 3rem;">{{ total_yardage|floatformat:0 }}</p>
+    <div class="rounded-lg p-5 text-center bg-camo-olive">
+        <p class="font-heading font-bold text-5xl text-white">{{ total_yardage|floatformat:0 }}</p>
         <p class="text-base font-heading font-medium text-white/90 mt-1">Total Yardage</p>
     </div>
 </div>
@@ -25,31 +25,31 @@
     <!-- Recent First Article Submissions -->
     <div class="card p-5">
         <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-bold font-heading">Recent First Articles</h2>
-            <a href="{% url 'inspections:fa_list' %}" class="text-sm text-accent-600 hover:text-accent-700">View all →</a>
+            <h2 class="text-lg font-bold font-heading text-gray-900 dark:text-white">Recent First Articles</h2>
+            <a href="{% url 'inspections:fa_list' %}" class="text-sm hover:underline text-accent-500 dark:text-accent-400">View all →</a>
         </div>
         <div class="space-y-3">
             {% for fa in recent_fas %}
                 {% load inspections_ui %}
                 {% fa_status_meta fa "dashboard" as meta %}
                 <a href="{% url 'inspections:fa_detail' fa.fai_id %}" class="block group">
-                    <div class="flex items-center justify-between p-3 rounded-lg border border-theme bg-cream-100 dark:bg-dark-card hover:shadow-sm transition-all">
+                    <div class="flex items-center justify-between p-3 rounded-lg transition-all hover:shadow-sm bg-gray-50 border border-gray-200 dark:bg-gray-700 dark:border-gray-600">
                         <div class="min-w-0 flex-1 mr-4">
-                            <p class="font-medium truncate group-hover:text-accent-600">{{ fa.display_name }}</p>
-                            <p class="text-sm text-muted">{% if fa.company %}{{ fa.company.name }}{% elif fa.vendor %}{{ fa.vendor.company_name }}{% else %}—{% endif %}</p>
+                            <p class="font-medium truncate text-gray-900 dark:text-white">{{ fa.display_name }}</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">{% if fa.company %}{{ fa.company.name }}{% elif fa.vendor %}{{ fa.vendor.company_name }}{% else %}—{% endif %}</p>
                         </div>
                         <div class="text-right flex-shrink-0">
                             <span class="badge {{ meta.badge_variant }}">{{ meta.badge_label }}</span>
                             {% if meta.subtext %}
                                 <p class="text-xs {{ meta.subtext_class }} mt-1">{{ meta.subtext }}</p>
                             {% else %}
-                                <p class="text-xs text-muted mt-1">{{ fa.submission_date|date:"M d" }}</p>
+                                <p class="text-xs mt-1 text-gray-500 dark:text-gray-400">{{ fa.submission_date|date:"M d" }}</p>
                             {% endif %}
                         </div>
                     </div>
                 </a>
             {% empty %}
-                <p class="text-muted text-center py-4">No recent activity</p>
+                <p class="text-center py-4 text-gray-500 dark:text-gray-400">No recent activity</p>
             {% endfor %}
         </div>
     </div>
@@ -57,27 +57,27 @@
     <!-- Recent Lot Submissions -->
     <div class="card p-5">
         <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-bold font-heading">Recent Lots</h2>
-            <a href="{% url 'inspections:lot_list' %}" class="text-sm text-accent-600 hover:text-accent-700">View all →</a>
+            <h2 class="text-lg font-bold font-heading text-gray-900 dark:text-white">Recent Lots</h2>
+            <a href="{% url 'inspections:lot_list' %}" class="text-sm hover:underline text-accent-500 dark:text-accent-400">View all →</a>
         </div>
         <div class="space-y-3">
             {% for lot in recent_lots %}
                 {% load inspections_ui %}
                 {% lot_status_meta lot "dashboard" as meta %}
                 <a href="{% url 'inspections:lot_detail' lot.lot_id %}" class="block group">
-                    <div class="flex items-center justify-between p-3 rounded-lg border border-theme bg-cream-100 dark:bg-dark-card hover:shadow-sm transition-all">
+                    <div class="flex items-center justify-between p-3 rounded-lg transition-all hover:shadow-sm bg-gray-50 border border-gray-200 dark:bg-gray-700 dark:border-gray-600">
                         <div class="min-w-0 flex-1 mr-4">
-                            <p class="font-medium truncate group-hover:text-accent-600">{{ lot.display_name }}</p>
-                            <p class="text-sm text-muted">{% if lot.company %}{{ lot.company.name }}{% elif lot.vendor %}{{ lot.vendor.company_name }}{% else %}—{% endif %}</p>
+                            <p class="font-medium truncate text-gray-900 dark:text-white">{{ lot.display_name }}</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">{% if lot.company %}{{ lot.company.name }}{% elif lot.vendor %}{{ lot.vendor.company_name }}{% else %}—{% endif %}</p>
                         </div>
                         <div class="text-right flex-shrink-0">
                             <span class="badge {{ meta.badge_variant }}">{{ meta.badge_label }}</span>
-                            <p class="text-xs text-muted mt-1">{{ lot.submission_date|date:"M d" }}</p>
+                            <p class="text-xs mt-1 text-gray-500 dark:text-gray-400">{{ lot.submission_date|date:"M d" }}</p>
                         </div>
                     </div>
                 </a>
             {% empty %}
-                <p class="text-muted text-center py-4">No recent activity</p>
+                <p class="text-center py-4 text-gray-500 dark:text-gray-400">No recent activity</p>
             {% endfor %}
         </div>
     </div>
@@ -87,152 +87,152 @@
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
     <!-- First Article Statistics Chart -->
     <div class="card p-5">
-        <h2 class="text-lg font-bold font-heading mb-4">First Article Statistics</h2>
+        <h2 class="text-lg font-bold font-heading mb-4 text-gray-900 dark:text-white">First Article Statistics</h2>
         <div class="flex items-center gap-6">
             <div id="fa-chart" class="w-48 h-48"></div>
             <div class="flex-1 space-y-3">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full" style="background-color: #e3d39c;"></span>
-                        <span class="text-sm">Pending Primary</span>
+                        <span class="w-3 h-3 rounded-full bg-camo-tan"></span>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">Pending Primary</span>
                     </div>
-                    <span class="font-bold">{{ fa_stats.pending }}</span>
+                    <span class="font-bold text-gray-900 dark:text-white">{{ fa_stats.pending }}</span>
                 </div>
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full" style="background-color: #dd8a4e;"></span>
-                        <span class="text-sm">Pending Final</span>
+                        <span class="w-3 h-3 rounded-full bg-accent-500"></span>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">Pending Final</span>
                     </div>
-                    <span class="font-bold">{{ fa_stats.pending_final }}</span>
+                    <span class="font-bold text-gray-900 dark:text-white">{{ fa_stats.pending_final }}</span>
                 </div>
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-green-600"></span>
-                        <span class="text-sm">Approved</span>
+                        <span class="w-3 h-3 rounded-full bg-camo-green"></span>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">Approved</span>
                     </div>
-                    <span class="font-bold">{{ fa_stats.approved }}</span>
+                    <span class="font-bold text-gray-900 dark:text-white">{{ fa_stats.approved }}</span>
                 </div>
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-red-600"></span>
-                        <span class="text-sm">Rejected</span>
+                        <span class="w-3 h-3 rounded-full" style="background-color:#A63D2B"></span>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">Rejected</span>
                     </div>
-                    <span class="font-bold">{{ fa_stats.rejected|default:0 }}</span>
+                    <span class="font-bold text-gray-900 dark:text-white">{{ fa_stats.rejected|default:0 }}</span>
                 </div>
             </div>
         </div>
-        <div class="pt-4 mt-4 border-t border-theme space-y-2">
+        <div class="pt-4 mt-4 space-y-2 border-t border-gray-200 dark:border-gray-700">
             <div class="flex justify-between text-sm">
-                <span class="text-muted">This Month:</span>
-                <span class="font-medium">{{ fa_stats.this_month }} submitted</span>
+                <span class="text-gray-500 dark:text-gray-400">This Month:</span>
+                <span class="font-medium text-gray-700 dark:text-gray-300">{{ fa_stats.this_month }} submitted</span>
             </div>
             <div class="flex justify-between text-sm">
-                <span class="text-muted">This Quarter:</span>
-                <span class="font-medium">{{ fa_stats.this_quarter }} submitted</span>
+                <span class="text-gray-500 dark:text-gray-400">This Quarter:</span>
+                <span class="font-medium text-gray-700 dark:text-gray-300">{{ fa_stats.this_quarter }} submitted</span>
             </div>
             <div class="flex justify-between text-sm">
-                <span class="text-muted">This Year:</span>
-                <span class="font-medium">{{ fa_stats.this_year }} submitted</span>
+                <span class="text-gray-500 dark:text-gray-400">This Year:</span>
+                <span class="font-medium text-gray-700 dark:text-gray-300">{{ fa_stats.this_year }} submitted</span>
             </div>
             <div class="flex justify-between text-sm">
-                <span class="text-muted">Approval Rate:</span>
-                <span class="font-medium">{{ fa_stats.approval_rate }}%</span>
+                <span class="text-gray-500 dark:text-gray-400">Approval Rate:</span>
+                <span class="font-medium text-gray-700 dark:text-gray-300">{{ fa_stats.approval_rate }}%</span>
             </div>
         </div>
     </div>
 
     <!-- Lot Statistics Chart -->
     <div class="card p-5">
-        <h2 class="text-lg font-bold font-heading mb-4">Lot Statistics</h2>
+        <h2 class="text-lg font-bold font-heading mb-4 text-gray-900 dark:text-white">Lot Statistics</h2>
         <div class="flex items-center gap-6">
             <div id="lot-chart" class="w-48 h-48"></div>
             <div class="flex-1 space-y-3">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full" style="background-color: #e3d39c;"></span>
-                        <span class="text-sm">Pending Review</span>
+                        <span class="w-3 h-3 rounded-full bg-camo-tan"></span>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">Pending Review</span>
                     </div>
-                    <span class="font-bold">{{ lot_stats.pending }}</span>
+                    <span class="font-bold text-gray-900 dark:text-white">{{ lot_stats.pending }}</span>
                 </div>
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-green-600"></span>
-                        <span class="text-sm">Approved</span>
+                        <span class="w-3 h-3 rounded-full bg-camo-green"></span>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">Approved</span>
                     </div>
-                    <span class="font-bold">{{ lot_stats.approved }}</span>
+                    <span class="font-bold text-gray-900 dark:text-white">{{ lot_stats.approved }}</span>
                 </div>
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-full bg-red-600"></span>
-                        <span class="text-sm">Rejected</span>
+                        <span class="w-3 h-3 rounded-full" style="background-color:#A63D2B"></span>
+                        <span class="text-sm text-gray-700 dark:text-gray-300">Rejected</span>
                     </div>
-                    <span class="font-bold">{{ lot_stats.rejected }}</span>
+                    <span class="font-bold text-gray-900 dark:text-white">{{ lot_stats.rejected }}</span>
                 </div>
             </div>
         </div>
-        <div class="pt-4 mt-4 border-t border-theme space-y-2">
+        <div class="pt-4 mt-4 space-y-2 border-t border-gray-200 dark:border-gray-700">
             <div class="flex justify-between text-sm">
-                <span class="text-muted">This Month:</span>
-                <span class="font-medium">{{ lot_stats.this_month }} submitted</span>
+                <span class="text-gray-500 dark:text-gray-400">This Month:</span>
+                <span class="font-medium text-gray-700 dark:text-gray-300">{{ lot_stats.this_month }} submitted</span>
             </div>
             <div class="flex justify-between text-sm">
-                <span class="text-muted">This Quarter:</span>
-                <span class="font-medium">{{ lot_stats.this_quarter }} submitted</span>
+                <span class="text-gray-500 dark:text-gray-400">This Quarter:</span>
+                <span class="font-medium text-gray-700 dark:text-gray-300">{{ lot_stats.this_quarter }} submitted</span>
             </div>
             <div class="flex justify-between text-sm">
-                <span class="text-muted">This Year:</span>
-                <span class="font-medium">{{ lot_stats.this_year }} submitted</span>
+                <span class="text-gray-500 dark:text-gray-400">This Year:</span>
+                <span class="font-medium text-gray-700 dark:text-gray-300">{{ lot_stats.this_year }} submitted</span>
             </div>
             <div class="flex justify-between text-sm">
-                <span class="text-muted">Approval Rate:</span>
-                <span class="font-medium">{{ lot_stats.approval_rate }}%</span>
+                <span class="text-gray-500 dark:text-gray-400">Approval Rate:</span>
+                <span class="font-medium text-gray-700 dark:text-gray-300">{{ lot_stats.approval_rate }}%</span>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Production Volume - Clean, no gradients -->
+<!-- Production Volume -->
 <div class="card p-5 mb-6">
-    <h2 class="text-lg font-bold font-heading mb-4">Production Volume</h2>
+    <h2 class="text-lg font-bold font-heading mb-4 text-gray-900 dark:text-white">Production Volume</h2>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="text-center p-5 bg-cream-100 dark:bg-dark-card rounded-xl border border-theme">
-            <p class="text-4xl font-heading font-bold text-foreground">{{ total_yardage|floatformat:0 }}</p>
-            <p class="text-sm text-muted mt-2">Total Yardage (All Time)</p>
+        <div class="text-center p-5 rounded-xl bg-gray-50 border border-gray-200 dark:bg-gray-700 dark:border-gray-600">
+            <p class="text-4xl font-heading font-bold text-gray-900 dark:text-white">{{ total_yardage|floatformat:0 }}</p>
+            <p class="text-sm mt-2 text-gray-500 dark:text-gray-400">Total Yardage (All Time)</p>
         </div>
-        <div class="text-center p-5 bg-cream-100 dark:bg-dark-card rounded-xl border border-theme">
-            <p class="text-4xl font-heading font-bold text-foreground">{{ yardage_this_month|floatformat:0 }}</p>
-            <p class="text-sm text-muted mt-2">This Month</p>
+        <div class="text-center p-5 rounded-xl bg-gray-50 border border-gray-200 dark:bg-gray-700 dark:border-gray-600">
+            <p class="text-4xl font-heading font-bold text-gray-900 dark:text-white">{{ yardage_this_month|floatformat:0 }}</p>
+            <p class="text-sm mt-2 text-gray-500 dark:text-gray-400">This Month</p>
         </div>
-        <div class="text-center p-5 bg-cream-100 dark:bg-dark-card rounded-xl border border-theme">
-            <p class="text-4xl font-heading font-bold text-foreground">{{ yardage_this_year|floatformat:0 }}</p>
-            <p class="text-sm text-muted mt-2">This Year</p>
+        <div class="text-center p-5 rounded-xl bg-gray-50 border border-gray-200 dark:bg-gray-700 dark:border-gray-600">
+            <p class="text-4xl font-heading font-bold text-gray-900 dark:text-white">{{ yardage_this_year|floatformat:0 }}</p>
+            <p class="text-sm mt-2 text-gray-500 dark:text-gray-400">This Year</p>
         </div>
     </div>
 </div>
 
 <!-- Monthly Trends Chart -->
 <div class="card p-5 mb-6">
-    <h2 class="text-lg font-bold font-heading mb-4">Monthly Trends (Last 6 Months)</h2>
+    <h2 class="text-lg font-bold font-heading mb-4 text-gray-900 dark:text-white">Monthly Trends (Last 6 Months)</h2>
     <div id="trends-chart" class="w-full h-72"></div>
 </div>
 
-<!-- Top Partners by Volume - Full Width -->
+<!-- Top Partners by Volume -->
 <div class="card p-5 mb-6">
-    <h2 class="text-lg font-bold font-heading mb-4">Top Partners by Volume</h2>
+    <h2 class="text-lg font-bold font-heading mb-4 text-gray-900 dark:text-white">Top Partners by Volume</h2>
     <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
         {% for partner in top_partners %}
-            <div class="flex items-center justify-between p-4 rounded-xl bg-cream-100 dark:bg-dark-card border border-theme">
+            <div class="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-200 dark:bg-gray-700 dark:border-gray-600">
                 <div>
-                    <p class="font-medium">{{ partner.company_name }}</p>
-                    <p class="text-sm text-muted">{{ partner.approved_fas }} approved FAs</p>
+                    <p class="font-medium text-gray-900 dark:text-white">{{ partner.company_name }}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ partner.approved_fas }} approved FAs</p>
                 </div>
                 <div class="text-right">
-                    <p class="text-2xl font-bold text-accent-600">{{ partner.lot_count }}</p>
-                    <p class="text-xs text-muted">total lots</p>
+                    <p class="text-2xl font-bold text-accent-500 dark:text-accent-400">{{ partner.lot_count }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">total lots</p>
                 </div>
             </div>
         {% empty %}
-            <p class="text-muted text-center py-4 col-span-4">No partners yet</p>
+            <p class="text-center py-4 col-span-4 text-gray-500 dark:text-gray-400">No partners yet</p>
         {% endfor %}
     </div>
 </div>
@@ -240,36 +240,36 @@
 <!-- All Partners List -->
 <div class="card p-5">
     <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-bold font-heading">All Partners</h2>
+        <h2 class="text-lg font-bold font-heading text-gray-900 dark:text-white">All Partners</h2>
     </div>
     <div class="overflow-x-auto">
         <table class="min-w-full">
             <thead>
-                <tr>
-                    <th class="text-left py-3 px-4">Company</th>
-                    <th class="text-center py-3 px-4">Status</th>
-                    <th class="text-center py-3 px-4">First Articles</th>
-                    <th class="text-center py-3 px-4">Lots</th>
+                <tr class="border-b border-gray-200 dark:border-gray-700">
+                    <th class="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Company</th>
+                    <th class="text-center py-3 px-4 font-medium text-gray-900 dark:text-white">Status</th>
+                    <th class="text-center py-3 px-4 font-medium text-gray-900 dark:text-white">First Articles</th>
+                    <th class="text-center py-3 px-4 font-medium text-gray-900 dark:text-white">Lots</th>
                 </tr>
             </thead>
             <tbody>
                 {% for partner in all_partners %}
-                    <tr>
+                    <tr class="border-b border-gray-200 dark:border-gray-700">
                         <td class="py-3 px-4">
-                            <p class="font-medium">{{ partner.company_name }}</p>
-                            <p class="text-sm text-muted">{{ partner.technical_email }}</p>
+                            <p class="font-medium text-gray-900 dark:text-white">{{ partner.company_name }}</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">{{ partner.technical_email }}</p>
                         </td>
                         <td class="text-center py-3 px-4">
                             <span class="badge {% if partner.status == 'active' %}badge-approved{% else %}badge-pending{% endif %}">
                                 {{ partner.get_status_display }}
                             </span>
                         </td>
-                        <td class="text-center py-3 px-4">{{ partner.fa_count }}</td>
-                        <td class="text-center py-3 px-4">{{ partner.lot_count }}</td>
+                        <td class="text-center py-3 px-4 text-gray-700 dark:text-gray-300">{{ partner.fa_count }}</td>
+                        <td class="text-center py-3 px-4 text-gray-700 dark:text-gray-300">{{ partner.lot_count }}</td>
                     </tr>
                 {% empty %}
                     <tr>
-                        <td colspan="4" class="text-center py-8 text-muted">No partners yet</td>
+                        <td colspan="4" class="text-center py-8 text-gray-500 dark:text-gray-400">No partners yet</td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -280,12 +280,9 @@
 <!-- ApexCharts Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
-// Store chart instances for cleanup
 window.dashboardCharts = window.dashboardCharts || {};
 
-// Initialize charts function - called on load and after HTMX swaps
 function initDashboardCharts() {
-    // Destroy existing charts first to prevent duplicates
     Object.keys(window.dashboardCharts).forEach(key => {
         if (window.dashboardCharts[key]) {
             window.dashboardCharts[key].destroy();
@@ -293,23 +290,21 @@ function initDashboardCharts() {
         }
     });
     
-    // Check if dark mode is enabled
     const isDark = document.documentElement.classList.contains('dark') || 
                    localStorage.getItem('color-theme') === 'dark';
     
-    // Use app design system colors (same as badges)
     const chartColors = {
-        pending: '#e3d39c',      // Awaiting Primary yellow (matches badge-pending filled)
-        pendingFinal: '#dd8a4e', // Awaiting Final orange (matches badge-pending-final)
-        approved: '#16a34a',     // green-600 (matches badge-approved)
-        rejected: '#dc2626',     // red-600 (matches badge-rejected)
-        accent: '#E84D1C',       // accent-500 (for trends chart)
-        brand: '#756148',        // brand-700 (for trends chart)
-        text: isDark ? '#d1d5db' : '#374151',
-        background: isDark ? '#1f2121' : '#F5F3EF'
+        pending: '#D4C5A9',
+        pendingFinal: '#FF6000',
+        approved: '#4A5442',
+        rejected: '#A63D2B',
+        accent: '#FF6000',
+        sand: '#C4B396',
+        olive: '#5C5844',
+        text: isDark ? '#D5CFC6' : '#504A41',
+        background: isDark ? '#1A1714' : '#FAF9F7'
     };
     
-    // FA Donut Chart
     const faChartEl = document.querySelector("#fa-chart");
     if (faChartEl) {
         const faOptions = {
@@ -356,7 +351,6 @@ function initDashboardCharts() {
         window.dashboardCharts.fa.render();
     }
     
-    // Lot Donut Chart
     const lotChartEl = document.querySelector("#lot-chart");
     if (lotChartEl) {
         const lotOptions = {
@@ -403,7 +397,6 @@ function initDashboardCharts() {
         window.dashboardCharts.lot.render();
     }
     
-    // Monthly Trends Bar Chart
     const trendsChartEl = document.querySelector("#trends-chart");
     if (trendsChartEl) {
         const trendsOptions = {
@@ -433,7 +426,7 @@ function initDashboardCharts() {
                 fontFamily: 'Roboto, sans-serif',
                 animations: { enabled: false }
             },
-            colors: [chartColors.accent, chartColors.brand, chartColors.approved, '#0d9488'],
+            colors: [chartColors.accent, chartColors.sand, chartColors.approved, chartColors.olive],
             plotOptions: {
                 bar: {
                     horizontal: false,
@@ -451,8 +444,8 @@ function initDashboardCharts() {
                         fontSize: '12px'
                     }
                 },
-                axisBorder: { color: isDark ? '#2a2d2d' : '#efece8' },
-                axisTicks: { color: isDark ? '#2a2d2d' : '#efece8' }
+                axisBorder: { color: isDark ? '#2A2520' : '#E8E4DE' },
+                axisTicks: { color: isDark ? '#2A2520' : '#E8E4DE' }
             },
             yaxis: {
                 labels: {
@@ -463,7 +456,7 @@ function initDashboardCharts() {
                 }
             },
             grid: {
-                borderColor: isDark ? '#2a2d2d' : '#efece8',
+                borderColor: isDark ? '#2A2520' : '#E8E4DE',
                 strokeDashArray: 4
             },
             legend: {
@@ -480,19 +473,51 @@ function initDashboardCharts() {
     }
 }
 
-// Initialize on first load
 if (typeof ApexCharts !== 'undefined') {
     initDashboardCharts();
 } else {
-    // Wait for ApexCharts to load
     document.addEventListener('DOMContentLoaded', initDashboardCharts);
 }
 
-// Re-initialize after HTMX swaps (when polling refreshes the content)
 document.body.addEventListener('htmx:afterSwap', function(event) {
     if (event.detail.target.id === 'staff-dashboard-live') {
-        // Small delay to ensure DOM is ready
         setTimeout(initDashboardCharts, 50);
     }
 });
+
+function getThemeColors() {
+    const isDark = document.documentElement.classList.contains('dark');
+    return {
+        text: isDark ? '#D5CFC6' : '#504A41',
+        border: isDark ? '#2A2520' : '#E8E4DE',
+        tooltip: isDark ? 'dark' : 'light'
+    };
+}
+
+function updateChartsTheme() {
+    const tc = getThemeColors();
+    const labelStyle = { colors: tc.text, fontSize: '12px' };
+
+    Object.keys(window.dashboardCharts).forEach(key => {
+        const chart = window.dashboardCharts[key];
+        if (!chart) return;
+
+        const opts = { tooltip: { theme: tc.tooltip } };
+
+        if (key === 'trends') {
+            opts.xaxis = { labels: { style: labelStyle }, axisBorder: { color: tc.border }, axisTicks: { color: tc.border } };
+            opts.yaxis = { labels: { style: labelStyle } };
+            opts.grid = { borderColor: tc.border, strokeDashArray: 4 };
+            opts.legend = { labels: { colors: tc.text } };
+        } else {
+            opts.plotOptions = { pie: { donut: { labels: { total: { color: tc.text } } } } };
+        }
+
+        chart.updateOptions(opts, false, false);
+    });
+}
+
+new MutationObserver(function() {
+    updateChartsTheme();
+}).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 </script>

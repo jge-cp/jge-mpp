@@ -7,17 +7,17 @@
     <div class="flex justify-between items-start mb-6">
         <div>
             <h1 class="text-3xl font-bold font-heading text-gray-900 dark:text-white">Files</h1>
-            <p class="text-muted mt-1">Documents and resources for your account</p>
+            <p class="mt-1 text-gray-500 dark:text-gray-400">Documents and resources for your account</p>
         </div>
     </div>
 
     {% if not company %}
-    <div class="card p-6">
-        <p class="text-muted">Your account is not linked to a partner company. Please contact an administrator.</p>
+    <div class="p-6 rounded-lg shadow-sm bg-warm-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+        <p class="text-gray-500 dark:text-gray-400">Your account is not linked to a partner company. Please contact an administrator.</p>
     </div>
     {% elif not company.is_standard and not company.is_narrow %}
-    <div class="card p-6">
-        <p class="text-muted">Your company has not yet been assigned a partner category. Please contact an administrator to set up access.</p>
+    <div class="p-6 rounded-lg shadow-sm bg-warm-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+        <p class="text-gray-500 dark:text-gray-400">Your company has not yet been assigned a partner category. Please contact an administrator to set up access.</p>
     </div>
     {% else %}
 
@@ -25,15 +25,15 @@
     {% if company.is_standard and company.is_narrow %}
     <div class="flex gap-2 mb-6">
         <a href="{% url 'dashboard:partner_files' %}"
-           class="px-4 py-2 text-sm font-medium rounded-lg transition-colors {% if not category_filter %}bg-accent-600 text-white{% else %}bg-warm text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-dark-elevated{% endif %}">
+           class="px-4 py-2 text-sm font-medium rounded-lg transition-colors {% if not category_filter %}bg-accent-500 text-white{% else %}bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}">
             All Files
         </a>
         <a href="{% url 'dashboard:partner_files' %}?category=standard"
-           class="px-4 py-2 text-sm font-medium rounded-lg transition-colors {% if category_filter == 'standard' %}bg-accent-600 text-white{% else %}bg-warm text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-dark-elevated{% endif %}">
+           class="px-4 py-2 text-sm font-medium rounded-lg transition-colors {% if category_filter == 'standard' %}bg-accent-500 text-white{% else %}bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}">
             Standard
         </a>
         <a href="{% url 'dashboard:partner_files' %}?category=narrow"
-           class="px-4 py-2 text-sm font-medium rounded-lg transition-colors {% if category_filter == 'narrow' %}bg-accent-600 text-white{% else %}bg-warm text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-dark-elevated{% endif %}">
+           class="px-4 py-2 text-sm font-medium rounded-lg transition-colors {% if category_filter == 'narrow' %}bg-accent-500 text-white{% else %}bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600{% endif %}">
             Narrow
         </a>
     </div>
@@ -43,22 +43,22 @@
     <div class="space-y-3">
         {% for file in files %}
         <a href="{% url 'dashboard:partner_file_view' file.pk %}" target="_blank"
-           class="card p-4 flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer block">
+           class="p-4 flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer block rounded-lg bg-warm-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
             <!-- File type icon -->
             <div class="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center
-                {% if file.file_extension == 'PDF' %}bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400
-                {% elif file.file_extension == 'JPG' or file.file_extension == 'JPEG' or file.file_extension == 'PNG' or file.file_extension == 'GIF' or file.file_extension == 'WEBP' %}bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400
-                {% else %}bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400{% endif %}">
+                {% if file.file_extension == 'PDF' %}bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400
+                {% elif file.file_extension == 'JPG' or file.file_extension == 'JPEG' or file.file_extension == 'PNG' or file.file_extension == 'GIF' or file.file_extension == 'WEBP' %}bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400
+                {% else %}bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400{% endif %}">
                 <span class="text-xs font-bold">{{ file.file_extension|default:"FILE" }}</span>
             </div>
 
             <!-- File info -->
             <div class="flex-1 min-w-0">
-                <h3 class="text-sm font-semibold text-accent-600 dark:text-accent-400 truncate hover:underline">{{ file.title }}</h3>
+                <h3 class="text-sm font-semibold truncate hover:underline text-accent-500 dark:text-accent-400">{{ file.title }}</h3>
                 {% if file.description %}
-                <p class="text-xs text-muted mt-0.5 line-clamp-1">{{ file.description }}</p>
+                <p class="text-xs mt-0.5 line-clamp-1 text-gray-500 dark:text-gray-400">{{ file.description }}</p>
                 {% endif %}
-                <div class="flex items-center gap-3 mt-1 text-xs text-muted">
+                <div class="flex items-center gap-3 mt-1 text-xs text-gray-500 dark:text-gray-400">
                     <span>{{ file.created_at|date:"M d, Y" }}</span>
                     {% if file.file_size_display %}
                     <span>&middot;</span>
@@ -66,9 +66,9 @@
                     {% endif %}
                     <span>&middot;</span>
                     <span class="px-1.5 py-0.5 rounded text-[10px] font-medium uppercase
-                        {% if file.category == 'standard' %}bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400
-                        {% elif file.category == 'narrow' %}bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400
-                        {% else %}bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400{% endif %}">
+                        {% if file.category == 'standard' %}bg-accent-100 text-accent-600 dark:bg-accent-900/20 dark:text-accent-400
+                        {% elif file.category == 'narrow' %}bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400
+                        {% else %}bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400{% endif %}">
                         {{ file.get_category_display }}
                     </span>
                 </div>
@@ -84,11 +84,11 @@
         {% endfor %}
     </div>
     {% else %}
-    <div class="card p-10 text-center">
-        <svg class="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="p-10 text-center rounded-lg bg-warm-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+        <svg class="w-12 h-12 mx-auto mb-3 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
         </svg>
-        <p class="text-muted">No files available{% if category_filter %} for this category{% endif %}.</p>
+        <p class="text-gray-500 dark:text-gray-400">No files available{% if category_filter %} for this category{% endif %}.</p>
     </div>
     {% endif %}
 

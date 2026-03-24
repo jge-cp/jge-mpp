@@ -1,13 +1,13 @@
 {% comment %}
-Sortable table header component
+Sortable table header component - Flowbite style
 Usage: {% include '_sortable_header.html' with label="Column" field="field_name" current_sort=filters.sort current_dir=filters.sort_dir form_id=form_id %}
 For dashboard pages with prefixed params: add sort_prefix='fa_' or 'lot_'
 Optional: width='w-[140px]' for fixed width columns
 {% endcomment %}
-<th class="px-5 py-4 text-left {% if width %}{{ width }}{% endif %}">
+<th class="px-6 py-3 {% if width %}{{ width }}{% endif %}">
   <button
     type="button"
-    class="group inline-flex items-center gap-1 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide hover:text-gray-900 dark:hover:text-white transition-colors"
+    class="group inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
     hx-get="."
     hx-trigger="click"
     hx-target="#{% if target_id %}{{ target_id }}{% else %}list-results{% endif %}"
@@ -17,13 +17,8 @@ Optional: width='w-[140px]' for fixed width columns
     hx-replace-url="true"
   >
     {{ label }}
-    <span class="flex flex-col">
-      <svg class="w-2.5 h-2.5 {% if current_sort == field and current_dir == 'asc' %}text-gray-900 dark:text-white{% else %}text-gray-300 dark:text-gray-600 group-hover:text-gray-500{% endif %}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 6l-8 8h16l-8-8z"/>
-      </svg>
-      <svg class="w-2.5 h-2.5 -mt-1 {% if current_sort == field and current_dir == 'desc' %}text-gray-900 dark:text-white{% else %}text-gray-300 dark:text-gray-600 group-hover:text-gray-500{% endif %}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 18l8-8H4l8 8z"/>
-      </svg>
-    </span>
+    <svg class="w-4 h-4 ms-0.5 {% if current_sort == field %}text-gray-900 dark:text-white{% else %}opacity-50{% endif %}" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m8 15 4 4 4-4m0-6-4-4-4 4"/>
+    </svg>
   </button>
 </th>

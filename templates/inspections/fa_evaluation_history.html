@@ -18,51 +18,34 @@
         padding: 2px 8px;
         border-radius: 4px;
     }
-    .eval-table th {
-        background-color: #efece8;
-        font-weight: 600;
-        font-size: 0.75rem;
-    }
-    .dark .eval-table th {
-        background-color: #0a0a0a;
-        color: #d1d5db;
-    }
-    .eval-table td, .eval-table th {
-        padding: 0.5rem 0.75rem;
-        border: 1px solid #efece8;
-    }
-    .dark .eval-table td, .dark .eval-table th {
-        border-color: #2a2d2d;
-        color: #d1d5db;
-    }
     .attempt-section {
-        border: 2px solid #efece8;
+        border: 2px solid #E8E4DE;
         border-radius: 8px;
         margin-bottom: 1.5rem;
-        background-color: #F5F3EF;
+        background-color: #FAF9F7;
     }
     .dark .attempt-section {
-        border-color: #2a2d2d;
-        background-color: #1f2121;
+        border-color: #2A2520;
+        background-color: #1A1714;
     }
     .attempt-header {
-        background-color: #efece8;
+        background-color: #F5F3EF;
         padding: 1rem;
-        border-bottom: 1px solid #efece8;
+        border-bottom: 1px solid #E8E4DE;
         border-radius: 6px 6px 0 0;
     }
     .dark .attempt-header {
-        background-color: #0a0a0a;
-        border-bottom-color: #2a2d2d;
-        color: #d1d5db;
+        background-color: #2A2520;
+        border-bottom-color: #2A2520;
+        color: #D5CFC6;
     }
     .attempt-body {
         padding: 1rem;
-        background-color: #F5F3EF;
+        background-color: #FAF9F7;
         border-radius: 0 0 6px 6px;
     }
     .dark .attempt-body {
-        background-color: #1f2121;
+        background-color: #1A1714;
     }
 </style>
 {% endblock %}
@@ -98,15 +81,15 @@
             </div>
             <div>
                 <dt class="text-sm font-medium text-muted">Partner</dt>
-                <dd class="mt-1 text-primary">{% if fa.company %}{{ fa.company.name }}{% elif fa.vendor %}{{ fa.vendor.company_name }}{% else %}—{% endif %}</dd>
+                <dd class="mt-1 text-gray-900 dark:text-white">{% if fa.company %}{{ fa.company.name }}{% elif fa.vendor %}{{ fa.vendor.company_name }}{% else %}—{% endif %}</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-muted">Fabric Style</dt>
-                <dd class="mt-1 text-primary">{{ fa.fabric_style }}</dd>
+                <dd class="mt-1 text-gray-900 dark:text-white">{{ fa.fabric_style }}</dd>
             </div>
             <div>
                 <dt class="text-sm font-medium text-muted">Total Attempts</dt>
-                <dd class="mt-1 text-primary font-semibold">{{ evaluation_history|length }}</dd>
+                <dd class="mt-1 text-gray-900 dark:text-white font-semibold">{{ evaluation_history|length }}</dd>
             </div>
         </div>
     </div>
@@ -139,7 +122,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Primary Inspector Evaluation -->
                 <div>
-                    <h3 class="text-lg font-bold mb-3 text-primary">Primary Inspector (1947)</h3>
+                    <h3 class="text-lg font-bold mb-3 text-gray-900 dark:text-white">Primary Inspector (1947)</h3>
                     {% if stages.primary %}
                     <div class="mb-3">
                         <p class="text-sm text-muted">
@@ -222,7 +205,7 @@
                     {% if stages.primary.comments %}
                     <div>
                         <h4 class="font-semibold text-sm mb-2">Comments</h4>
-                        <p class="text-sm text-muted bg-elevated p-2 rounded">{{ stages.primary.comments }}</p>
+                        <p class="text-sm text-muted bg-gray-50 dark:bg-gray-700 p-2 rounded">{{ stages.primary.comments }}</p>
                     </div>
                     {% endif %}
                     {% else %}
@@ -232,7 +215,7 @@
                 
                 <!-- Final Inspector Evaluation -->
                 <div>
-                    <h3 class="text-lg font-bold mb-3 text-primary">Final Inspector (Crye)</h3>
+                    <h3 class="text-lg font-bold mb-3 text-gray-900 dark:text-white">Final Inspector (Crye)</h3>
                     {% if stages.final %}
                     <div class="mb-3">
                         <p class="text-sm text-muted">
@@ -315,7 +298,7 @@
                     {% if stages.final.comments %}
                     <div>
                         <h4 class="font-semibold text-sm mb-2">Comments</h4>
-                        <p class="text-sm text-muted bg-elevated p-2 rounded">{{ stages.final.comments }}</p>
+                        <p class="text-sm text-muted bg-gray-50 dark:bg-gray-700 p-2 rounded">{{ stages.final.comments }}</p>
                     </div>
                     {% endif %}
                     {% else %}

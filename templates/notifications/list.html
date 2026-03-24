@@ -4,65 +4,65 @@
 
 {% block dashboard_content %}
 <div class="mb-6 flex justify-between items-center">
-    <h1 class="text-2xl font-bold">Notifications</h1>
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Notifications</h1>
     {% if unread_count %}
     <form method="post" action="{% url 'notifications:mark_all_read' %}">
         {% csrf_token %}
-        <button type="submit" class="btn-secondary text-sm">
+        <button type="submit" class="text-sm px-4 py-2 rounded-lg font-medium text-gray-900 bg-warm-white border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700">
             Mark all as read
         </button>
     </form>
     {% endif %}
 </div>
 
-<div class="card divide-y divide-warm-gray-200 dark:divide-dark-border border-warm-gray-200 dark:border-dark-border">
+<div class="rounded-lg shadow-sm overflow-hidden bg-warm-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
     {% for notification in notifications %}
-    <div class="p-4 {% if not notification.is_read %}bg-primary-50 dark:bg-primary-900/20{% endif %} border-warm-gray-200 dark:border-dark-border">
+    <div class="p-4 border-b border-gray-200 dark:border-gray-700 {% if not notification.is_read %}bg-accent-50 dark:bg-accent-900/20{% endif %}">
         <a href="{% if notification.action_url %}{{ notification.action_url }}{% else %}#{% endif %}"
            hx-post="{% url 'notifications:mark_read' notification.id %}"
            hx-swap="none"
            hx-on::after-request="if(this.getAttribute('href') && this.getAttribute('href') !== '#') window.location.href = this.getAttribute('href');"
-           class="block hover:bg-elevated rounded -m-2 p-2 transition-colors">
+           class="block hover:opacity-80 rounded -m-2 p-2 transition-colors">
             <div class="flex items-start space-x-4">
                 <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center
-                    {% if 'approved' in notification.notification_type %}bg-green-100 dark:bg-green-900/30
-                    {% elif 'rejected' in notification.notification_type %}bg-red-100 dark:bg-red-900/30
-                    {% elif 'submitted' in notification.notification_type %}bg-blue-100 dark:bg-blue-900/30
-                    {% elif 'pending' in notification.notification_type %}bg-yellow-100 dark:bg-yellow-900/30
-                    {% else %}bg-gray-100 dark:bg-dark-card{% endif %}">
+                    {% if 'approved' in notification.notification_type %}bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400
+                    {% elif 'rejected' in notification.notification_type %}bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400
+                    {% elif 'submitted' in notification.notification_type %}bg-accent-100 text-accent-700 dark:bg-accent-900/20 dark:text-accent-400
+                    {% elif 'pending' in notification.notification_type %}bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400
+                    {% else %}bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400{% endif %}">
                     {% if 'approved' in notification.notification_type %}
-                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                     </svg>
                     {% elif 'rejected' in notification.notification_type %}
-                    <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
                     {% elif 'submitted' in notification.notification_type %}
-                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                     {% elif 'pending' in notification.notification_type %}
-                    <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                     {% else %}
-                    <svg class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                     </svg>
                     {% endif %}
                 </div>
                 <div class="flex-1 min-w-0">
                     <div class="flex items-start justify-between">
-                        <p class="text-sm font-medium {% if not notification.is_read %}text-primary-700 dark:text-primary-300{% endif %}">
+                        <p class="text-sm font-medium {% if not notification.is_read %}text-gray-900 dark:text-white{% else %}text-gray-700 dark:text-gray-300{% endif %}">
                             {{ notification.title }}
                         </p>
                         {% if not notification.is_read %}
-                        <span class="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0 ml-2 mt-1"></span>
+                        <span class="w-2 h-2 rounded-full flex-shrink-0 ml-2 mt-1 bg-accent-500"></span>
                         {% endif %}
                     </div>
-                    <p class="text-sm text-muted mt-1">{{ notification.message|truncatewords:30 }}</p>
-                    <div class="flex items-center space-x-4 mt-2 text-xs text-muted">
+                    <p class="text-sm mt-1 text-gray-500 dark:text-gray-400">{{ notification.message|truncatewords:30 }}</p>
+                    <div class="flex items-center space-x-4 mt-2 text-xs text-gray-500 dark:text-gray-400">
                         <span>{{ notification.created_at|date:"M d, Y H:i" }}</span>
                         <span class="capitalize">{{ notification.get_notification_type_display }}</span>
                     </div>
@@ -72,11 +72,11 @@
     </div>
     {% empty %}
     <div class="p-12 text-center">
-        <svg class="w-16 h-16 mx-auto text-muted mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-16 h-16 mx-auto mb-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
         </svg>
-        <p class="text-lg font-medium">No notifications yet</p>
-        <p class="text-muted mt-1">You'll see notifications here when there's activity on your account.</p>
+        <p class="text-lg font-medium text-gray-900 dark:text-white">No notifications yet</p>
+        <p class="mt-1 text-gray-500 dark:text-gray-400">You'll see notifications here when there's activity on your account.</p>
     </div>
     {% endfor %}
 </div>
@@ -84,17 +84,16 @@
 {% if notifications.has_other_pages %}
 <nav class="flex items-center justify-center space-x-2 mt-6">
     {% if notifications.has_previous %}
-    <a href="?page={{ notifications.previous_page_number }}" class="btn-secondary">Previous</a>
+    <a href="?page={{ notifications.previous_page_number }}" class="px-4 py-2 rounded-lg font-medium text-gray-900 bg-warm-white border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700">Previous</a>
     {% endif %}
     
-    <span class="text-sm text-muted">
+    <span class="text-sm text-gray-500 dark:text-gray-400">
         Page {{ notifications.number }} of {{ notifications.paginator.num_pages }}
     </span>
     
     {% if notifications.has_next %}
-    <a href="?page={{ notifications.next_page_number }}" class="btn-secondary">Next</a>
+    <a href="?page={{ notifications.next_page_number }}" class="px-4 py-2 rounded-lg font-medium text-gray-900 bg-warm-white border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700">Next</a>
     {% endif %}
 </nav>
 {% endif %}
 {% endblock %}
-

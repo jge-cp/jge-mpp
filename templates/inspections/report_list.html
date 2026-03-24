@@ -9,12 +9,12 @@
             <h1 class="text-3xl font-bold text-gray-900">Monthly Reports</h1>
             <p class="text-gray-600 mt-1">Your production report history</p>
         </div>
-        <a href="{% url 'inspections:report_submit' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        <a href="{% url 'inspections:report_submit' %}" class="bg-accent-500 hover:bg-accent-600 text-white font-bold py-2 px-4 rounded">
             + Submit New Report
         </a>
     </div>
     
-    <div class="bg-white shadow overflow-hidden sm:rounded-md">
+    <div class="bg-warm-white shadow overflow-hidden sm:rounded-md">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
@@ -27,11 +27,11 @@
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
+            <tbody class="bg-warm-white divide-y divide-gray-200">
                 {% for report in reports %}
                     <tr class="hover:bg-gray-50">
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <a href="{% url 'inspections:report_detail' report.report_id %}" class="text-blue-600 hover:underline font-medium">
+                            <a href="{% url 'inspections:report_detail' report.report_id %}" class="text-accent-500 hover:underline font-medium">
                                 #{{ report.report_id }}
                             </a>
                         </td>
@@ -50,7 +50,7 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 py-1 text-xs rounded-full 
                                 {% if report.status == 'invoiced' %}bg-green-100 text-green-800
-                                {% elif report.status == 'reviewed' %}bg-blue-100 text-blue-800
+                                {% elif report.status == 'reviewed' %}bg-accent-100 text-accent-700
                                 {% else %}bg-yellow-100 text-yellow-800{% endif %}">
                                 {{ report.get_status_display }}
                             </span>
@@ -61,7 +61,7 @@
                             {% endif %}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <a href="{% url 'inspections:report_detail' report.report_id %}" class="text-blue-600 hover:underline">
+                            <a href="{% url 'inspections:report_detail' report.report_id %}" class="text-accent-500 hover:underline">
                                 View
                             </a>
                         </td>
