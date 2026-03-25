@@ -21,7 +21,8 @@ urlpatterns = [
     
     # Partner file repository
     path('files/', views.partner_files, name='partner_files'),
-    path('files/<int:file_id>/view/', views.partner_file_view, name='partner_file_view'),
+    path('files/<int:file_id>/', views.partner_file_viewer, name='partner_file_viewer'),
+    path('files/<int:file_id>/raw/', views.partner_file_view, name='partner_file_view'),
     
     # Legacy dashboards - redirect to appropriate new dashboards
     path('dashboard/rm-supplier/', views.rm_supplier_dashboard, name='rm_supplier_dashboard'),

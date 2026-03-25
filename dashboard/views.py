@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import FileResponse, Http404
+from django.urls import reverse
 from django.utils import timezone
 from django.db.models import Count, Q, Sum
 from datetime import timedelta
@@ -613,32 +614,65 @@ def partner_files(request):
     return render(request, 'dashboard/partner_files.html', context)
 
 
-@login_required
-def partner_file_view(request, file_id):
-    """Serve a partner file inline in the browser after checking access."""
+def _get_partner_file_or_404(request):
+    """Validate partner access and return (profile, company, PartnerFile) or raise Http404."""
     profile = request.profile
-    
     if not profile.is_partner():
         raise Http404
-    
     company = profile.company
     if not company:
         raise Http404
-    
-    pf = PartnerFile.objects.filter(pk=file_id, is_active=True).first()
+    return profile, company
+
+
+def _check_file_access(company, pf):
+    """Raise Http404 if the company doesn't have access to this file's category."""
     if not pf:
         raise Http404
-    
     if pf.category == 'standard' and not company.is_standard:
         raise Http404
     if pf.category == 'narrow' and not company.is_narrow:
         raise Http404
-    
+
+
+@login_required
+def partner_file_viewer(request, file_id):
+    """Display a partner file embedded within the portal layout."""
+    _, company = _get_partner_file_or_404(request)
+    pf = PartnerFile.objects.filter(pk=file_id, is_active=True).first()
+    _check_file_access(company, pf)
+
+    import mimetypes
+    content_type, _ = mimetypes.guess_type(pf.file.name)
+    ext = (pf.file.name.rsplit('.', 1)[-1] if '.' in pf.file.name else '').lower()
+    is_image = ext in ('jpg', 'jpeg', 'png', 'gif', 'webp', 'svg')
+    is_pdf = ext == 'pdf'
+    is_embeddable = is_image or is_pdf
+
+    context = {
+        'file': pf,
+        'raw_url': request.build_absolute_uri(
+            reverse('dashboard:partner_file_view', args=[file_id])
+        ),
+        'is_image': is_image,
+        'is_pdf': is_pdf,
+        'is_embeddable': is_embeddable,
+    }
+    return render(request, 'dashboard/partner_file_viewer.html', context)
+
+
+@login_required
+def partner_file_view(request, file_id):
+    """Serve a partner file inline in the browser after checking access."""
+    _, company = _get_partner_file_or_404(request)
+    pf = PartnerFile.objects.filter(pk=file_id, is_active=True).first()
+    _check_file_access(company, pf)
+
     import mimetypes
     content_type, _ = mimetypes.guess_type(pf.file.name)
     if not content_type:
         content_type = 'application/octet-stream'
-    
+
     try:
         response = FileResponse(pf.file.open('rb'), content_type=content_type)
         response['Content-Disposition'] = f'inline; filename="{pf.file.name.split("/")[-1]}"'
