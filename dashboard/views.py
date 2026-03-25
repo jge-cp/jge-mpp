@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.http import FileResponse, Http404
 from django.urls import reverse
 from django.utils import timezone
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.db.models import Count, Q, Sum
 from datetime import timedelta
 from inspections.models import FirstArticleInspection, LotAcceptance, MonthlyReport
@@ -662,6 +663,7 @@ def partner_file_viewer(request, file_id):
 
 
 @login_required
+@xframe_options_sameorigin
 def partner_file_view(request, file_id):
     """Serve a partner file inline in the browser after checking access."""
     _, company = _get_partner_file_or_404(request)
