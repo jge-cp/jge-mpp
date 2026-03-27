@@ -607,15 +607,19 @@ def partner_files(request):
     if category_filter:
         files = files.filter(category=category_filter)
     
-    quality_specs = files.filter(file_type='quality_specs')
-    misc_files = files.filter(file_type='misc')
+    type_filter = request.GET.get('type', '')
+    if type_filter in ('quality_specs', 'misc'):
+        files = files.filter(file_type=type_filter)
+    
+    type_labels = {'quality_specs': 'Quality Specifications', 'misc': 'Misc'}
     
     context = {
-        'quality_specs': quality_specs,
-        'misc_files': misc_files,
-        'has_files': quality_specs.exists() or misc_files.exists(),
+        'files': files,
+        'has_files': files.exists(),
         'company': company,
         'category_filter': category_filter,
+        'type_filter': type_filter,
+        'type_label': type_labels.get(type_filter, 'Files'),
     }
     return render(request, 'dashboard/partner_files.html', context)
 

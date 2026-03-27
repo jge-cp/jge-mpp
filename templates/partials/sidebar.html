@@ -163,11 +163,19 @@ Queue badge counts are loaded via HTMX endpoints.
         <ul class="pt-4 mt-4 space-y-2 font-medium border-t border-gray-200 dark:border-gray-700">
             <li class="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Resources</li>
             <li>
-                <a href="{% url 'dashboard:partner_files' %}" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group {% if request.resolver_match.url_name == 'partner_files' %}bg-gray-100 dark:bg-gray-700{% endif %}">
+                <a href="{% url 'dashboard:partner_files' %}?type=quality_specs" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group {% if request.resolver_match.url_name == 'partner_files' and request.GET.type == 'quality_specs' %}bg-gray-100 dark:bg-gray-700{% endif %}">
                     <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    <span class="flex-1 ms-3 whitespace-nowrap">Files</span>
+                    <span class="flex-1 ms-3 whitespace-nowrap">Quality Specifications</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'dashboard:partner_files' %}?type=misc" class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group {% if request.resolver_match.url_name == 'partner_files' and request.GET.type == 'misc' %}bg-gray-100 dark:bg-gray-700{% endif %}">
+                    <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"></path>
+                    </svg>
+                    <span class="flex-1 ms-3 whitespace-nowrap">Misc</span>
                 </a>
             </li>
         </ul>
