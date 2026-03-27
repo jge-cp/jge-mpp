@@ -106,6 +106,8 @@ def map_variant_name(raw_name):
     if not raw_name:
         return None
     low = str(raw_name).lower().replace('\u00ae', '').replace('\ufffd', '').strip()
+    if 'imtp' in low or 'itmp' in low:
+        return 'IMTP'
     if 'alpine' in low:
         return 'Multicam Alpine'
     if 'tropic' in low:
@@ -114,7 +116,7 @@ def map_variant_name(raw_name):
         return 'Multicam Black'
     if 'arid' in low:
         return 'Multicam Arid'
-    if 'multicam' in low:
+    if 'multicam' in low or low in ('mc',):
         return 'Multicam'
     return None
 
@@ -326,6 +328,8 @@ class Command(BaseCommand):
             if not lot_number:
                 lot_number = f'HISTORIC-{row_idx}'
 
+            is_bdcs = 'bdcs' in (fabric_style or '').lower()
+
             date_of_printing = to_date(row[7]) or PLACEHOLDER_DATE
             ship_date = to_date(row[8])
             tracking = '' if is_historic_value(row[9]) else to_str(row[9], 50)
@@ -336,9 +340,17 @@ class Command(BaseCommand):
             # --- Dry-run output ---
             if dry_run:
                 tag = '[HISTORIC] ' if is_historic else ''
+                flags = []
+                if is_bdcs:
+                    flags.append('BDCS')
+                if variant_name == 'IMTP':
+                    flags.append('IMTP')
+                if spectral == 'swir':
+                    flags.append('SWIR')
+                flag_str = f' [{", ".join(flags)}]' if flags else ''
                 self.stdout.write(
                     f'  {tag}Row {row_idx}: {status.upper()} | '
-                    f'{fabric_style} | {variant_name} | Lot: {lot_number}'
+                    f'{fabric_style} | {variant_name} | Lot: {lot_number}{flag_str}'
                 )
                 if is_historic:
                     stats['fa_historic'] += 1
@@ -374,6 +386,7 @@ class Command(BaseCommand):
                         status=status,
                         submitted=True,
                         is_historic=is_historic,
+                        is_bdcs=is_bdcs,
                         sheet_name_generated=sheet_name,
                     )
                     fa.save()

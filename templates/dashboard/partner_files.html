@@ -39,49 +39,44 @@
     </div>
     {% endif %}
 
-    {% if files %}
-    <div class="space-y-3">
-        {% for file in files %}
-        <a href="{% url 'dashboard:partner_file_viewer' file.pk %}"
-           class="p-4 flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer block rounded-lg bg-warm-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-            <!-- File type icon -->
-            <div class="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center
-                {% if file.file_extension == 'PDF' %}bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400
-                {% elif file.file_extension == 'JPG' or file.file_extension == 'JPEG' or file.file_extension == 'PNG' or file.file_extension == 'GIF' or file.file_extension == 'WEBP' %}bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400
-                {% else %}bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400{% endif %}">
-                <span class="text-xs font-bold">{{ file.file_extension|default:"FILE" }}</span>
-            </div>
+    {% if has_files %}
 
-            <!-- File info -->
-            <div class="flex-1 min-w-0">
-                <h3 class="text-sm font-semibold truncate hover:underline text-accent-500 dark:text-accent-400">{{ file.title }}</h3>
-                {% if file.description %}
-                <p class="text-xs mt-0.5 line-clamp-1 text-gray-500 dark:text-gray-400">{{ file.description }}</p>
-                {% endif %}
-                <div class="flex items-center gap-3 mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    <span>{{ file.created_at|date:"M d, Y" }}</span>
-                    {% if file.file_size_display %}
-                    <span>&middot;</span>
-                    <span>{{ file.file_size_display }}</span>
-                    {% endif %}
-                    <span>&middot;</span>
-                    <span class="px-1.5 py-0.5 rounded text-[10px] font-medium uppercase
-                        {% if file.category == 'standard' %}bg-accent-100 text-accent-600 dark:bg-accent-900/20 dark:text-accent-400
-                        {% elif file.category == 'narrow' %}bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400
-                        {% else %}bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400{% endif %}">
-                        {{ file.get_category_display }}
-                    </span>
-                </div>
-            </div>
-
-            <div class="flex-shrink-0 text-gray-400 dark:text-gray-500">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-            </div>
-        </a>
-        {% endfor %}
+    <!-- Quality Specifications -->
+    {% if quality_specs %}
+    <div class="mb-8">
+        <div class="flex items-center gap-2 mb-3">
+            <svg class="w-5 h-5 text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Quality Specifications</h2>
+            <span class="text-xs text-gray-400 dark:text-gray-500">({{ quality_specs|length }})</span>
+        </div>
+        <div class="space-y-3">
+            {% for file in quality_specs %}
+            {% include "dashboard/_partner_file_row.html" %}
+            {% endfor %}
+        </div>
     </div>
+    {% endif %}
+
+    <!-- Misc -->
+    {% if misc_files %}
+    <div class="mb-8">
+        <div class="flex items-center gap-2 mb-3">
+            <svg class="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"></path>
+            </svg>
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Misc</h2>
+            <span class="text-xs text-gray-400 dark:text-gray-500">({{ misc_files|length }})</span>
+        </div>
+        <div class="space-y-3">
+            {% for file in misc_files %}
+            {% include "dashboard/_partner_file_row.html" %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
     {% else %}
     <div class="p-10 text-center rounded-lg bg-warm-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
         <svg class="w-12 h-12 mx-auto mb-3 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

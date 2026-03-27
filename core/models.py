@@ -161,6 +161,11 @@ class PartnerFile(models.Model):
         ('both', 'Both (Standard & Narrow)'),
     ]
     
+    FILE_TYPE_CHOICES = [
+        ('quality_specs', 'Quality Specifications'),
+        ('misc', 'Misc'),
+    ]
+    
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     file = models.FileField(upload_to='partner_files/%Y/%m/')
@@ -169,6 +174,12 @@ class PartnerFile(models.Model):
         choices=CATEGORY_CHOICES,
         default='both',
         help_text='Which partner types can see this file'
+    )
+    file_type = models.CharField(
+        max_length=15,
+        choices=FILE_TYPE_CHOICES,
+        default='quality_specs',
+        help_text='Section this file appears under'
     )
     uploaded_by = models.ForeignKey(
         User,

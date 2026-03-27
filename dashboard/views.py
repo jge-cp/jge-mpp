@@ -607,8 +607,13 @@ def partner_files(request):
     if category_filter:
         files = files.filter(category=category_filter)
     
+    quality_specs = files.filter(file_type='quality_specs')
+    misc_files = files.filter(file_type='misc')
+    
     context = {
-        'files': files,
+        'quality_specs': quality_specs,
+        'misc_files': misc_files,
+        'has_files': quality_specs.exists() or misc_files.exists(),
         'company': company,
         'category_filter': category_filter,
     }

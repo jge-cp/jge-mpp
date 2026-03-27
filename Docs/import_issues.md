@@ -18,6 +18,7 @@ Some FA evaluation sheets reference variant-specific color names that don't exis
 | Jinchen (JNCN) | JNCN-FA-0016, 0017, 0020, 0021, 0022, 0025 | Alpine / Tropic | Light Tan 170, Urban Tan 171, Olive 172, Light Coyote 173, Highland 174 |
 | Jinchen (JNCN) | JNCN-FA-0030 | Arid | White 124, Light Gray 125, Medium Gray 126 |
 | Car-Mel (CRML) | All FAs and all 41 Lots | All variants (Narrow goods) | Narrow color codes use "W" suffix (e.g., Cream 524W, Olive 527W, Black 207W) — not in DB. 0 color evals created for this partner. |
+| Sapphire (SAP) | SAP-FA-0022, SAP-FA-0023, SAP-LOT-0029 | IMTP | IMTP-specific colors not in DB: Irish Cream 570, Shamrock Green 571, Collins Green 572, Curragh Green 573, Brugha Brown 574, Ordnance Green 575, Bay Brown 576. 0 color evals for these FAs/Lot. |
 
 ## Unlinked Lots (No Parent FA Found)
 

@@ -58,14 +58,14 @@ class FileUploadAdmin(ModelAdmin):
 
 @admin.register(PartnerFile)
 class PartnerFileAdmin(ModelAdmin):
-    list_display = ['title', 'category', 'file_extension', 'is_active', 'uploaded_by', 'created_at']
-    list_filter = ['category', 'is_active']
+    list_display = ['title', 'file_type', 'category', 'file_extension', 'is_active', 'uploaded_by', 'created_at']
+    list_filter = ['file_type', 'category', 'is_active']
     search_fields = ['title', 'description']
     readonly_fields = ['created_at', 'updated_at']
     
     fieldsets = (
         (None, {
-            'fields': ('title', 'description', 'file', 'category', 'is_active'),
+            'fields': ('title', 'description', 'file', 'file_type', 'category', 'is_active'),
         }),
         ('Metadata', {
             'fields': ('uploaded_by', 'created_at', 'updated_at'),
