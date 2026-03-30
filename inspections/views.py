@@ -112,13 +112,15 @@ def fa_list(request):
     # All users get all filter options
     submitted_by_options = submitted_by_options_for_partner(profile) if profile.is_partner() else submitted_by_options_for_inspector()
 
+    is_admin = not profile.is_partner()
     context = {
         'profile': profile,
         'filters': filters.__dict__,
         'status_options': FA_STATUS_OPTIONS,
         'variant_options': variant_options(),
-        'company_options': company_options_for_inspector(),
+        'company_options': company_options_for_inspector() if is_admin else [],
         'submitted_by_options': submitted_by_options,
+        'show_company_filter': is_admin,
         'clear_url': request.path,
         'items': fas,
         'kind': 'fa',
@@ -331,13 +333,15 @@ def lot_list(request):
     # All users get all filter options
     submitted_by_options = submitted_by_options_for_partner(profile) if profile.is_partner() else submitted_by_options_for_inspector()
 
+    is_admin = not profile.is_partner()
     context = {
         'profile': profile,
         'filters': filters.__dict__,
         'status_options': LOT_STATUS_OPTIONS,
         'variant_options': variant_options(),
-        'company_options': company_options_for_inspector(),
+        'company_options': company_options_for_inspector() if is_admin else [],
         'submitted_by_options': submitted_by_options,
+        'show_company_filter': is_admin,
         'clear_url': request.path,
         'items': lots,
         'kind': 'lot',
@@ -412,6 +416,7 @@ def fa_review_queue_primary(request):
         'variant_options': variant_options(),
         'company_options': company_options_for_inspector(),
         'submitted_by_options': submitted_by_options_for_inspector(),
+        'show_company_filter': True,
         'clear_url': request.path,
         # shared results config
         'items': pending_fas,
@@ -451,6 +456,7 @@ def fa_review_queue_final(request):
         'variant_options': variant_options(),
         'company_options': company_options_for_inspector(),
         'submitted_by_options': submitted_by_options_for_inspector(),
+        'show_company_filter': True,
         'clear_url': request.path,
         # shared results config
         'items': pending_fas,
@@ -836,6 +842,7 @@ def lot_review_queue(request):
         'variant_options': variant_options(),
         'company_options': company_options_for_inspector(),
         'submitted_by_options': submitted_by_options_for_inspector(),
+        'show_company_filter': True,
         'clear_url': request.path,
         # shared results config
         'items': pending_lots,

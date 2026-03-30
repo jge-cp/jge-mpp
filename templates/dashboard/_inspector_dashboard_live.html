@@ -35,7 +35,7 @@
     </form>
     
     <div id="fa-queue-results">
-        {% include 'partials/submissions/_results.html' with items=fas kind='fa' mode='queue' row_url='inspections:fa_review' empty_text='No First Articles in queue' filters=fa_filters form_id='fa-filters-form' target_id='fa-queue-results' sort_prefix='fa_' variant_options=fa_variant_options company_options=fa_company_options submitted_by_options=fa_submitted_by_options status_options=fa_status_options %}
+        {% include 'partials/submissions/_results.html' with items=fas kind='fa' mode='queue' row_url='inspections:fa_review' empty_text='No First Articles in queue' filters=fa_filters form_id='fa-filters-form' target_id='fa-queue-results' sort_prefix='fa_' variant_options=fa_variant_options company_options=fa_company_options submitted_by_options=fa_submitted_by_options status_options=fa_status_options show_company_filter=True %}
     </div>
 </div>
 
@@ -52,7 +52,7 @@
     </form>
     
     <div id="lot-queue-results">
-        {% include 'partials/submissions/_results.html' with items=lots kind='lot' mode='queue' row_url='inspections:lot_review' empty_text='No Lots in queue' filters=lot_filters form_id='lot-filters-form' target_id='lot-queue-results' sort_prefix='lot_' variant_options=lot_variant_options company_options=lot_company_options submitted_by_options=lot_submitted_by_options status_options=lot_status_options %}
+        {% include 'partials/submissions/_results.html' with items=lots kind='lot' mode='queue' row_url='inspections:lot_review' empty_text='No Lots in queue' filters=lot_filters form_id='lot-filters-form' target_id='lot-queue-results' sort_prefix='lot_' variant_options=lot_variant_options company_options=lot_company_options submitted_by_options=lot_submitted_by_options status_options=lot_status_options show_company_filter=True %}
     </div>
 </div>
 
@@ -72,7 +72,7 @@
     </form>
     
     <div id="fa-queue-results">
-        {% include 'partials/submissions/_results.html' with items=fas kind='fa' mode='queue' row_url='inspections:fa_review' empty_text='No First Articles in queue' filters=fa_filters form_id='fa-filters-form' target_id='fa-queue-results' sort_prefix='fa_' variant_options=fa_variant_options company_options=fa_company_options submitted_by_options=fa_submitted_by_options status_options=fa_status_options %}
+        {% include 'partials/submissions/_results.html' with items=fas kind='fa' mode='queue' row_url='inspections:fa_review' empty_text='No First Articles in queue' filters=fa_filters form_id='fa-filters-form' target_id='fa-queue-results' sort_prefix='fa_' variant_options=fa_variant_options company_options=fa_company_options submitted_by_options=fa_submitted_by_options status_options=fa_status_options show_company_filter=True %}
     </div>
 </div>
 

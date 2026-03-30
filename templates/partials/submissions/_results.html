@@ -1,3 +1,4 @@
+{% load inspections_ui %}
 <!-- Mobile card view -->
 <div class="block lg:hidden space-y-3">
   {% for item in items %}
@@ -22,51 +23,55 @@
             {% include 'partials/submissions/_sortable_header.html' with label='First Article' field='display_name' current_sort=filters.sort current_dir=filters.sort_dir form_id=form_id target_id=target_id sort_prefix=sort_prefix %}
           {% endif %}
           {% include 'partials/submissions/_sortable_header.html' with label='Variant' field='variant' current_sort=filters.sort current_dir=filters.sort_dir form_id=form_id target_id=target_id sort_prefix=sort_prefix %}
+          {% if show_company_filter %}
           {% include 'partials/submissions/_sortable_header.html' with label='Company' field='company' current_sort=filters.sort current_dir=filters.sort_dir form_id=form_id target_id=target_id sort_prefix=sort_prefix %}
+          {% endif %}
           {% include 'partials/submissions/_sortable_header.html' with label='Submitted By' field='submitted_by' current_sort=filters.sort current_dir=filters.sort_dir form_id=form_id target_id=target_id sort_prefix=sort_prefix %}
           {% include 'partials/submissions/_sortable_header.html' with label='Submitted' field='submission_date' current_sort=filters.sort current_dir=filters.sort_dir form_id=form_id target_id=target_id sort_prefix=sort_prefix %}
           {% include 'partials/submissions/_sortable_header.html' with label='Status' field='status' current_sort=filters.sort current_dir=filters.sort_dir form_id=form_id target_id=target_id sort_prefix=sort_prefix width='w-[140px]' %}
         </tr>
         <!-- Column filter row -->
-        <tr class="bg-gray-50 dark:bg-gray-700">
+        <tr id="{% if target_id %}{{ target_id }}{% else %}list-results{% endif %}-filters" class="bg-gray-50 dark:bg-gray-700">
           <th class="px-6 py-2">
             <input type="text" name="{{ sort_prefix|default:'' }}q" value="{{ filters.q|default:'' }}"
               placeholder=""
               class="w-full py-1.5 px-2 text-xs font-normal rounded border border-gray-300 bg-white text-gray-900 focus:ring-accent-500 focus:border-accent-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white dark:placeholder-gray-400"
               hx-get="." hx-trigger="keyup changed delay:300ms"
               hx-target="#{% if target_id %}{{ target_id }}{% else %}list-results{% endif %}" hx-swap="innerHTML"
-              hx-include="#{% if form_id %}{{ form_id }}{% else %}filters-form{% endif %}" hx-replace-url="true" />
+              hx-include="#{% if form_id %}{{ form_id }}{% else %}filters-form{% endif %}, #{% if target_id %}{{ target_id }}{% else %}list-results{% endif %}-filters" hx-replace-url="true" />
           </th>
           <th class="px-6 py-2">
             <select name="{{ sort_prefix|default:'' }}variant"
               class="w-full py-1.5 px-2 text-xs font-normal rounded border border-gray-300 bg-white text-gray-900 focus:ring-accent-500 focus:border-accent-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
               hx-get="." hx-trigger="change"
               hx-target="#{% if target_id %}{{ target_id }}{% else %}list-results{% endif %}" hx-swap="innerHTML"
-              hx-include="#{% if form_id %}{{ form_id }}{% else %}filters-form{% endif %}" hx-replace-url="true">
+              hx-include="#{% if form_id %}{{ form_id }}{% else %}filters-form{% endif %}, #{% if target_id %}{{ target_id }}{% else %}list-results{% endif %}-filters" hx-replace-url="true">
               <option value=""></option>
               {% for value,label in variant_options %}
                 <option value="{{ value }}" {% if filters.variant == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
               {% endfor %}
             </select>
           </th>
+          {% if show_company_filter %}
           <th class="px-6 py-2">
             <select name="{{ sort_prefix|default:'' }}company"
               class="w-full py-1.5 px-2 text-xs font-normal rounded border border-gray-300 bg-white text-gray-900 focus:ring-accent-500 focus:border-accent-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
               hx-get="." hx-trigger="change"
               hx-target="#{% if target_id %}{{ target_id }}{% else %}list-results{% endif %}" hx-swap="innerHTML"
-              hx-include="#{% if form_id %}{{ form_id }}{% else %}filters-form{% endif %}" hx-replace-url="true">
+              hx-include="#{% if form_id %}{{ form_id }}{% else %}filters-form{% endif %}, #{% if target_id %}{{ target_id }}{% else %}list-results{% endif %}-filters" hx-replace-url="true">
               <option value=""></option>
               {% for value,label in company_options %}
                 <option value="{{ value }}" {% if filters.company == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
               {% endfor %}
             </select>
           </th>
+          {% endif %}
           <th class="px-6 py-2">
             <select name="{{ sort_prefix|default:'' }}submitted_by"
               class="w-full py-1.5 px-2 text-xs font-normal rounded border border-gray-300 bg-white text-gray-900 focus:ring-accent-500 focus:border-accent-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
               hx-get="." hx-trigger="change"
               hx-target="#{% if target_id %}{{ target_id }}{% else %}list-results{% endif %}" hx-swap="innerHTML"
-              hx-include="#{% if form_id %}{{ form_id }}{% else %}filters-form{% endif %}" hx-replace-url="true">
+              hx-include="#{% if form_id %}{{ form_id }}{% else %}filters-form{% endif %}, #{% if target_id %}{{ target_id }}{% else %}list-results{% endif %}-filters" hx-replace-url="true">
               <option value=""></option>
               {% for value,label in submitted_by_options %}
                 <option value="{{ value }}" {% if filters.submitted_by == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
@@ -80,14 +85,14 @@
               onfocus="this.type='date'" onblur="if(!this.value)this.type='text'"
               hx-get="." hx-trigger="change"
               hx-target="#{% if target_id %}{{ target_id }}{% else %}list-results{% endif %}" hx-swap="innerHTML"
-              hx-include="#{% if form_id %}{{ form_id }}{% else %}filters-form{% endif %}" hx-replace-url="true" />
+              hx-include="#{% if form_id %}{{ form_id }}{% else %}filters-form{% endif %}, #{% if target_id %}{{ target_id }}{% else %}list-results{% endif %}-filters" hx-replace-url="true" />
           </th>
           <th class="px-6 py-2 w-[140px]">
             <select name="{{ sort_prefix|default:'' }}status"
               class="w-full py-1.5 px-2 text-xs font-normal rounded border border-gray-300 bg-white text-gray-900 focus:ring-accent-500 focus:border-accent-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
               hx-get="." hx-trigger="change"
               hx-target="#{% if target_id %}{{ target_id }}{% else %}list-results{% endif %}" hx-swap="innerHTML"
-              hx-include="#{% if form_id %}{{ form_id }}{% else %}filters-form{% endif %}" hx-replace-url="true">
+              hx-include="#{% if form_id %}{{ form_id }}{% else %}filters-form{% endif %}, #{% if target_id %}{{ target_id }}{% else %}list-results{% endif %}-filters" hx-replace-url="true">
               <option value=""></option>
               {% for value,label in status_options %}
                 <option value="{{ value }}" {% if filters.status == value %}selected{% endif %}>{{ label }}</option>
@@ -101,7 +106,7 @@
           {% include 'partials/submissions/_row_table.html' with item=item kind=kind mode=mode row_url=row_url %}
         {% empty %}
           <tr>
-            <td colspan="6" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+            <td colspan="{% if show_company_filter %}6{% else %}5{% endif %}" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
               {{ empty_text }}
             </td>
           </tr>

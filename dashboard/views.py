@@ -151,9 +151,9 @@ def partner_dashboard(request):
                 'target_id': 'fa-queue-results',
                 'sort_prefix': 'fa_',
                 'variant_options': context['fa_variant_options'],
-                'company_options': context['fa_company_options'],
                 'submitted_by_options': context['fa_submitted_by_options'],
                 'status_options': context['fa_status_options'],
+                'show_company_filter': False,
             })
         elif htmx_target == 'lot-queue-results':
             return render(request, 'partials/submissions/_results.html', {
@@ -167,9 +167,9 @@ def partner_dashboard(request):
                 'target_id': 'lot-queue-results',
                 'sort_prefix': 'lot_',
                 'variant_options': context['lot_variant_options'],
-                'company_options': context['lot_company_options'],
                 'submitted_by_options': context['lot_submitted_by_options'],
                 'status_options': context['lot_status_options'],
+                'show_company_filter': False,
             })
         else:
             # Default: return full dashboard fragment
@@ -392,6 +392,7 @@ def inspector_dashboard(request):
                 'company_options': fa_company_options,
                 'submitted_by_options': fa_submitted_by_options,
                 'status_options': FA_STATUS_OPTIONS,
+                'show_company_filter': True,
             })
         elif htmx_target == 'lot-queue-results':
             return render(request, 'partials/submissions/_results.html', {
@@ -408,6 +409,7 @@ def inspector_dashboard(request):
                 'company_options': lot_company_options,
                 'submitted_by_options': lot_submitted_by_options,
                 'status_options': LOT_STATUS_OPTIONS,
+                'show_company_filter': True,
             })
         else:
             # Default: return full dashboard fragment

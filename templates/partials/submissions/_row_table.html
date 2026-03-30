@@ -9,9 +9,11 @@
     <td class="border-t border-gray-200 dark:border-gray-700 px-6 py-4 whitespace-nowrap">
       {{ item.multicam_variant.camouflage_name|default:"—" }}
     </td>
+    {% if show_company_filter %}
     <td class="border-t border-gray-200 dark:border-gray-700 px-6 py-4">
       {% if item.company %}{{ item.company.name }}{% elif item.vendor %}{{ item.vendor.company_name }}{% else %}—{% endif %}
     </td>
+    {% endif %}
     <td class="border-t border-gray-200 dark:border-gray-700 px-6 py-4">
       <div class="truncate">{% if item.submitter_full_name %}{{ item.submitter_full_name }}{% elif item.vendor %}{{ item.vendor.user.get_full_name|default:item.vendor.user.username }}{% else %}—{% endif %}</div>
     </td>
@@ -35,9 +37,11 @@
     <td class="border-t border-gray-200 dark:border-gray-700 px-6 py-4 whitespace-nowrap">
       {{ item.original_fa.multicam_variant.camouflage_name|default:"—" }}
     </td>
+    {% if show_company_filter %}
     <td class="border-t border-gray-200 dark:border-gray-700 px-6 py-4">
       {% if item.company %}{{ item.company.name }}{% elif item.vendor %}{{ item.vendor.company_name }}{% else %}—{% endif %}
     </td>
+    {% endif %}
     <td class="border-t border-gray-200 dark:border-gray-700 px-6 py-4">
       <div class="truncate">{% if item.submitter_full_name %}{{ item.submitter_full_name }}{% elif item.vendor %}{{ item.vendor.user.get_full_name|default:item.vendor.user.username }}{% else %}—{% endif %}</div>
     </td>
