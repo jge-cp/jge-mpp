@@ -150,6 +150,10 @@ def partner_dashboard(request):
                 'form_id': 'fa-filters-form',
                 'target_id': 'fa-queue-results',
                 'sort_prefix': 'fa_',
+                'variant_options': context['fa_variant_options'],
+                'company_options': context['fa_company_options'],
+                'submitted_by_options': context['fa_submitted_by_options'],
+                'status_options': context['fa_status_options'],
             })
         elif htmx_target == 'lot-queue-results':
             return render(request, 'partials/submissions/_results.html', {
@@ -162,6 +166,10 @@ def partner_dashboard(request):
                 'form_id': 'lot-filters-form',
                 'target_id': 'lot-queue-results',
                 'sort_prefix': 'lot_',
+                'variant_options': context['lot_variant_options'],
+                'company_options': context['lot_company_options'],
+                'submitted_by_options': context['lot_submitted_by_options'],
+                'status_options': context['lot_status_options'],
             })
         else:
             # Default: return full dashboard fragment
@@ -380,6 +388,10 @@ def inspector_dashboard(request):
                 'form_id': 'fa-filters-form',
                 'target_id': 'fa-queue-results',
                 'sort_prefix': 'fa_',
+                'variant_options': fa_variant_options,
+                'company_options': fa_company_options,
+                'submitted_by_options': fa_submitted_by_options,
+                'status_options': FA_STATUS_OPTIONS,
             })
         elif htmx_target == 'lot-queue-results':
             return render(request, 'partials/submissions/_results.html', {
@@ -392,6 +404,10 @@ def inspector_dashboard(request):
                 'form_id': 'lot-filters-form',
                 'target_id': 'lot-queue-results',
                 'sort_prefix': 'lot_',
+                'variant_options': lot_variant_options,
+                'company_options': lot_company_options,
+                'submitted_by_options': lot_submitted_by_options,
+                'status_options': LOT_STATUS_OPTIONS,
             })
         else:
             # Default: return full dashboard fragment

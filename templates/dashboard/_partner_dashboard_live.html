@@ -53,7 +53,7 @@
     
     <!-- FA Results -->
     <div id="fa-queue-results">
-        {% include 'partials/submissions/_results.html' with items=recent_fas kind='fa' mode='list' row_url='inspections:fa_detail' empty_text='No First Articles yet. Submit your first one above!' filters=fa_filters form_id='fa-filters-form' target_id='fa-queue-results' sort_prefix='fa_' %}
+        {% include 'partials/submissions/_results.html' with items=recent_fas kind='fa' mode='list' row_url='inspections:fa_detail' empty_text='No First Articles yet. Submit your first one above!' filters=fa_filters form_id='fa-filters-form' target_id='fa-queue-results' sort_prefix='fa_' variant_options=fa_variant_options company_options=fa_company_options submitted_by_options=fa_submitted_by_options status_options=fa_status_options %}
     </div>
 </div>
 
@@ -73,6 +73,6 @@
     
     <!-- Lot Results -->
     <div id="lot-queue-results">
-        {% include 'partials/submissions/_results.html' with items=recent_lots kind='lot' mode='list' row_url='inspections:lot_detail' empty_text='No Lots yet. You can submit lots after an FA is approved.' filters=lot_filters form_id='lot-filters-form' target_id='lot-queue-results' sort_prefix='lot_' %}
+        {% include 'partials/submissions/_results.html' with items=recent_lots kind='lot' mode='list' row_url='inspections:lot_detail' empty_text='No Lots yet. You can submit lots after an FA is approved.' filters=lot_filters form_id='lot-filters-form' target_id='lot-queue-results' sort_prefix='lot_' variant_options=lot_variant_options company_options=lot_company_options submitted_by_options=lot_submitted_by_options status_options=lot_status_options %}
     </div>
 </div>
