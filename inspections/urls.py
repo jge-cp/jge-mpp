@@ -9,7 +9,6 @@ urlpatterns = [
     path('fa/list/', views.fa_list, name='fa_list'),
     path('fa/<str:fai_id>/', views.fa_detail, name='fa_detail'),
     path('fa/<str:fai_id>/resubmit/', views.fa_resubmit, name='fa_resubmit'),
-    path('fa/<str:fai_id>/history/', views.fa_evaluation_history, name='fa_evaluation_history'),
     
     # Lot URLs - Partner facing
     path('lot/submit/', views.lot_submit, name='lot_submit'),

@@ -564,10 +564,6 @@
             <a href="{% url 'inspections:fa_detail' fa.fai_id %}" class="btn-secondary">
                 ← Back to FA Detail
             </a>
-            <a href="{% url 'inspections:fa_evaluation_history' fa.fai_id %}" 
-               class="btn-secondary">
-                View Full History
-            </a>
             {% else %}
             <a href="{% if is_primary_review %}{% url 'inspections:fa_review_queue_primary' %}{% else %}{% url 'inspections:fa_review_queue_final' %}{% endif %}" 
                class="btn-secondary">

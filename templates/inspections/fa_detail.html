@@ -29,9 +29,6 @@
             <h2 class="text-xl text-muted mt-1">{{ fa.display_name }}</h2>
         </div>
         <div class="flex space-x-3">
-            <a href="{% url 'inspections:fa_evaluation_history' fa.fai_id %}" class="btn-primary">
-                View Evaluation History
-            </a>
             {% if can_resubmit %}
             <a href="{% url 'inspections:fa_resubmit' fa.fai_id %}" class="btn-primary">
                 Resubmit for Review

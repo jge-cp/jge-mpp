@@ -192,31 +192,6 @@ def fa_resubmit(request, fai_id):
     return render(request, 'inspections/fa_resubmit_confirm.html', {'fa': fa})
 
 
-@login_required
-def fa_evaluation_history(request, fai_id):
-    """View full evaluation history for an FA"""
-    profile = request.profile
-    fa = get_fa_for_user(profile, fai_id)
-    
-    # Get all evaluations with related data
-    evaluations = fa.evaluations.select_related('inspector').prefetch_related(
-        'color_evaluations__color'
-    ).order_by('-attempt_number', 'stage')
-    
-    # Group by attempt number for easier template rendering
-    evaluation_history = fa.get_evaluation_history()
-    
-    # Get variant colors for display
-    variant_colors = fa.multicam_variant.colors.all().order_by('position')
-    
-    context = {
-        'fa': fa,
-        'evaluations': evaluations,
-        'evaluation_history': evaluation_history,
-        'variant_colors': variant_colors,
-    }
-    return render(request, 'inspections/fa_evaluation_history.html', context)
-
 
 @login_required
 @partner_required
