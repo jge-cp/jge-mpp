@@ -1,7 +1,7 @@
 {% autoescape off %}
 Hello{{ user.first_name|yesno:", ," }} {{ user.first_name|default:user.username }},
 
-Your account has been created on the MultiCam Partner Portal.
+{% if is_admin %}Your administrator account has been created on the MultiCam Partner Portal. You have been assigned the role of {{ role_display }}.{% else %}Your account has been created on the MultiCam Partner Portal.{% endif %}
 
 To get started, please set your password by clicking the link below:
 

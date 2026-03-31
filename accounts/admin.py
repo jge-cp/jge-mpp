@@ -76,6 +76,11 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
             return
         if not profile.company and not profile.admin_role:
             return
+        is_admin = bool(profile.admin_role)
+        extra_context = {
+            'is_admin': is_admin,
+            'role_display': profile.get_admin_role_display() if is_admin else '',
+        }
         try:
             reset_form = PasswordResetForm({'email': user.email})
             if reset_form.is_valid():
@@ -85,6 +90,7 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
                     email_template_name='registration/welcome_email.html',
                     subject_template_name='registration/welcome_subject.txt',
                     from_email=settings.DEFAULT_FROM_EMAIL,
+                    extra_email_context=extra_context,
                 )
                 self.message_user(request, f'Welcome email sent to {user.email}.', messages.SUCCESS)
         except Exception as e:
