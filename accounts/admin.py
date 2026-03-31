@@ -60,19 +60,21 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
         """Remind admin to assign company/role after creating a user."""
         self.message_user(
             request,
-            'Now assign a company and role below. A welcome email will be sent automatically when you save.',
+            'Now assign a role (and company if partner) below. A welcome email will be sent automatically when you save.',
             messages.INFO,
         )
         return super().response_add(request, obj, post_url_continue)
 
     def save_related(self, request, form, formsets, change):
-        """After inlines are saved, send welcome email if company was just assigned to a new user."""
+        """After inlines are saved, send welcome email if role/company was just assigned to a new user."""
         super().save_related(request, form, formsets, change)
         user = form.instance
         if not user.email or user.last_login is not None:
             return
         profile = getattr(user, 'profile', None)
-        if not profile or not profile.company:
+        if not profile:
+            return
+        if not profile.company and not profile.admin_role:
             return
         try:
             reset_form = PasswordResetForm({'email': user.email})
